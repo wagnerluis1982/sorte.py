@@ -1,0 +1,19 @@
+# arquivos de cache do python
+__pycache__/
+*.pyc
+
+# gerados por setup.py (sdist|bdist)
+build/
+dist/
+src/GVAL.egg-info/
+
+# usados pelo vim
+*.swp
+
+# usados pelo eclipse
+.project
+.pydevproject
+.settings/
+
+# backup
+*~
