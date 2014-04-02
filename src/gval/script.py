@@ -4,7 +4,7 @@ from __future__ import print_function
 import getopt
 import sys
 
-from .loteria import Loteria, QuantidadeInvalida
+from . import loteria
 
 def show_usage():
 	print("Uso: %s LOTERIA" % sys.argv[0])
@@ -54,28 +54,29 @@ def main():
     if len(args) > 1:
         error("deve ser informado apenas uma loteria", code=2)
 
-    ori_nome, nome = args[0], args[0].lower()
-    if nome not in ("quina",):
-        error("loteria '%s' não suportada" % ori_nome, code=3)
+    nome = args[0]
+    try:
+        lot = loteria.Loteria(nome.lower())
+    except loteria.LoteriaNaoSuportada:
+        error("loteria '%s' não suportada" % nome, code=3)
 
-    lote = Loteria(nome)
     print("Gerador de Apostas da", nome.title())
     try:
-        aposta1 = lote.gerar_aposta(numeros)
-    except QuantidadeInvalida, err:
-        error("'%s'" % ori_nome, "não gera apostas com", err.valor, "números",
+        aposta1 = lot.gerar_aposta(numeros)
+    except loteria.QuantidadeInvalida, err:
+        error("'%s'" % nome, "não gera apostas com", err.valor, "números",
                 usage=False, code=4)
+
+    if quantidade == 1:
+        print(' '.join("%02d" % n for n in aposta1))
     else:
-        if quantidade == 1:
-            print(' '.join("%02d" % n for n in aposta1))
-        else:
-            qdigitos = len(str(quantidade))
-            print('#', '0'*(qdigitos-1), "1 = ",
-                    ' '.join("%02d" % n for n in aposta1), sep='')
-            for i in xrange(2, quantidade+1):
-                aposta = lote.gerar_aposta(numeros)
-                print('#', '0'*(qdigitos - len(str(i))), "%d = " % i,
-                        ' '.join("%02d" % n for n in aposta), sep='')
+        qdigitos = len(str(quantidade))
+        print('#', '0'*(qdigitos-1), "1 = ",
+                ' '.join("%02d" % n for n in aposta1), sep='')
+        for i in xrange(2, quantidade+1):
+            aposta = lot.gerar_aposta(numeros)
+            print('#', '0'*(qdigitos - len(str(i))), "%d = " % i,
+                    ' '.join("%02d" % n for n in aposta), sep='')
 
 
 if __name__ == "__main__":
