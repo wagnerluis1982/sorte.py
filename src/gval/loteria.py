@@ -11,17 +11,23 @@ class QuantidadeInvalida(Exception):
         Exception.__init__(self, valor)
 
 
+APELIDOS = {
+    'sena': 'megasena',
+}
+
 LOTERIAS = {
     'quina': {'validos': (5, 80), 'faixa': (1, 80)},
+    'megasena': {'validos': (6, 60), 'faixa': (1, 60), 'nome': "Mega-Sena"},
 }
 
 class Loteria:
     def __init__(self, nome):
         try:
-            c = LOTERIAS[nome]
+            c = LOTERIAS[APELIDOS.get(nome, nome)]
         except KeyError, err:
             raise LoteriaNaoSuportada(err.message)
         else:
+            self.nome = c.get('nome', nome.title())
             self.qmin = c['validos'][0]
             self.qmax = c['validos'][1]
             self.range = xrange(c['faixa'][0], c['faixa'][1] + 1)

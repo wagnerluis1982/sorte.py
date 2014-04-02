@@ -17,7 +17,7 @@ Argumentos:
                       o padrão depende da LOTERIA informada
   -h --help         Mostra esta ajuda e finaliza
 
-O valor de LOTERIA pode ser: quina, lotofacil*, lotomania*, megasena*""")
+O valor de LOTERIA pode ser: quina, lotofacil*, lotomania*, megasena""")
 
 def error(*args, **kwargs):
     print(*args, file=sys.stderr)
@@ -28,13 +28,13 @@ def error(*args, **kwargs):
     if isinstance(errcode, int):
         sys.exit(errcode)
 
-def exec_gerador(instancia, nome, quantidade, numeros):
-    print("Gerador de Apostas da", nome.title())
+def exec_gerador(instancia, quantidade, numeros):
+    print("Gerador de Apostas da", instancia.nome)
     try:
         aposta1 = instancia.gerar_aposta(numeros)
     except loteria.QuantidadeInvalida, err:
-        error("'%s'" % nome, "não gera apostas com", err.valor, "números",
-                usage=False, code=4)
+        error("não dá para gerar aposta da %s com %d números" %
+                (instancia.nome, err.valor), usage=False, code=4)
 
     if quantidade == 1:
         print(' '.join("%02d" % n for n in aposta1))
@@ -81,7 +81,7 @@ def main():
     except loteria.LoteriaNaoSuportada:
         error("loteria '%s' não suportada" % nome, code=3)
 
-    exec_gerador(instancia, nome, quantidade, numeros)
+    exec_gerador(instancia, quantidade, numeros)
 
 
 if __name__ == "__main__":
