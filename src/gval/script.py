@@ -15,7 +15,9 @@ Argumentos:
   -q --quantidade   Quantas apostas deverão ser geradas. Padrão: 1
   -n --numeros      Quantos números cada aposta gerada terá. Se não informado
                       o padrão depende da LOTERIA informada
-  -h --help         Mostra esta ajuda e finaliza""")
+  -h --help         Mostra esta ajuda e finaliza
+
+O valor de LOTERIA pode ser: quina, lotofacil*, lotomania*, megasena*""")
 
 def error(*args, **kwargs):
     print(*args, file=sys.stderr)
@@ -25,6 +27,25 @@ def error(*args, **kwargs):
     errcode = kwargs.get('code')
     if isinstance(errcode, int):
         sys.exit(errcode)
+
+def exec_gerador(instancia, nome, quantidade, numeros):
+    print("Gerador de Apostas da", nome.title())
+    try:
+        aposta1 = instancia.gerar_aposta(numeros)
+    except loteria.QuantidadeInvalida, err:
+        error("'%s'" % nome, "não gera apostas com", err.valor, "números",
+                usage=False, code=4)
+
+    if quantidade == 1:
+        print(' '.join("%02d" % n for n in aposta1))
+    else:
+        qdigitos = len(str(quantidade))
+        print('#', '0'*(qdigitos-1), "1 = ",
+                ' '.join("%02d" % n for n in aposta1), sep='')
+        for i in xrange(2, quantidade+1):
+            aposta = instancia.gerar_aposta(numeros)
+            print('#', '0'*(qdigitos - len(str(i))), "%d = " % i,
+                    ' '.join("%02d" % n for n in aposta), sep='')
 
 def main():
     try:
@@ -56,27 +77,11 @@ def main():
 
     nome = args[0]
     try:
-        lot = loteria.Loteria(nome.lower())
+        instancia = loteria.Loteria(nome.lower())
     except loteria.LoteriaNaoSuportada:
         error("loteria '%s' não suportada" % nome, code=3)
 
-    print("Gerador de Apostas da", nome.title())
-    try:
-        aposta1 = lot.gerar_aposta(numeros)
-    except loteria.QuantidadeInvalida, err:
-        error("'%s'" % nome, "não gera apostas com", err.valor, "números",
-                usage=False, code=4)
-
-    if quantidade == 1:
-        print(' '.join("%02d" % n for n in aposta1))
-    else:
-        qdigitos = len(str(quantidade))
-        print('#', '0'*(qdigitos-1), "1 = ",
-                ' '.join("%02d" % n for n in aposta1), sep='')
-        for i in xrange(2, quantidade+1):
-            aposta = lot.gerar_aposta(numeros)
-            print('#', '0'*(qdigitos - len(str(i))), "%d = " % i,
-                    ' '.join("%02d" % n for n in aposta), sep='')
+    exec_gerador(instancia, nome, quantidade, numeros)
 
 
 if __name__ == "__main__":
