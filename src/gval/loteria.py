@@ -16,10 +16,10 @@ APELIDOS = {
 }
 
 LOTERIAS = {
-    'quina': {'validos': (5, 80), 'faixa': (1, 80)},
-    'megasena': {'validos': (6, 60), 'faixa': (1, 60), 'nome': "Mega-Sena"},
-    'lotofacil': {'validos': (15, 25), 'faixa': (1, 25)},
-    'lotomania': {'validos': (1, 50), 'faixa': (1, 100), 'padrao': 50},
+    'quina': {'quantidade': (5, 80), 'faixa': (1, 80)},
+    'megasena': {'quantidade': (6, 60), 'faixa': (1, 60), 'nome': "Mega-Sena"},
+    'lotofacil': {'quantidade': (15, 25), 'faixa': (1, 25)},
+    'lotomania': {'quantidade': (1, 50), 'faixa': (1, 100), 'padrao': 50},
 }
 
 class Loteria:
@@ -29,11 +29,13 @@ class Loteria:
         except KeyError, err:
             raise LoteriaNaoSuportada(err.message)
         else:
+            quant = c['quantidade']
+            faixa = c['faixa']
             self.nome = c.get('nome', nome.title())
-            self.qmin = c['validos'][0]
-            self.qmax = c['validos'][1]
+            self.qmin = quant[0]
+            self.qmax = quant[1]
             self.padrao = c.get('padrao', self.qmin)
-            self.range = xrange(c['faixa'][0], c['faixa'][1] + 1)
+            self.range = xrange(faixa[0], faixa[1] + 1)
 
     def gerar_aposta(self, quant=None):
         if quant is None:
