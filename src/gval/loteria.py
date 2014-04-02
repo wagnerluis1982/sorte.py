@@ -7,7 +7,5 @@ class Loteria:
     def gerar_aposta(self, quant=5):
         if not (5 <= quant <= 80):
             return ()
-        result = set()
-        while len(result) < quant:
-            result.add(random.randint(1, 80))
-        return tuple(result)
+        result = random.sample(xrange(1, 81), quant)
+        return tuple(sorted(result))
