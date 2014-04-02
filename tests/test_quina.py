@@ -24,7 +24,7 @@ class QuinaTest:
         assert_not_equal(aposta, aposta2, "segunda aposta igual à primeira")
 
         # apostas com mais de 5 números
-        for n in range(5, 10):
+        for n in range(6, 8):
             aposta = quina.gerar_aposta(n)
             assert_is_instance(aposta, tuple)
             eq_(len(aposta), n, "aposta não tem %d números" % n)

@@ -16,9 +16,9 @@ APELIDOS = {
 }
 
 LOTERIAS = {
-    'quina': {'quantidade': (5, 80), 'faixa': (1, 80)},
-    'megasena': {'quantidade': (6, 60), 'faixa': (1, 60), 'nome': "Mega-Sena"},
-    'lotofacil': {'quantidade': (15, 25), 'faixa': (1, 25)},
+    'quina': {'quantidade': (5, 7), 'faixa': (1, 80)},
+    'megasena': {'quantidade': (6, 15), 'faixa': (1, 60), 'nome': "Mega-Sena"},
+    'lotofacil': {'quantidade': (15, 18), 'faixa': (1, 25)},
     'lotomania': {'quantidade': (1, 50), 'faixa': (1, 100), 'padrao': 50},
 }
 

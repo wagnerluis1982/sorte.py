@@ -24,7 +24,7 @@ class LotofacilTest:
         assert_not_equal(aposta, aposta2, "segunda aposta igual à primeira")
 
         # apostas com mais de 15 números
-        for n in range(16, 21):
+        for n in range(16, 19):
             aposta = lotofacil.gerar_aposta(n)
             assert_is_instance(aposta, tuple)
             eq_(len(aposta), n, "aposta não tem %d números" % n)
