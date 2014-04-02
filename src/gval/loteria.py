@@ -18,6 +18,7 @@ APELIDOS = {
 LOTERIAS = {
     'quina': {'validos': (5, 80), 'faixa': (1, 80)},
     'megasena': {'validos': (6, 60), 'faixa': (1, 60), 'nome': "Mega-Sena"},
+    'lotofacil': {'validos': (15, 25), 'faixa': (1, 25)},
 }
 
 class Loteria:
