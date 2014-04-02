@@ -19,6 +19,7 @@ LOTERIAS = {
     'quina': {'validos': (5, 80), 'faixa': (1, 80)},
     'megasena': {'validos': (6, 60), 'faixa': (1, 60), 'nome': "Mega-Sena"},
     'lotofacil': {'validos': (15, 25), 'faixa': (1, 25)},
+    'lotomania': {'validos': (1, 50), 'faixa': (1, 100), 'padrao': 50},
 }
 
 class Loteria:
@@ -31,13 +32,13 @@ class Loteria:
             self.nome = c.get('nome', nome.title())
             self.qmin = c['validos'][0]
             self.qmax = c['validos'][1]
+            self.padrao = c.get('padrao', self.qmin)
             self.range = xrange(c['faixa'][0], c['faixa'][1] + 1)
 
     def gerar_aposta(self, quant=None):
-        qmin, qmax = self.qmin, self.qmax
         if quant is None:
-            quant = qmin
-        if not (qmin <= quant <= qmax):
+            quant = self.padrao
+        if not (self.qmin <= quant <= self.qmax):
             raise QuantidadeInvalida(quant)
         result = random.sample(self.range, quant)
         return tuple(sorted(result))
