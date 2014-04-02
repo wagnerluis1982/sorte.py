@@ -17,7 +17,7 @@ Argumentos:
                       o padrão depende da LOTERIA informada
   -h --help         Mostra esta ajuda e finaliza
 
-O valor de LOTERIA pode ser: quina, lotofacil*, lotomania*, megasena""")
+O valor de LOTERIA pode ser:""", ', '.join(loteria.LOTERIAS))
 
 def error(*args, **kwargs):
     print(*args, file=sys.stderr)
