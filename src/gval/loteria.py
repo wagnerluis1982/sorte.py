@@ -12,7 +12,7 @@ class QuantidadeInvalida(Exception):
 
 
 LOTERIAS = {
-    'quina': {'min': 5, 'max': 80},
+    'quina': {'validos': (5, 80), 'faixa': (1, 80)},
 }
 
 class Loteria:
@@ -22,8 +22,9 @@ class Loteria:
         except KeyError, err:
             raise LoteriaNaoSuportada(err.message)
         else:
-            self.qmin = c['min']
-            self.qmax = c['max']
+            self.qmin = c['validos'][0]
+            self.qmax = c['validos'][1]
+            self.range = xrange(c['faixa'][0], c['faixa'][1] + 1)
 
     def gerar_aposta(self, quant=None):
         qmin, qmax = self.qmin, self.qmax
@@ -31,5 +32,5 @@ class Loteria:
             quant = qmin
         if not (qmin <= quant <= qmax):
             raise QuantidadeInvalida(quant)
-        result = random.sample(xrange(qmin, qmax+1), quant)
+        result = random.sample(self.range, quant)
         return tuple(sorted(result))
