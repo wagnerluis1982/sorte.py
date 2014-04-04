@@ -19,7 +19,7 @@ Argumentos:
                       o padrão depende da LOTERIA informada
   -h --help         Mostra esta ajuda e finaliza
 """,
-"O valor de LOTERIA pode ser:", ', '.join(sorted(loterica.LOTERIAS))))
+"O valor de LOTERIA pode ser: ", ', '.join(sorted(loterica.LOTERIAS))))
 
 def error(*args, **kwargs):
     print = kwargs.get('print_function', __builtin__.print)
