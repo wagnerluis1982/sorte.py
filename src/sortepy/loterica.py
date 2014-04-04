@@ -16,10 +16,10 @@ APELIDOS = {
 }
 
 LOTERIAS = {
-    'quina': {'quantidade': (5, 7), 'faixa': (1, 80)},
-    'megasena': {'quantidade': (6, 15), 'faixa': (1, 60), 'nome': "Mega-Sena"},
-    'lotofacil': {'quantidade': (15, 18), 'faixa': (1, 25)},
-    'lotomania': {'quantidade': (1, 50), 'faixa': (1, 100), 'padrao': 50},
+    'quina': {'numeros': (5, 7), 'faixa': (1, 80)},
+    'megasena': {'numeros': (6, 15), 'faixa': (1, 60), 'nome': "Mega-Sena"},
+    'lotofacil': {'numeros': (15, 18), 'faixa': (1, 25)},
+    'lotomania': {'numeros': (1, 50), 'faixa': (1, 100), 'padrao': 50},
 }
 
 class Loteria:
@@ -29,7 +29,7 @@ class Loteria:
         except KeyError, err:
             raise LoteriaNaoSuportada(err.message)
         else:
-            quant = c['quantidade']
+            quant = c['numeros']
             faixa = c['faixa']
             self.nome = c.get('nome', nome.title())
             self.qmin = quant[0]
