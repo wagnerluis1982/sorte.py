@@ -19,7 +19,7 @@ LOTERIAS = {
     'quina': {'numeros': (5, 7), 'faixa': (1, 80)},
     'megasena': {'numeros': (6, 15), 'faixa': (1, 60), 'nome': "Mega-Sena"},
     'lotofacil': {'numeros': (15, 18), 'faixa': (1, 25)},
-    'lotomania': {'numeros': (1, 50), 'faixa': (1, 100), 'padrao': 50},
+    'lotomania': {'numeros': (1, 50), 'faixa': (1, 100), 'padrao': 20},
 }
 
 class Loteria:
