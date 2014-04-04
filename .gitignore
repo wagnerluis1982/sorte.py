@@ -10,6 +10,9 @@ src/GVAL.egg-info/
 # usados pelo vim
 *.swp
 
+# usados pelo rope
+.ropeproject/
+
 # usados pelo eclipse
 .project
 .pydevproject

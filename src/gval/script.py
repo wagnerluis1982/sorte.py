@@ -5,7 +5,7 @@ import __builtin__
 import getopt
 import sys
 
-from . import loteria
+from . import loterica
 
 def show_usage():
 	print("Uso: %s LOTERIA" % sys.argv[0])
@@ -18,7 +18,7 @@ Argumentos:
                       o padrão depende da LOTERIA informada
   -h --help         Mostra esta ajuda e finaliza
 
-O valor de LOTERIA pode ser:""", ', '.join(loteria.LOTERIAS))
+O valor de LOTERIA pode ser:""", ', '.join(loterica.LOTERIAS))
 
 def error(*args, **kwargs):
     print = kwargs.get('print_function', __builtin__.print)
@@ -35,7 +35,7 @@ def exec_gerador(instancia, quantidade, numeros, print_function=print):
     print("Gerador de Apostas da", instancia.nome)
     try:
         aposta1 = instancia.gerar_aposta(numeros)
-    except loteria.QuantidadeInvalida, err:
+    except loterica.QuantidadeInvalida, err:
         error("não dá para gerar aposta da %s com %d números" %
                 (instancia.nome, err.valor), usage=False, code=4)
 
@@ -83,8 +83,8 @@ def main(argv=sys.argv, stdout=sys.stdout):
 
     nome = args[0]
     try:
-        instancia = loteria.Loteria(nome.lower())
-    except loteria.LoteriaNaoSuportada:
+        instancia = loterica.Loteria(nome.lower())
+    except loterica.LoteriaNaoSuportada:
         error("loteria '%s' não suportada" % nome, code=3)
 
     exec_gerador(instancia, quantidade, numeros, print_function=print)

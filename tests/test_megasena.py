@@ -2,7 +2,7 @@
 
 import basetest
 
-from gval.loteria import Loteria
+from gval.loterica import Loteria
 
 class MegaSenaTest(basetest.BaseTestCase):
     'Mega-Sena'
