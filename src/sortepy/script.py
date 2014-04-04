@@ -7,9 +7,10 @@ import sys
 
 from . import loterica
 
-def show_usage():
-	print("Uso: %s LOTERIA" % sys.argv[0])
-	print("""Gerador e Verificador de Apostas da Loteria\n
+usage = ''.join((
+"Uso: %s LOTERIA\n" % sys.argv[0],
+"""
+O `sorte.py` é um gerador e verificador de apostas de loterias
 Informando somente a LOTERIA será gerada uma aposta
 
 Argumentos:
@@ -17,15 +18,15 @@ Argumentos:
   -n --numeros      Quantos números cada aposta gerada terá. Se não informado
                       o padrão depende da LOTERIA informada
   -h --help         Mostra esta ajuda e finaliza
-
-O valor de LOTERIA pode ser:""", ', '.join(loterica.LOTERIAS))
+""",
+"O valor de LOTERIA pode ser:", ', '.join(sorted(loterica.LOTERIAS))))
 
 def error(*args, **kwargs):
     print = kwargs.get('print_function', __builtin__.print)
     print(*args, file=sys.stderr)
     usage = kwargs.get('usage', True)
     if usage:
-        show_usage()
+        print(usage)
     errcode = kwargs.get('code')
     if isinstance(errcode, int):
         sys.exit(errcode)
@@ -68,7 +69,7 @@ def main(argv=sys.argv, stdout=sys.stdout):
     quantidade = 1
     for option, arg in opts:
         if option in ("-h", "--help"):
-            show_usage()
+            print(usage)
             sys.exit(0)
         elif option in ("-n", "--numeros"):
             numeros = int(arg)
@@ -76,7 +77,7 @@ def main(argv=sys.argv, stdout=sys.stdout):
             quantidade = int(arg)
 
     if len(args) == 0:
-        show_usage()
+        print(usage)
         sys.exit(0)
     if len(args) > 1:
         error("deve ser informado apenas uma loteria", code=2)

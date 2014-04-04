@@ -2,7 +2,7 @@
 
 import basetest
 
-from gval.loterica import Loteria
+from sortepy.loterica import Loteria
 
 class LotofacilTest(basetest.BaseTestCase):
     def setUp(_):

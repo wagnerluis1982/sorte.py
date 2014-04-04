@@ -3,7 +3,7 @@
 import basetest
 
 from StringIO import StringIO
-from gval.script import main
+from sortepy.script import main
 
 # Os testes do script serão focados na loteria da Quina porque tem menos números
 # para verificar. Caso necessário, testes com outras loterias serão criados.

@@ -1,11 +1,12 @@
-Gerador e Verificador de Apostas da Loteria (GVAL)
-==================================================
+sorte.py
+========
 
 Sobre
 -----
 
-O sistema GVAL surgiu com o propósito principal de conferir apostas feitas nas
-Casas Lotéricas do Brasil.
+O `sorte.py` é um script Python de linha de comando para geração e conferência
+de apostas de loterias.  Surgiu com o propósito principal de conferir apostas
+feitas nas Casas Lotéricas do Brasil.
 
-Uma função secundária é a geração de números para as suas apostas. É como a
-surpresinha, mas os jogos são preenchidos manualmente.
+A geração de números é como a *surpresinha*, mas os jogos têm que ser
+preenchidos manualmente.

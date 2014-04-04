@@ -5,7 +5,7 @@ __pycache__/
 # gerados por setup.py (sdist|bdist)
 build/
 dist/
-src/GVAL.egg-info/
+*.egg-info/
 
 # usados pelo vim
 *.swp
