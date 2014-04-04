@@ -1,6 +1,7 @@
 # encoding=utf8
 from __future__ import print_function
 
+import __builtin__
 import getopt
 import sys
 
@@ -20,6 +21,7 @@ Argumentos:
 O valor de LOTERIA pode ser:""", ', '.join(loteria.LOTERIAS))
 
 def error(*args, **kwargs):
+    print = kwargs.get('print_function', __builtin__.print)
     print(*args, file=sys.stderr)
     usage = kwargs.get('usage', True)
     if usage:
@@ -28,7 +30,8 @@ def error(*args, **kwargs):
     if isinstance(errcode, int):
         sys.exit(errcode)
 
-def exec_gerador(instancia, quantidade, numeros):
+def exec_gerador(instancia, quantidade, numeros, print_function=print):
+    print = print_function
     print("Gerador de Apostas da", instancia.nome)
     try:
         aposta1 = instancia.gerar_aposta(numeros)
@@ -47,9 +50,12 @@ def exec_gerador(instancia, quantidade, numeros):
             print('#', '0'*(qdigitos - len(str(i))), "%d = " % i,
                     ' '.join("%02d" % n for n in aposta), sep='')
 
-def main():
+def main(argv=sys.argv, stdout=sys.stdout):
+    def print(*args, **kwargs):
+        __builtin__.print(*args, file=stdout, **kwargs)
+
     try:
-        opts, args = getopt.gnu_getopt(sys.argv[1:],
+        opts, args = getopt.gnu_getopt(argv[1:],
         # opções curtas
         "hn:q:",
         # opções longas
@@ -81,7 +87,7 @@ def main():
     except loteria.LoteriaNaoSuportada:
         error("loteria '%s' não suportada" % nome, code=3)
 
-    exec_gerador(instancia, quantidade, numeros)
+    exec_gerador(instancia, quantidade, numeros, print_function=print)
 
 
 if __name__ == "__main__":
