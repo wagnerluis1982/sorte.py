@@ -39,7 +39,8 @@ Outras opções disponíveis para geração:
                         o padrão depende da LOTERIA informada
     -h --help         Mostra esta ajuda e finaliza
 
-Loterias disponíveis por enquanto: lotofacil, lotomania, megasena, quina
+Loterias disponíveis por enquanto: duplasena, lotofacil, lotomania, megasena,
+quina.
 
 ### Conferindo apostas
 
