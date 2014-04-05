@@ -1,6 +1,9 @@
 # encoding=utf8
+
+import codecs
 import cookielib
 import os
+import re
 import urllib2
 
 
@@ -28,23 +31,65 @@ def get_config_path(app='sortepy'):
 
 class Util(object):
     def __init__(self, cfg_path=None):
-        self.cfg_path = os.path.realpath(cfg_path) or get_config_path()
-
-    def download(url):
-        # As páginas de resultado de loterias exigem cookies
-        cj = cookielib.CookieJar()
-        opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
-        # A adição desse cookie dobra o tempo de resposta
-        opener.addheaders.append(("Cookie", "security=true"))
-
-        page = opener.open(url)
-        page_data = page.read()
-
-        charset = page.headers.getparam('charset')
-        if charset is not None:
+        self.usar_cache = False
+        if cfg_path:
             try:
-                return unicode(page_data, charset)
-            except (UnicodeDecodeError, LookupError):
+                cfg_path = os.path.realpath(cfg_path) or get_config_path()
+            except NotImplementedError:
                 pass
+            else:
+                self.cfg_path = cfg_path
+                self.pages_cache = os.path.join(cfg_path, 'cache', 'paginas')
+                self.usar_cache = True
+
+    def download(self, url, usar_cache=False):
+        usar_cache = usar_cache or self.usar_cache
+
+        # Obtém a página do cache
+        conteudo = None
+        if usar_cache:
+            conteudo = self.cache(url)
+
+        # Ou faz o download
+        if conteudo is None:
+            # As páginas de resultado de loterias exigem cookies
+            cj = cookielib.CookieJar()
+            opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
+            # A adição desse cookie dobra o tempo de resposta
+            opener.addheaders.append(("Cookie", "security=true"))
+
+            page = opener.open(url)
+            conteudo = page.read()
+
+            charset = page.headers.getparam('charset')
+            if charset is not None:
+                try:
+                    conteudo = unicode(conteudo, charset)
+                except (UnicodeDecodeError, LookupError):
+                    pass
+
+            if usar_cache:
+                self.cache(url, conteudo)
+
+        return conteudo
+
+    def cache(self, url, conteudo=None):
+        # Caminho com nome seguro
+        caminho = os.path.join(self.pages_cache, re.sub('[:/?]', '_', url))
+
+        # Sem contéudo: leitura do cache
+        if conteudo is None:
+            try:
+                f = codecs.open(caminho, 'r', encoding='utf-8')
+            except IOError:
+                return None
+            else:
+                conteudo = f.read()
+                f.close()
+                return conteudo
+
+        # Do contrário: escrita no cache
         else:
-            return page_data
+            f = codecs.open(caminho, 'w', encoding='utf-8')
+            f.write(conteudo)
+            f.close()
