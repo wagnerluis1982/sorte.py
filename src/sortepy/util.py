@@ -31,16 +31,26 @@ def get_config_path(app='sortepy'):
 
 class Util(object):
     def __init__(self, cfg_path=None):
-        self.usar_cache = False
-        if cfg_path:
+        # Se nenhum caminho foi passado, usa diretório de configuração padrão
+        if cfg_path is None:
             try:
-                cfg_path = os.path.realpath(cfg_path) or get_config_path()
+                cfg_path = get_config_path()
             except NotImplementedError:
-                pass
+                self.usar_cache = False
             else:
-                self.cfg_path = cfg_path
                 self.pages_cache = os.path.join(cfg_path, 'cache', 'paginas')
                 self.usar_cache = True
+
+        # Se o caminho é False, indica que não deve ser usado nenhum cache
+        # Uso para propósitos de teste
+        elif cfg_path is False:
+            self.usar_cache = False
+
+        # Caso contrário, usa o caminho passado pelo argumento
+        else:
+            self.cfg_path = cfg_path
+            self.pages_cache = os.path.join(cfg_path, 'cache', 'paginas')
+            self.usar_cache = True
 
     def download(self, url, usar_cache=False):
         usar_cache = usar_cache or self.usar_cache
