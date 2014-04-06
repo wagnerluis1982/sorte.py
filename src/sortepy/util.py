@@ -2,6 +2,7 @@
 
 import codecs
 import cookielib
+import errno
 import os
 import re
 import urllib2
@@ -29,6 +30,18 @@ def get_config_path(app='sortepy'):
     return os.path.join(profile_dir, prefixo + app)
 
 
+def makedirs(caminho):
+    """Versão própria do makedirs()
+
+    Essa versão não lança exceção se o caminho já existir
+    """
+    try:
+        os.makedirs(caminho)
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
+
+
 class Util(object):
     def __init__(self, cfg_path=None):
         # Se nenhum caminho foi passado, usa diretório de configuração padrão
@@ -37,20 +50,27 @@ class Util(object):
                 cfg_path = get_config_path()
             except NotImplementedError:
                 self.usar_cache = False
+                return
             else:
+                self.cfg_path = cfg_path
                 self.pages_cache = os.path.join(cfg_path, 'cache', 'paginas')
                 self.usar_cache = True
 
         # Se o caminho é False, indica que não deve ser usado nenhum cache
-        # Uso para propósitos de teste
+        # Definido para propósitos de teste
         elif cfg_path is False:
             self.usar_cache = False
+            return
 
         # Caso contrário, usa o caminho passado pelo argumento
         else:
             self.cfg_path = cfg_path
             self.pages_cache = os.path.join(cfg_path, 'cache', 'paginas')
             self.usar_cache = True
+
+        # Cria diretórios de cache, caso necessário
+        if self.usar_cache:
+            makedirs(self.pages_cache)
 
     def download(self, url, usar_cache=False):
         usar_cache = usar_cache or self.usar_cache

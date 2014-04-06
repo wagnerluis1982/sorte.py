@@ -12,6 +12,7 @@ class BaseTestCase(TestCase):
 
     # asserts com nomes mais legais
     is_instance = TestCase.assertIsInstance
+    is_none = TestCase.assertIsNone
     eq = TestCase.assertEqual
     not_eq = TestCase.assertNotEqual
     ok = TestCase.assertTrue
