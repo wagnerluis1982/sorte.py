@@ -2,67 +2,67 @@
 
 import basetest
 
-from StringIO import StringIO
 from sortepy.script import main
 
-# Os testes do script serão focados na loteria da Quina porque tem menos números
+# Os testes do script são focados na loteria da Quina porque tem menos números
 # para verificar. Caso necessário, testes com outras loterias serão criados.
 class ScriptTest(basetest.BaseTestCase):
     @classmethod
     def setUpClass(cls):
-        global output
-        output = FakeStdOut()
+        cls.output = FakeStdOut()
 
-    def setUp(_):
-        output.clear()
+    def setUp(self):
+        self.output.clear()
 
     def test_gerar_UMA_aposta_padrao(_):
         # geração de aposta da quina padrão com 5 números
         args = (None, 'quina')
-        main(args, stdout=output)
-        linha = output.line(2)
+        main(args, stdout=_.output)
+        linha = _.output.line(2)
         _.eq(len([int(x) for x in linha.split()]), 5)
 
     def test_gerar_UMA_aposta_nao_padrao(_):
         # geração de aposta da quina com mais de 5 números
         for i in (6, 7):
-        # opções curtas
-            output.clear()
+            # opções curtas
+            _.output.clear()
             args = (None, 'quina', '-n', str(i))
-            main(args, stdout=output)
-            linha = output.line(2)
+            main(args, stdout=_.output)
+            linha = _.output.line(2)
             _.eq(len([int(x) for x in linha.split()]), i)
-        # opções longas
-            output.clear()
+
+            # opções longas
+            _.output.clear()
             args = (None, 'quina', '--numeros=%d' % i)
-            main(args, stdout=output)
-            linha = output.line(2)
+            main(args, stdout=_.output)
+            linha = _.output.line(2)
             _.eq(len([int(x) for x in linha.split()]), i)
 
     def test_gerar_VARIAS_apostas(_):
         # geração de apostas da quina padrão com 5 números
         args = (None, 'quina', '-q', '2')
-        main(args, stdout=output)
-        linhas = output.lines(2, 3)
+        main(args, stdout=_.output)
+        linhas = _.output.lines(2, 3)
         for no, linha in enumerate(linhas, 1):
             _.eq(linha[0:2], '#%d' % no)
             _.eq(len([int(x) for x in linha[5:].split()]), 5)
 
         # geração de aposta da quina com mais de 5 números
         for i in (6, 7):
-        # opções curtas
-            output.clear()
+            # opções curtas
+            _.output.clear()
             args = (None, 'quina', '-q', '2', '-n', str(i))
-            main(args, stdout=output)
-            linhas = output.lines(2, 3)
+            main(args, stdout=_.output)
+            linhas = _.output.lines(2, 3)
             for no, linha in enumerate(linhas, 1):
                 _.eq(linha[0:2], '#%d' % no)
                 _.eq(len([int(x) for x in linha[5:].split()]), i)
-        # opções longas
-            output.clear()
+
+            # opções longas
+            _.output.clear()
             args = (None, 'quina', '--quantidade', '2', '--numeros=%d' % i)
-            main(args, stdout=output)
-            linhas = output.lines(2, 3)
+            main(args, stdout=_.output)
+            linhas = _.output.lines(2, 3)
             for no, linha in enumerate(linhas, 1):
                 _.eq(linha[0:2], '#%d' % no)
                 _.eq(len([int(x) for x in linha[5:].split()]), i)
