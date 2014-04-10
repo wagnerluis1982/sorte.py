@@ -122,6 +122,25 @@ class CacheTest(basetest.BaseTestCase):
         _.eq(_.util.download(url), CONTEUDO_ASCII)
 
 
+class FileDBTest(basetest.BaseTestCase):
+    'FileDB'
+
+    def setUp(self):
+        self.arquivo = os.path.join(tempdir(), 'test.db')
+        self.db = sortepy.util.FileDB.open(self.arquivo)
+
+    def test_guardar_e_recuperar_valor(_):
+        chave = u'chave de teste'
+        valor = u'Olá, amigo, tudo bem?'
+        _.db[chave] = valor
+        _.db.close()
+
+        # depois de fechar a base, tenta reabrir e ver se o valor continua lá
+        db = sortepy.util.FileDB.open(_.arquivo)
+        _.eq(db[chave], valor)
+        db.close()
+
+
 class FixtureRequestHandler(SimpleHTTPRequestHandler):
     def log_message(self, *args, **kwargs):
         # Desabilitando mensagens de log no terminal.
