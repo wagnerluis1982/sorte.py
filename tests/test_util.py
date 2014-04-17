@@ -109,7 +109,7 @@ class CacheTest(basetest.BaseTestCase):
         # baixa conteúdo e verifica se está em cache
         url = base_url + '/pagina_ascii.html'
         try:
-            _.util.download(base_url + '/pagina_ascii.html')
+            _.util.download(url)
             _.eq(_.util.cache(url), CONTEUDO_ASCII)
         finally:
             server.stop()

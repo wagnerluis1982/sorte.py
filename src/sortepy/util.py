@@ -107,10 +107,9 @@ class Util(object):
 
         # Sem contéudo: leitura do cache
         if conteudo is None:
-            if url in db:
-                conteudo = db[url]
-                db.close()
-                return conteudo
+            conteudo = db.get(url)
+            db.close()
+            return conteudo
 
         # Do contrário: escrita no cache
         else:
@@ -160,6 +159,12 @@ class FileDB:
             cursor = self._cur
             cursor.execute('PRAGMA user_version = %d' % version)
 
+        def get(self, key, default=None):
+            try:
+                return self[key]
+            except KeyError:
+                return default
+
         def __setitem__(self, key, value):
             cursor = self._cur
             try:
@@ -171,8 +176,11 @@ class FileDB:
         def __getitem__(self, key):
             cursor = self._cur
             cursor.execute("SELECT value FROM map WHERE key=?", (key,))
-            (value,) = cursor.fetchone()
-            return value
+            result = cursor.fetchone()
+            if result:
+                return result[0]
+            else:
+                raise KeyError(key)
 
         def __delitem__(self, key):
             cursor = self._cur
