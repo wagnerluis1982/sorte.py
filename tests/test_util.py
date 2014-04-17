@@ -88,13 +88,11 @@ class CacheTest(basetest.BaseTestCase):
 
     def setUp(self):
         self.util = sortepy.util.Util(cfg_path=tempdir())
-        self.cache = self.util.pages_cache
 
     def test_gravar_e_ler_cache(_):
         # gravação
         put_txt = u'Minha terra tem palmeiras, Onde canta o Sabiá'
         _.util.cache('dias.txt', put_txt)
-        _.ok(os.path.exists(os.path.join(_.cache, 'dias.txt')))
 
         # leitura
         got_txt = _.util.cache('dias.txt')
@@ -108,17 +106,16 @@ class CacheTest(basetest.BaseTestCase):
         server.start()
         base_url = "http://127.0.0.1:%d" % server.port
 
-        # baixa conteúdo e verifica se arquivo foi criado
-        filename = 'http___127.0.0.1_%d_pagina_ascii.html' % server.port
+        # baixa conteúdo e verifica se está em cache
+        url = base_url + '/pagina_ascii.html'
         try:
             _.util.download(base_url + '/pagina_ascii.html')
-            _.ok(os.path.exists(os.path.join(_.cache, filename)))
+            _.eq(_.util.cache(url), CONTEUDO_ASCII)
         finally:
             server.stop()
 
-        # verifica se mesmo sem o servidor disponível o cache ainda é
-        # encontrado
-        url = base_url + '/pagina_ascii.html'
+        # verifica se mesmo sem o servidor disponível o download ainda é feito
+        # usando o cache
         _.eq(_.util.download(url), CONTEUDO_ASCII)
 
 

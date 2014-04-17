@@ -1,10 +1,8 @@
 # encoding=utf8
 
-import codecs
 import cookielib
 import errno
 import os
-import re
 import sqlite3
 import urllib2
 
@@ -54,7 +52,7 @@ class Util(object):
                 return
             else:
                 self.cfg_path = cfg_path
-                self.pages_cache = os.path.join(cfg_path, 'cache', 'paginas')
+                self.pages_cache = os.path.join(cfg_path, 'pages_cache.db')
                 self.usar_cache = True
 
         # Se o caminho é False, indica que não deve ser usado nenhum cache
@@ -66,12 +64,12 @@ class Util(object):
         # Caso contrário, usa o caminho passado pelo argumento
         else:
             self.cfg_path = cfg_path
-            self.pages_cache = os.path.join(cfg_path, 'cache', 'paginas')
+            self.pages_cache = os.path.join(cfg_path, 'pages_cache.db')
             self.usar_cache = True
 
-        # Cria diretórios de cache, caso necessário
+        # Cria diretórios de configuração, se necessário
         if self.usar_cache:
-            makedirs(self.pages_cache)
+            makedirs(self.cfg_path)
 
     def download(self, url, usar_cache=False):
         usar_cache = usar_cache or self.usar_cache
@@ -105,25 +103,19 @@ class Util(object):
         return conteudo
 
     def cache(self, url, conteudo=None):
-        # Caminho com nome seguro
-        caminho = os.path.join(self.pages_cache, re.sub('[:/?]', '_', url))
+        db = FileDB.open(self.pages_cache)
 
         # Sem contéudo: leitura do cache
         if conteudo is None:
-            try:
-                f = codecs.open(caminho, 'r', encoding='utf-8')
-            except IOError:
-                return None
-            else:
-                conteudo = f.read()
-                f.close()
+            if url in db:
+                conteudo = db[url]
+                db.close()
                 return conteudo
 
         # Do contrário: escrita no cache
         else:
-            f = codecs.open(caminho, 'w', encoding='utf-8')
-            f.write(conteudo)
-            f.close()
+            db[url] = conteudo
+            db.close()
 
 
 class FileDB:
