@@ -144,6 +144,12 @@ class FileDB:
             self._conn.commit()
             self._conn.close()
 
+        def __del__(self):
+            try:
+                self.close()
+            except sqlite3.ProgrammingError:
+                pass
+
         def _create_schema(self):
             cursor = self._cur
             try:
