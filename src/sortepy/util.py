@@ -103,18 +103,15 @@ class Util(object):
         return conteudo
 
     def cache(self, url, conteudo=None):
-        db = FileDB.open(self.pages_cache)
-
         # Sem contéudo: leitura do cache
         if conteudo is None:
-            conteudo = db.get(url)
-            db.close()
-            return conteudo
+            with FileDB.open(self.pages_cache) as db:
+                return db.get(url)
 
         # Do contrário: escrita no cache
         else:
-            db[url] = conteudo
-            db.close()
+            with FileDB.open(self.pages_cache) as db:
+                db[url] = conteudo
 
 
 class FileDB:
@@ -190,3 +187,9 @@ class FileDB:
             cursor = self._cur
             cursor.execute("SELECT 1 FROM map WHERE key=?", (key,))
             return cursor.fetchall() != []
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            self.__del__()
