@@ -130,7 +130,7 @@ class FileDBTest(basetest.BaseTestCase):
         self.db = sortepy.util.FileDB.open(self.arquivo)
 
     def test_guardar_e_recuperar_valor(_):
-        chave = u'chave de teste'
+        chave = 'cumprimento'
         valor = u'Olá, amigo, tudo bem?'
         _.db[chave] = valor
         _.db.close()
@@ -139,6 +139,24 @@ class FileDBTest(basetest.BaseTestCase):
         db = sortepy.util.FileDB.open(_.arquivo)
         _.eq(db[chave], valor)
         db.close()
+
+    def test_excluir_chave(_):
+        chave = 'inutil'
+        valor = u'Nada'
+        _.db[chave] = valor
+        _.ok(chave in _.db, "chave '%s' não existe" % chave)
+
+        del _.db[chave]
+        _.ok(chave not in _.db, "chave '%s' não foi excluída" % chave)
+        _.db.close()
+
+    def test_redefinir_valor(_):
+        chave = 'chave'
+        _.db[chave] = 'valor1'
+        _.eq(_.db[chave], 'valor1')
+
+        _.db[chave] = 'valor2'
+        _.eq(_.db[chave], 'valor2')
 
 
 class FixtureRequestHandler(SimpleHTTPRequestHandler):

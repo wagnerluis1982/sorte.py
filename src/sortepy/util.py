@@ -164,7 +164,11 @@ class FileDB:
 
         def __setitem__(self, key, value):
             cursor = self._cur
-            cursor.execute("INSERT INTO map VALUES (?, ?)", (key, value))
+            try:
+                cursor.execute("INSERT INTO map VALUES (?, ?)", (key, value))
+            except sqlite3.IntegrityError:
+                cursor.execute("UPDATE map SET value=? WHERE key=?",
+                               (value, key))
 
         def __getitem__(self, key):
             cursor = self._cur
@@ -173,4 +177,10 @@ class FileDB:
             return value
 
         def __delitem__(self, key):
-            pass
+            cursor = self._cur
+            cursor.execute("DELETE FROM map WHERE key=?", (key,))
+
+        def __contains__(self, key):
+            cursor = self._cur
+            cursor.execute("SELECT 1 FROM map WHERE key=?", (key,))
+            return cursor.fetchall() != []
