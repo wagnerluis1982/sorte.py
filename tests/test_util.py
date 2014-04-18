@@ -55,7 +55,7 @@ class DownloadTest(basetest.BaseTestCase):
         cls.server = FixtureHttpServer()
         cls.server.start()
         cls.base_url = "http://127.0.0.1:%d" % cls.server.port
-        cls.util = sortepy.util.Util(cfg_path=False)
+        cls.util = sortepy.util.Util(cfg_path='')
 
     @classmethod
     def tearDownClass(cls):

@@ -43,33 +43,28 @@ def makedirs(caminho):
 
 class Util(object):
     def __init__(self, cfg_path=None):
+        # Se o caminho é uma string vazia, não deve ser usado nenhum cache
+        # Definido para propósitos de teste
+        if cfg_path == '':
+            self.usar_cache = False
+            return
+
         # Se nenhum caminho foi passado, usa diretório de configuração padrão
         if cfg_path is None:
             try:
                 cfg_path = get_config_path()
+            # Pode ocorrer de não conseguir definir o diretório para cfg_path
             except NotImplementedError:
                 self.usar_cache = False
                 return
-            else:
-                self.cfg_path = cfg_path
-                self.pages_cache = os.path.join(cfg_path, 'pages_cache.db')
-                self.usar_cache = True
 
-        # Se o caminho é False, indica que não deve ser usado nenhum cache
-        # Definido para propósitos de teste
-        elif cfg_path is False:
-            self.usar_cache = False
-            return
+        # Cria diretórios de configuração, se não existirem
+        cache_path = os.path.join(cfg_path, 'cache')
+        makedirs(cache_path)
 
-        # Caso contrário, usa o caminho passado pelo argumento
-        else:
-            self.cfg_path = cfg_path
-            self.pages_cache = os.path.join(cfg_path, 'pages_cache.db')
-            self.usar_cache = True
-
-        # Cria diretórios de configuração, se necessário
-        if self.usar_cache:
-            makedirs(self.cfg_path)
+        # Define atributos de configuração
+        self.pages_cache = os.path.join(cache_path, 'paginas.db')
+        self.usar_cache = True
 
     def download(self, url, usar_cache=False):
         usar_cache = usar_cache or self.usar_cache
