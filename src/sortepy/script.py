@@ -19,6 +19,9 @@ Opções de geração de apostas:
   -n --numeros      Quantos números para marcar em cada aposta gerada. Se não
                       informado o padrão depende da LOTERIA informada
 
+Opções de consulta ou verificação:
+  -c --concurso     Número do concurso para consultar ou verificar
+
 Opções gerais:
   -h --help         Mostra esta ajuda e finaliza
 
@@ -61,9 +64,9 @@ def main(argv=sys.argv, stdout=sys.stdout):
     try:
         opts, args = getopt.gnu_getopt(argv[1:],
         # opções curtas
-        "hn:q:",
+        "hn:q:c:",
         # opções longas
-        ["help", "numeros=", "quantidade="])
+        ["help", "numeros=", "quantidade=", "concurso="])
     except getopt.GetoptError, err:
         opt = (len(err.opt) == 1 and '-' or '--') + err.opt
         return error("opção", opt, "desconhecida", code=1)
@@ -71,6 +74,7 @@ def main(argv=sys.argv, stdout=sys.stdout):
     # Avalia os parâmetros passados
     numeros = None
     quantidade = None
+    concurso = None
     for option, arg in opts:
         if option in ("-h", "--help"):
             print(help_msg)
@@ -79,6 +83,8 @@ def main(argv=sys.argv, stdout=sys.stdout):
             numeros = int(arg)
         elif option in ("-q", "--quantidade"):
             quantidade = int(arg)
+        elif option in ("-c", "--concurso"):
+            concurso = int(arg)
 
     if len(args) != 1:
         return error("deve ser informado uma loteria", code=2)
@@ -89,7 +95,10 @@ def main(argv=sys.argv, stdout=sys.stdout):
     except loterica.LoteriaNaoSuportada:
         return error("loteria '%s' não suportada" % nome, code=3)
 
-    return exec_gerador(loteria, quantidade or 1, numeros)
+    if concurso:
+        pass
+    else:
+        return exec_gerador(loteria, quantidade or 1, numeros)
 
 
 if __name__ == "__main__":
