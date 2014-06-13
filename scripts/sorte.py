@@ -1,5 +1,3 @@
 #!/usr/bin/env python
-import sortepy.script
-
-if __name__ == "__main__":
-    sortepy.script.main()
+import runpy
+runpy.run_module('sortepy.script', run_name='__main__')
