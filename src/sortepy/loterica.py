@@ -17,11 +17,11 @@ APELIDOS = {
 }
 
 LOTERIAS = {
-    'quina': {'numeros': (5, 7), 'faixa': (1, 80)},
-    'megasena': {'numeros': (6, 15), 'faixa': (1, 60), 'nome': "Mega-Sena"},
-    'lotofacil': {'numeros': (15, 18), 'faixa': (1, 25)},
-    'lotomania': {'numeros': (1, 50), 'faixa': (1, 100), 'padrao': 20},
-    'duplasena': {'numeros': (6, 15), 'faixa': (1, 50), 'nome': "Dupla Sena"},
+    'quina': {'marcar': (5, 7), 'numeros': (1, 80)},
+    'megasena': {'marcar': (6, 15), 'numeros': (1, 60), 'nome': "Mega-Sena"},
+    'lotofacil': {'marcar': (15, 18), 'numeros': (1, 25)},
+    'lotomania': {'marcar': (1, 50), 'numeros': (1, 100), 'padrao': 20},
+    'duplasena': {'marcar': (6, 15), 'numeros': (1, 50), 'nome': "Dupla Sena"},
 }
 
 class Loteria:
@@ -30,20 +30,17 @@ class Loteria:
             c = LOTERIAS[APELIDOS.get(nome, nome)]
         except KeyError, err:
             raise LoteriaNaoSuportada(err.message)
-        else:
-            quant = c['numeros']
-            faixa = c['faixa']
-            self.nome = c.get('nome', nome.title())
-            self.nome_simples = nome
-            self.qmin = quant[0]
-            self.qmax = quant[1]
-            self.padrao = c.get('padrao', self.qmin)
-            self.range = xrange(faixa[0], faixa[1] + 1)
 
-    def gerar_aposta(self, quant=None):
-        if quant is None:
-            quant = self.padrao
-        if not (self.qmin <= quant <= self.qmax):
-            raise QuantidadeInvalida(quant)
-        result = random.sample(self.range, quant)
+        self.nome = nome
+        self._range = xrange(c['numeros'][0], c['numeros'][1] + 1)
+        self._min = c['marcar'][0]
+        self._max = c['marcar'][1]
+        self._padrao = c.get('padrao', self._min)
+
+    def gerar_aposta(self, marcar=None):
+        if marcar is None:
+            marcar = self._padrao
+        if not (self._min <= marcar <= self._max):
+            raise QuantidadeInvalida(marcar)
+        result = random.sample(self._range, marcar)
         return tuple(sorted(result))

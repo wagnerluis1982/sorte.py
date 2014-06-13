@@ -33,7 +33,7 @@ def error(*args, **kwargs):
 
 
 def exec_gerador(loteria, quantidade, numeros):
-    print("# gerador da", loteria.nome_simples)
+    print("# gerador da", loteria.nome)
     try:
         aposta1 = loteria.gerar_aposta(numeros)
     except loterica.QuantidadeInvalida, err:
