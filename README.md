@@ -39,13 +39,51 @@ Outras opções disponíveis para geração:
                         o padrão depende da LOTERIA informada
     -h --help         Mostra esta ajuda e finaliza
 
-Loterias disponíveis por enquanto: duplasena, lotofacil, lotomania, megasena,
-quina.
+Loterias disponíveis: duplasena, lotofacil, lotomania, megasena, quina.
 
 ### Conferindo apostas
 
-Ainda não implementado
+**ATENÇÃO**: Ainda não implementado. Esta é a interface proposta.
+
+Para conferir três apostas do último concurso, execute
+
+    $ sorte.py quina '1,23,39,44,50' '5 9 15 50 75' '1-3 30 56'
+
+Cada argumento é uma aposta. Os números podem ser separados por vírgula ou
+espaço em branco. Caso utilize hífens entre dois números, será considerado um
+intervalo.
+
+Se for preciso especificar o concurso, então basta utilizar o parâmetro
+`-c|--concurso`, conforme exemplo abaixo
+
+    $ sorte.py quina -c 1325 '1,23,39,44,50' '5 9 15 50 75'
+
+Caso o parâmetro `-i|--stdin` seja ativado, as apostas serão lidas da entrada
+padrão, uma por linha até encontrar o EOF (Ctrl-D no Linux).
+
+    $ sorte.py quina [-c 1325] -i
+    1,23,39,44,50
+    5 9 15 50 75
+    1-3 30 56
+
+O parâmetro `-i` admite um nome de arquivo como argumento, assim os dois
+comandos abaixo são equivalentes.
+
+    $ sorte.py quina -c 1325 -i < fezinha-na-quina.txt
+    $ sorte.py quina -c 1325 -i fezinha-na-quina.txt
+
+As linhas que iniciam por `#` são consideradas comentários.
 
 ### Consultando resultados
 
-Ainda não implementado
+**ATENÇÃO**: Ainda não implementado. Esta é a interface proposta.
+
+Para consultar, execute
+
+    $ sorte.py quina -c|--concurso NUM
+
+onde o argumento NUM é o número do concurso em que quer o resultado. Se quiser
+obter o último resultado disponível, basta passar um argumento vazio, conforme
+comando abaixo.
+
+    $ sorte.py quina -c=
