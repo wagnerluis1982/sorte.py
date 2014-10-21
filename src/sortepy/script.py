@@ -7,6 +7,7 @@ import sys
 
 from . import loterica
 
+
 help_msg = ''.join([
 "Uso: %s LOTERIA [opcoes]\n" % sys.argv[0],
 """
@@ -21,8 +22,8 @@ Opções de geração de apostas:
 Opções gerais:
   -h --help         Mostra esta ajuda e finaliza
 
-""",
-"O valor de LOTERIA pode ser: ", ', '.join(sorted(loterica.LOTERIAS))])
+O valor de LOTERIA pode ser: """, ', '.join(sorted(loterica.LOTERIAS))])
+
 
 def error(*args, **kwargs):
     print(*args, file=sys.stderr)
@@ -30,31 +31,32 @@ def error(*args, **kwargs):
         print(help_msg)
     return kwargs.get('code', 255)
 
+
 def exec_gerador(loteria, quantidade, numeros):
-    print("Gerador de Apostas da", loteria.nome)
+    print("# gerador da", loteria.nome_simples)
     try:
         aposta1 = loteria.gerar_aposta(numeros)
     except loterica.QuantidadeInvalida, err:
         return error("não dá para gerar aposta da %s com %d números" %
                 (loteria.nome, err.valor), show_help=False, code=4)
 
-    if quantidade == 1:
-        print(' '.join("%02d" % n for n in aposta1))
-    else:
-        qdigitos = len(str(quantidade))
-        print('#', '0'*(qdigitos-1), "1 = ",
-                ' '.join("%02d" % n for n in aposta1), sep='')
-        for i in xrange(2, quantidade+1):
-            aposta = loteria.gerar_aposta(numeros)
-            print('#', '0'*(qdigitos - len(str(i))), "%d = " % i,
-                    ' '.join("%02d" % n for n in aposta), sep='')
+    print(' '.join("%02d" % n for n in aposta1))
+    for i in xrange(2, quantidade+1):
+        aposta = loteria.gerar_aposta(numeros)
+        print(' '.join("%02d" % n for n in aposta))
+
+
+def __print_closure(stdout):
+    def pf(*args, **kwargs):
+        kwargs.setdefault('file', stdout)
+        __builtin__.print(*args, **kwargs)
+    return pf
+
 
 def main(argv=sys.argv, stdout=sys.stdout):
     # Redefine 'print' para usar outra stdout passado como parâmetro
     global print
-    def print(*args, **kwargs):
-        kwargs.setdefault('file', stdout)
-        __builtin__.print(*args, **kwargs)
+    print = __print_closure(stdout)
 
     try:
         opts, args = getopt.gnu_getopt(argv[1:],

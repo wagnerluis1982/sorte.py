@@ -44,8 +44,7 @@ class ScriptTest(basetest.BaseTestCase):
         main(args, stdout=_.output)
         linhas = _.output.lines(2, 3)
         for no, linha in enumerate(linhas, 1):
-            _.eq(linha[0:2], '#%d' % no)
-            _.eq(len([int(x) for x in linha[5:].split()]), 5)
+            _.eq(len([int(x) for x in linha.split()]), 5)
 
         # geração de aposta da quina com mais de 5 números
         for i in (6, 7):
@@ -55,8 +54,7 @@ class ScriptTest(basetest.BaseTestCase):
             main(args, stdout=_.output)
             linhas = _.output.lines(2, 3)
             for no, linha in enumerate(linhas, 1):
-                _.eq(linha[0:2], '#%d' % no)
-                _.eq(len([int(x) for x in linha[5:].split()]), i)
+                _.eq(len([int(x) for x in linha.split()]), i)
 
             # opções longas
             _.output.clear()
@@ -64,8 +62,7 @@ class ScriptTest(basetest.BaseTestCase):
             main(args, stdout=_.output)
             linhas = _.output.lines(2, 3)
             for no, linha in enumerate(linhas, 1):
-                _.eq(linha[0:2], '#%d' % no)
-                _.eq(len([int(x) for x in linha[5:].split()]), i)
+                _.eq(len([int(x) for x in linha.split()]), i)
 
 
 class FakeStdOut:

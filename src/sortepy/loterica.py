@@ -5,6 +5,7 @@ class LoteriaNaoSuportada(Exception):
         self.nome = nome
         Exception.__init__(self, nome)
 
+
 class QuantidadeInvalida(Exception):
     def __init__(self, valor):
         self.valor = valor
@@ -33,6 +34,7 @@ class Loteria:
             quant = c['numeros']
             faixa = c['faixa']
             self.nome = c.get('nome', nome.title())
+            self.nome_simples = nome
             self.qmin = quant[0]
             self.qmax = quant[1]
             self.padrao = c.get('padrao', self.qmin)
