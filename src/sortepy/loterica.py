@@ -1,5 +1,8 @@
 import random
 
+from HTMLParser import HTMLParser
+
+
 class LoteriaNaoSuportada(Exception):
     def __init__(self, nome):
         self.nome = nome
@@ -44,3 +47,58 @@ class Loteria:
             raise QuantidadeInvalida(marcar)
         result = random.sample(self._range, marcar)
         return tuple(sorted(result))
+
+
+class LoteriaParser(HTMLParser):
+    def data(self):
+        return ''.join(self._data).split('|')
+
+    def reset(self):
+        HTMLParser.reset(self)
+
+        self._capture = True
+        self._data = []
+
+    def handle_starttag(self, tag, attrs):
+        self._capture = False
+
+    def handle_endtag(self, tag):
+        self._capture = True
+
+    def handle_data(self, data):
+        if self._capture:
+            self._data.append(data)
+
+
+class QuinaParser(LoteriaParser):
+    def reset(self):
+        LoteriaParser.reset(self)
+
+        self._capture_list = False
+        self._capture_number = False
+        self._numbers = []
+
+    def handle_starttag(self, tag, attrs):
+        LoteriaParser.handle_starttag(self, tag, attrs)
+
+        if tag == "li":
+            self._capture_number = True
+
+        if tag == "ul":
+            self._capture_list = True
+
+    def handle_endtag(self, tag):
+        LoteriaParser.handle_endtag(self, tag)
+
+        if tag == "li":
+            self._capture_number = False
+
+        if tag == "ul" and self._capture_list and len(self._numbers) > 0:
+            self._data.append('|' + '|'.join(self._numbers) + '|')
+            self._numbers = []
+
+    def handle_data(self, data):
+        LoteriaParser.handle_data(self, data)
+
+        if self._capture_number:
+            self._numbers.append(data)
