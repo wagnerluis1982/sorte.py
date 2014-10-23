@@ -6,15 +6,15 @@ from . import util
 
 
 class LoteriaNaoSuportada(Exception):
-    def __init__(self, nome):
-        self.nome = nome
-        Exception.__init__(self, nome)
+    pass
 
 
 class QuantidadeInvalida(Exception):
-    def __init__(self, valor):
-        self.valor = valor
-        Exception.__init__(self, valor)
+    pass
+
+
+class ResultadoNaoDisponivel(Exception):
+    pass
 
 
 APELIDOS = {
@@ -52,7 +52,7 @@ class Loteria:
         if marcar is None:
             marcar = self._padrao
         if not (self._min <= marcar <= self._max):
-            raise QuantidadeInvalida(marcar)
+            raise QuantidadeInvalida(self.nome, marcar)
         result = random.sample(self._range, marcar)
         return tuple(sorted(result))
 
@@ -71,11 +71,16 @@ class Loteria:
 
         dados = parser.data()
         pos_numeros = xrange(posicao['numeros'][0], posicao['numeros'][1]+1)
-        result = {
-            'concurso': int(dados[posicao.get('concurso', 0)]),
-            'numeros': [int(dados[i]) for i in pos_numeros],
-        }
-        return result
+        try:
+            result = {
+                'concurso': int(dados[posicao.get('concurso', 0)]),
+                'numeros': [int(dados[i]) for i in pos_numeros],
+            }
+            return result
+        except ValueError:
+            self.util.cache_evict(url)
+            raise ResultadoNaoDisponivel(self.nome, concurso)
+
 
     def _parser(self):
         if self.nome == 'quina':

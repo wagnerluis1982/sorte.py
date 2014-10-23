@@ -40,7 +40,7 @@ def exec_gerador(loteria, quantidade, numeros):
         aposta1 = loteria.gerar_aposta(numeros)
     except loterica.QuantidadeInvalida, err:
         return error("ERRO: não dá para gerar aposta da %s com %d números" %
-                (loteria.nome, err.valor), show_help=False, code=5)
+                err.args, show_help=False, code=5)
 
     print("# gerador da", loteria.nome)
     print(' '.join("%02d" % n for n in aposta1))
@@ -54,7 +54,10 @@ def exec_consultar(loteria, concurso):
         result = loteria.consultar(concurso)
     except loterica.LoteriaNaoSuportada, err:
         return error("ERRO: consulta para '%s' não implementada" %
-                loteria.nome, show_help=False, code=6)
+                err.args, show_help=False, code=6)
+    except loterica.ResultadoNaoDisponivel, err:
+        return error("ERRO: resultado da %s %d não disponível" %
+                err.args, show_help=False, code=6)
 
     print("# resultado da %s %d" % (loteria.nome, result['concurso']))
     print(' '.join("%02d" % n for n in result['numeros']))

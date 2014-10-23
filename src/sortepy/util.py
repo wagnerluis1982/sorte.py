@@ -108,6 +108,11 @@ class Util(object):
             with FileDB.open(self.pages_cache) as db:
                 db[url] = conteudo
 
+    def cache_evict(self, url):
+        if self.usar_cache:
+            with FileDB.open(self.pages_cache) as db:
+                del db[url]
+
 
 class FileDB:
     @staticmethod
