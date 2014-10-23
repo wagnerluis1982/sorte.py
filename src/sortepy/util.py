@@ -46,7 +46,7 @@ class Util(object):
         # Se o caminho é uma string vazia, não deve ser usado nenhum cache
         # Definido para propósitos de teste
         if cfg_path == '':
-            self.usar_cache = False
+            self.in_cache = False
             return
 
         # Se nenhum caminho foi passado, usa diretório de configuração padrão
@@ -55,7 +55,7 @@ class Util(object):
                 cfg_path = get_config_path()
             # Pode ocorrer de não conseguir definir o diretório para cfg_path
             except NotImplementedError:
-                self.usar_cache = False
+                self.in_cache = False
                 return
 
         # Cria diretórios de configuração, se não existirem
@@ -64,14 +64,14 @@ class Util(object):
 
         # Define atributos de configuração
         self.pages_cache = os.path.join(cache_path, 'paginas.db')
-        self.usar_cache = True
+        self.in_cache = True
 
-    def download(self, url, usar_cache=False):
-        usar_cache = usar_cache or self.usar_cache
+    def download(self, url, in_cache=None):
+        in_cache = in_cache if isinstance(in_cache, bool) else self.in_cache
 
         # Obtém a página do cache
         conteudo = None
-        if usar_cache:
+        if in_cache:
             conteudo = self.cache(url)
 
         # Ou faz o download
@@ -92,7 +92,7 @@ class Util(object):
                 except (UnicodeDecodeError, LookupError):
                     pass
 
-            if usar_cache:
+            if in_cache:
                 self.cache(url, conteudo)
 
         return conteudo
@@ -109,7 +109,7 @@ class Util(object):
                 db[url] = conteudo
 
     def cache_evict(self, url):
-        if self.usar_cache:
+        if self.in_cache:
             with FileDB.open(self.pages_cache) as db:
                 del db[url]
 

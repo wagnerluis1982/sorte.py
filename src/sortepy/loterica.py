@@ -24,7 +24,7 @@ APELIDOS = {
 LOTERIAS = {
     'quina': {
         'marcar': (5, 7), 'numeros': (1, 80),
-        'resultado': {'numeros': (21, 25)}
+        'resultado': {'numeros': (21, 25)},
     },
     'megasena': {'marcar': (6, 15), 'numeros': (1, 60), 'nome': "Mega-Sena"},
     'lotofacil': {'marcar': (15, 18), 'numeros': (1, 25)},
@@ -56,7 +56,7 @@ class Loteria:
         result = random.sample(self._range, marcar)
         return tuple(sorted(result))
 
-    def consultar(self, concurso=None):
+    def consultar(self, concurso=0):
         parser = self._parser()
         if parser is None:
             raise LoteriaNaoSuportada(self.nome)
@@ -66,7 +66,7 @@ class Loteria:
             raise LoteriaNaoSuportada(self.nome)
 
         url = self._url(concurso)
-        conteudo_html = self.util.download(url)
+        conteudo_html = self.util.download(url, in_cache=concurso > 0)
         parser.feed(conteudo_html)
 
         dados = parser.data()
@@ -92,8 +92,8 @@ class Loteria:
              base="http://www1.caixa.gov.br/loterias/loterias/%(loteria)s/",
              script="%(loteria)s_pesquisa_new.asp",
              query="?submeteu=sim&opcao=concurso&txtConcurso=%(concurso)d"):
-        if concurso is None:
-            return base
+        if concurso <= 0:
+            return (base+script) % {'loteria': self.nome}
         else:
             return (base+script+query) % {'loteria': self.nome,
                                           'concurso': concurso}

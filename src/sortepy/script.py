@@ -98,7 +98,10 @@ def main(argv=sys.argv, stdout=sys.stdout):
         elif option in ("-q", "--quantidade"):
             quantidade = int(arg)
         elif option in ("-c", "--concurso"):
-            concurso = int(arg)
+            if arg.isdigit():
+                concurso = int(arg)
+            else:
+                concurso = -1
 
     if len(args) != 1:
         return error("ERRO: deve ser informado uma loteria", code=2)
