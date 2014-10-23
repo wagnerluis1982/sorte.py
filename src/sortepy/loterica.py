@@ -34,7 +34,12 @@ LOTERIAS = {
         'marcar': (15, 18), 'numeros': (1, 25),
         'resultado': {'numeros': (3, 17)},
     },
-    'lotomania': {'marcar': (1, 50), 'numeros': (1, 100), 'padrao': 20},
+    'lotomania': {
+        'marcar': (1, 50), 'numeros': (1, 100), 'padrao': 20,
+        'resultado': {
+            'numeros': (6, 25), 'url-script': "_lotomania_pesquisa.asp",
+        },
+    },
     'duplasena': {'marcar': (6, 15), 'numeros': (1, 50), 'nome': "Dupla Sena"},
 }
 
@@ -98,6 +103,7 @@ class Loteria:
              base="http://www1.caixa.gov.br/loterias/loterias/%(loteria)s/",
              script="%(loteria)s_pesquisa_new.asp",
              query="?submeteu=sim&opcao=concurso&txtConcurso=%(concurso)d"):
+        script = self.settings['resultado'].get('url-script', script)
         if concurso <= 0:
             return (base+script) % {'loteria': self.nome}
         else:
