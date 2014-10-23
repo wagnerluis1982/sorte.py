@@ -19,7 +19,7 @@ Opções de geração de apostas:
   -n --numeros      Quantos números para marcar em cada aposta gerada. Se não
                       informado o padrão depende da LOTERIA informada
 
-Opções de consulta ou verificação:
+Opções de consulta:
   -c --concurso     Número do concurso para consultar ou verificar
 
 Opções gerais:
@@ -36,17 +36,28 @@ def error(*args, **kwargs):
 
 
 def exec_gerador(loteria, quantidade, numeros):
-    print("# gerador da", loteria.nome)
     try:
         aposta1 = loteria.gerar_aposta(numeros)
     except loterica.QuantidadeInvalida, err:
-        return error("não dá para gerar aposta da %s com %d números" %
-                (loteria.nome, err.valor), show_help=False, code=4)
+        return error("ERRO: não dá para gerar aposta da %s com %d números" %
+                (loteria.nome, err.valor), show_help=False, code=5)
 
+    print("# gerador da", loteria.nome)
     print(' '.join("%02d" % n for n in aposta1))
     for i in xrange(2, quantidade+1):
         aposta = loteria.gerar_aposta(numeros)
         print(' '.join("%02d" % n for n in aposta))
+
+
+def exec_consultar(loteria, concurso):
+    try:
+        result = loteria.consultar(concurso)
+    except loterica.LoteriaNaoSuportada, err:
+        return error("ERRO: consulta para '%s' não implementada" %
+                loteria.nome, show_help=False, code=6)
+
+    print("# resultado da %s %d" % (loteria.nome, result['concurso']))
+    print(' '.join("%02d" % n for n in result['numeros']))
 
 
 def __print_closure(stdout):
@@ -69,7 +80,7 @@ def main(argv=sys.argv, stdout=sys.stdout):
         ["help", "numeros=", "quantidade=", "concurso="])
     except getopt.GetoptError, err:
         opt = (len(err.opt) == 1 and '-' or '--') + err.opt
-        return error("opção", opt, "desconhecida", code=1)
+        return error("ERRO: opção", opt, "desconhecida", code=1)
 
     # Avalia os parâmetros passados
     numeros = None
@@ -87,16 +98,18 @@ def main(argv=sys.argv, stdout=sys.stdout):
             concurso = int(arg)
 
     if len(args) != 1:
-        return error("deve ser informado uma loteria", code=2)
+        return error("ERRO: deve ser informado uma loteria", code=2)
 
     nome = args[0]
     try:
         loteria = loterica.Loteria(nome.lower())
     except loterica.LoteriaNaoSuportada:
-        return error("loteria '%s' não suportada" % nome, code=3)
+        return error("ERRO: loteria '%s' não suportada" % nome, code=3)
 
     if concurso:
-        pass
+        if quantidade or numeros:
+            return error("ERRO: parâmetros incompatíveis", code=4)
+        return exec_consultar(loteria, concurso)
     else:
         return exec_gerador(loteria, quantidade or 1, numeros)
 

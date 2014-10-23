@@ -2,6 +2,8 @@ import random
 
 from HTMLParser import HTMLParser
 
+from . import util
+
 
 class LoteriaNaoSuportada(Exception):
     def __init__(self, nome):
@@ -20,7 +22,10 @@ APELIDOS = {
 }
 
 LOTERIAS = {
-    'quina': {'marcar': (5, 7), 'numeros': (1, 80)},
+    'quina': {
+        'marcar': (5, 7), 'numeros': (1, 80),
+        'resultado': {'numeros': (21, 25)}
+    },
     'megasena': {'marcar': (6, 15), 'numeros': (1, 60), 'nome': "Mega-Sena"},
     'lotofacil': {'marcar': (15, 18), 'numeros': (1, 25)},
     'lotomania': {'marcar': (1, 50), 'numeros': (1, 100), 'padrao': 20},
@@ -34,7 +39,10 @@ class Loteria:
         except KeyError, err:
             raise LoteriaNaoSuportada(err.message)
 
+        self.settings = c
         self.nome = nome
+        self.util = util.Util()
+
         self._range = xrange(c['numeros'][0], c['numeros'][1] + 1)
         self._min = c['marcar'][0]
         self._max = c['marcar'][1]
@@ -47,6 +55,43 @@ class Loteria:
             raise QuantidadeInvalida(marcar)
         result = random.sample(self._range, marcar)
         return tuple(sorted(result))
+
+    def consultar(self, concurso=None):
+        parser = self._parser()
+        if parser is None:
+            raise LoteriaNaoSuportada(self.nome)
+
+        posicao = self.settings.get('resultado')
+        if posicao is None:
+            raise LoteriaNaoSuportada(self.nome)
+
+        url = self._url(concurso)
+        conteudo_html = self.util.download(url)
+        parser.feed(conteudo_html)
+
+        dados = parser.data()
+        pos_numeros = xrange(posicao['numeros'][0], posicao['numeros'][1]+1)
+        result = {
+            'concurso': int(dados[posicao.get('concurso', 0)]),
+            'numeros': [int(dados[i]) for i in pos_numeros],
+        }
+        return result
+
+    def _parser(self):
+        if self.nome == 'quina':
+            return QuinaParser()
+        else:
+            return None
+
+    def _url(self, concurso,
+             base="http://www1.caixa.gov.br/loterias/loterias/%(loteria)s/",
+             script="%(loteria)s_pesquisa_new.asp",
+             query="?submeteu=sim&opcao=concurso&txtConcurso=%(concurso)d"):
+        if concurso is None:
+            return base
+        else:
+            return (base+script+query) % {'loteria': self.nome,
+                                          'concurso': concurso}
 
 
 class LoteriaParser(HTMLParser):
