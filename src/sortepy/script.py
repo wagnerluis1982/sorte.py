@@ -35,7 +35,7 @@ def error(*args, **kwargs):
     return kwargs.get('code', 255)
 
 
-def exec_gerador(loteria, quantidade, numeros):
+def exec_gerar(loteria, quantidade, numeros):
     try:
         aposta1 = loteria.gerar_aposta(numeros)
     except loterica.QuantidadeInvalida, err:
@@ -60,7 +60,7 @@ def exec_consultar(loteria, concurso):
                 err.args, show_help=False, code=6)
 
     print("# resultado da %s %d" % (loteria.nome, result['concurso']))
-    print(' '.join("%02d" % n for n in result['numeros']))
+    print('numeros:', ' '.join("%02d" % n for n in result['numeros']))
 
 
 def __print_closure(stdout):
@@ -117,7 +117,7 @@ def main(argv=sys.argv, stdout=sys.stdout):
             return error("ERRO: parâmetros incompatíveis", code=4)
         return exec_consultar(loteria, concurso)
     else:
-        return exec_gerador(loteria, quantidade or 1, numeros)
+        return exec_gerar(loteria, quantidade or 1, numeros)
 
 
 if __name__ == "__main__":
