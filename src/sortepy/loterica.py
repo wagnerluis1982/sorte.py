@@ -26,16 +26,23 @@ LOTERIAS = {
         'marcar': (5, 7), 'numeros': (1, 80),
         'resultado': {'numeros': (21, 25)},
     },
-    'megasena': {'marcar': (6, 15), 'numeros': (1, 60), 'nome': "Mega-Sena"},
-    'lotofacil': {'marcar': (15, 18), 'numeros': (1, 25)},
+    'megasena': {
+        'marcar': (6, 15), 'numeros': (1, 60), 'nome': "Mega-Sena",
+        'resultado': {'numeros': (28, 33)},
+    },
+    'lotofacil': {
+        'marcar': (15, 18), 'numeros': (1, 25),
+        'resultado': {'numeros': (3, 17)},
+    },
     'lotomania': {'marcar': (1, 50), 'numeros': (1, 100), 'padrao': 20},
     'duplasena': {'marcar': (6, 15), 'numeros': (1, 50), 'nome': "Dupla Sena"},
 }
 
 class Loteria:
     def __init__(self, nome):
+        nome = APELIDOS.get(nome, nome)
         try:
-            c = LOTERIAS[APELIDOS.get(nome, nome)]
+            c = LOTERIAS[nome]
         except KeyError, err:
             raise LoteriaNaoSuportada(err.message)
 
@@ -81,12 +88,11 @@ class Loteria:
             self.util.cache_evict(url)
             raise ResultadoNaoDisponivel(self.nome, concurso)
 
-
     def _parser(self):
-        if self.nome == 'quina':
+        if self.nome in ('quina', 'megasena'):
             return QuinaParser()
         else:
-            return None
+            return LoteriaParser()
 
     def _url(self, concurso,
              base="http://www1.caixa.gov.br/loterias/loterias/%(loteria)s/",
