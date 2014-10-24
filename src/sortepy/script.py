@@ -60,7 +60,9 @@ def exec_consultar(loteria, concurso):
                 err.args, show_help=False, code=6)
 
     print("# resultado da %s %d" % (loteria.nome, result['concurso']))
-    print('numeros:', ' '.join("%02d" % n for n in result['numeros']))
+    print("numeros:")
+    for res_nums in result['numeros']:
+        print('-', ' '.join("%02d" % n for n in res_nums))
 
 
 def __print_closure(stdout):

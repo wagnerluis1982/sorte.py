@@ -24,23 +24,34 @@ APELIDOS = {
 LOTERIAS = {
     'quina': {
         'marcar': (5, 7), 'numeros': (1, 80),
-        'resultado': {'numeros': (21, 25)},
+        'resultado': {
+            'numeros': [(21, 25)],
+        },
     },
     'megasena': {
         'marcar': (6, 15), 'numeros': (1, 60), 'nome': "Mega-Sena",
-        'resultado': {'numeros': (28, 33)},
+        'resultado': {
+            'numeros': [(28, 33)],
+        },
     },
     'lotofacil': {
         'marcar': (15, 18), 'numeros': (1, 25),
-        'resultado': {'numeros': (3, 17)},
+        'resultado': {
+            'numeros': [(3, 17)],
+        },
     },
     'lotomania': {
         'marcar': (1, 50), 'numeros': (1, 100), 'padrao': 20,
         'resultado': {
-            'numeros': (6, 25), 'url-script': "_lotomania_pesquisa.asp",
+            'numeros': [(6, 25)], 'url-script': "_lotomania_pesquisa.asp",
         },
     },
-    'duplasena': {'marcar': (6, 15), 'numeros': (1, 50), 'nome': "Dupla Sena"},
+    'duplasena': {
+        'marcar': (6, 15), 'numeros': (1, 50), 'nome': "Dupla Sena",
+        'resultado': {
+            'numeros': [(4, 9), (12, 17)],
+        },
+    },
 }
 
 class Loteria:
@@ -81,12 +92,12 @@ class Loteria:
         conteudo_html = self.util.download(url, in_cache=concurso > 0)
         parser.feed(conteudo_html)
 
+        pos_nums = [xrange(p[0], p[1]+1) for p in posicao['numeros']]
         dados = parser.data()
-        pos_numeros = xrange(posicao['numeros'][0], posicao['numeros'][1]+1)
         try:
             result = {
                 'concurso': int(dados[posicao.get('concurso', 0)]),
-                'numeros': [int(dados[i]) for i in pos_numeros],
+                'numeros': [[int(dados[i]) for i in r] for r in pos_nums],
             }
             return result
         except ValueError:
@@ -94,7 +105,7 @@ class Loteria:
             raise ResultadoNaoDisponivel(self.nome, concurso)
 
     def _parser(self):
-        if self.nome in ('quina', 'megasena'):
+        if self.nome in ('quina', 'megasena', 'duplasena'):
             return QuinaParser()
         else:
             return LoteriaParser()
