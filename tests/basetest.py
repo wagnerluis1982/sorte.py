@@ -32,6 +32,11 @@ class LoteriaTestCase(BaseTestCase):
     # elemento é a aposta na quantidade padrão
     numeros = ()
 
+    # número do concurso para consultar
+    concurso = 0
+    # resultados da consulta para o concurso especificado
+    sorteios = ()
+
     def __init__(self, *args, **kwargs):
         if self.permitidos:
             self.infsup = min(self.permitidos), max(self.permitidos)
@@ -51,6 +56,12 @@ class LoteriaTestCase(BaseTestCase):
         # apostas com outras quantidades de números
         for n in _.numeros[1:]:
             _.check_gerar_aposta(n)
+
+    def test_consultar_resultado(_):
+        result = _.loto.consultar(_.concurso)
+        _.is_instance(result, dict)
+        _.eq(result['concurso'], _.concurso)
+        _.eq(result['numeros'], _.sorteios)
 
     def check_gerar_aposta(_, n):
         n = n or _.numeros[0]  # número padrão ou informado
