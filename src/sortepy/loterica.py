@@ -55,7 +55,7 @@ LOTERIAS = {
 }
 
 class Loteria:
-    def __init__(self, nome):
+    def __init__(self, nome, cfg_path=None):
         nome = APELIDOS.get(nome, nome)
         try:
             c = LOTERIAS[nome]
@@ -64,7 +64,7 @@ class Loteria:
 
         self.settings = c
         self.nome = nome
-        self.util = util.Util()
+        self.util = util.Util(cfg_path)
 
         self._range = xrange(c['numeros'][0], c['numeros'][1] + 1)
         self._min = c['marcar'][0]

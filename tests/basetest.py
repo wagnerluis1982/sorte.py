@@ -5,8 +5,10 @@ import os
 
 from unittest import TestCase
 
-# preparando path do projeto para os testes
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
+# preparando paths do projeto para os testes
+test_path = os.path.dirname(__file__)
+cfg_fixture_path = os.path.join(test_path, 'fixtures', 'config')
+sys.path.append(os.path.join(test_path, '..', 'src'))
 
 from sortepy.loterica import Loteria
 
@@ -36,7 +38,7 @@ class LoteriaTestCase(BaseTestCase):
         TestCase.__init__(self, *args, **kwargs)
 
     def setUp(self):
-        self.loto = Loteria(self.nome)
+        self.loto = Loteria(self.nome, cfg_path=cfg_fixture_path)
 
     def test_gerar_aposta(_):
         # gerar aposta na quantidade padrão
