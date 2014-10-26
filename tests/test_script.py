@@ -66,12 +66,19 @@ class ScriptTest(basetest.BaseTestCase):
             for no, linha in enumerate(linhas, 1):
                 _.eq(len([int(x) for x in linha.split()]), i)
 
-    def test_consultar_aposta(_):
+    def test_consultar_UMA_aposta(_):
         # consulta de apostas da quina
         args = (None, 'quina', '-c', '1')
         main(args, stdout=_.output, cfg_path=basetest.cfg_fixture_path)
         linha = _.output.line(3)
         _.eq(linha, "- 25 45 60 76 79\n")
+
+    def test_consultar_VARIAS_aposta(_):
+        # consulta de apostas da quina
+        args = (None, 'quina', '-c', '1', '-c', '2')
+        main(args, stdout=_.output, cfg_path=basetest.cfg_fixture_path)
+        linhas = [_.output.line(3), _.output.line(6)]
+        _.eq(linhas, ["- 25 45 60 76 79\n", "- 13 30 58 63 64\n"])
 
 
 class FakeStdOut:

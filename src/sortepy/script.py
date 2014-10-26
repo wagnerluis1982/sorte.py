@@ -49,20 +49,24 @@ def exec_gerar(loteria, quantidade, numeros):
         print(' '.join("%02d" % n for n in aposta))
 
 
-def exec_consultar(loteria, concurso):
-    try:
-        result = loteria.consultar(concurso)
-    except loterica.LoteriaNaoSuportada, err:
-        return error("ERRO: consulta para '%s' não implementada" %
-                err.args, show_help=False, code=6)
-    except loterica.ResultadoNaoDisponivel, err:
-        return error("ERRO: resultado da %s %d não disponível" %
-                err.args, show_help=False, code=6)
+def exec_consultar(loteria, concursos):
+    consultados = set()
+    for c in concursos:
+        if c not in consultados:
+            consultados.add(c)
+            try:
+                result = loteria.consultar(c)
+            except loterica.LoteriaNaoSuportada, err:
+                return error("ERRO: consulta para '%s' não implementada" %
+                        err.args, show_help=False, code=6)
+            except loterica.ResultadoNaoDisponivel, err:
+                return error("ERRO: resultado da %s %d não disponível" %
+                        err.args, show_help=False, code=6)
 
-    print("# resultado da %s %d" % (loteria.nome, result['concurso']))
-    print("numeros:")
-    for res_nums in result['numeros']:
-        print('-', ' '.join("%02d" % n for n in res_nums))
+            print("# resultado da %s %d" % (loteria.nome, result['concurso']))
+            print("numeros:")
+            for res_nums in result['numeros']:
+                print('-', ' '.join("%02d" % n for n in res_nums))
 
 
 def __print_closure(stdout):
@@ -90,7 +94,7 @@ def main(argv=sys.argv, stdout=sys.stdout, cfg_path=None):
     # Avalia os parâmetros passados
     numeros = None
     quantidade = None
-    concurso = None
+    concursos = []
     for option, arg in opts:
         if option in ("-h", "--help"):
             print(help_msg)
@@ -101,9 +105,9 @@ def main(argv=sys.argv, stdout=sys.stdout, cfg_path=None):
             quantidade = int(arg)
         elif option in ("-c", "--concurso"):
             if arg.isdigit():
-                concurso = int(arg)
+                concursos.append(int(arg))
             else:
-                concurso = -1
+                concursos.append(-1)
 
     if len(args) != 1:
         return error("ERRO: deve ser informado uma loteria", code=2)
@@ -114,10 +118,10 @@ def main(argv=sys.argv, stdout=sys.stdout, cfg_path=None):
     except loterica.LoteriaNaoSuportada:
         return error("ERRO: loteria '%s' não suportada" % nome, code=3)
 
-    if concurso:
+    if concursos:
         if quantidade or numeros:
             return error("ERRO: parâmetros incompatíveis", code=4)
-        return exec_consultar(loteria, concurso)
+        return exec_consultar(loteria, concursos)
     else:
         return exec_gerar(loteria, quantidade or 1, numeros)
 
