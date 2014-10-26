@@ -61,7 +61,7 @@ Se for preciso especificar o concurso, então basta utilizar o parâmetro
 Caso o parâmetro `-i|--stdin` seja ativado, as apostas serão lidas da entrada
 padrão, uma por linha até encontrar o EOF (Ctrl-D no Linux).
 
-    $ sorte.py quina [-c 1325] -i
+    $ sorte.py quina -c 1325 -i
     1,23,39,44,50
     5 9 15 50 75
     1-3 30 56
@@ -76,8 +76,6 @@ As linhas que iniciam por `#` são consideradas comentários.
 
 ### Consultando resultados
 
-**ATENÇÃO**: Ainda não implementado. Esta é a interface proposta.
-
 Para consultar, execute
 
     $ sorte.py quina -c|--concurso NUM
@@ -87,3 +85,8 @@ obter o último resultado disponível, basta passar um argumento vazio, conforme
 comando abaixo.
 
     $ sorte.py quina -c=
+
+Mais de uma consultas em um mesmo comando é possível, basta passar o argumento
+`-c` várias vezes:
+
+    $ sorte.py quina -c 1325 -c 1326
