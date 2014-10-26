@@ -69,6 +69,25 @@ def exec_consultar(loteria, concursos):
                 print('-', ' '.join("%02d" % n for n in res_nums))
 
 
+def exec_conferir(loteria, concurso, aposta):
+    aposta = [int(n) for n in aposta.split(',')]
+
+    try:
+        resp = loteria.conferir(concurso, aposta)
+    except loterica.LoteriaNaoSuportada, err:
+        return error("ERRO: conferência para '%s' não implementada" %
+                err.args, show_help=False, code=6)
+    except loterica.ResultadoNaoDisponivel, err:
+        return error("ERRO: resultado da %s %d não disponível" %
+                err.args, show_help=False, code=6)
+
+    print("# conferência da %s %d" % (loteria.nome, resp['concurso']))
+    print("- aposta:")
+    print("    numeros:", ' '.join("%02d" % n for n in aposta))
+    print("    acertou:", resp['acertou'])
+    print("    ganhou:", resp['ganhou'])
+
+
 def __print_closure(stdout):
     def pf(*args, **kwargs):
         kwargs.setdefault('file', stdout)
@@ -109,7 +128,7 @@ def main(argv=sys.argv, stdout=sys.stdout, cfg_path=None):
             else:
                 concursos.append(-1)
 
-    if len(args) != 1:
+    if len(args) < 1:
         return error("ERRO: deve ser informado uma loteria", code=2)
 
     nome = args[0]
@@ -118,10 +137,15 @@ def main(argv=sys.argv, stdout=sys.stdout, cfg_path=None):
     except loterica.LoteriaNaoSuportada:
         return error("ERRO: loteria '%s' não suportada" % nome, code=3)
 
+    apostas = args[1:]
+
     if concursos:
         if quantidade or numeros:
             return error("ERRO: parâmetros incompatíveis", code=4)
-        return exec_consultar(loteria, concursos)
+        elif apostas:
+            return exec_conferir(loteria, concursos[-1], apostas[0])
+        else:
+            return exec_consultar(loteria, concursos)
     else:
         return exec_gerar(loteria, quantidade or 1, numeros)
 

@@ -26,6 +26,11 @@ LOTERIAS = {
         'marcar': (5, 7), 'numeros': (1, 80),
         'resultado': {
             'numeros': [(21, 25)],
+            'premios': {
+                5: 7,
+                4: 9,
+                3: 11,
+            },
         },
     },
     'megasena': {
@@ -79,13 +84,16 @@ class Loteria:
         result = random.sample(self._range, marcar)
         return tuple(sorted(result))
 
-    def consultar(self, concurso=0):
+    def consultar(self, concurso=0, com_premios=False):
         parser = self._parser()
         if parser is None:
             raise LoteriaNaoSuportada(self.nome)
 
         posicao = self.settings.get('resultado')
         if posicao is None:
+            raise LoteriaNaoSuportada(self.nome)
+
+        if com_premios and posicao.get('premios') is None:
             raise LoteriaNaoSuportada(self.nome)
 
         url = self._url(concurso)
@@ -99,10 +107,22 @@ class Loteria:
                 'concurso': int(dados[posicao.get('concurso', 0)]),
                 'numeros': [[int(dados[i]) for i in r] for r in pos_nums],
             }
+            if com_premios:
+                result['premios'] = {}
+                for qnt, pos_premio in sorted(posicao['premios'].items()):
+                    result['premios'][qnt] = dados[pos_premio]
             return result
         except ValueError:
             self.util.cache_evict(url)
             raise ResultadoNaoDisponivel(self.nome, concurso)
+
+    def conferir(self, concurso, aposta):
+        result = self.consultar(concurso, com_premios=True)
+        acertou = len([1 for n in result['numeros'][0] if n in aposta])
+        resp = {'concurso': concurso, 'numeros': aposta, 'acertou': acertou,
+                'ganhou': result['premios'].get(acertou, '0,00')}
+
+        return resp
 
     def _parser(self):
         if self.nome in ('quina', 'megasena', 'duplasena'):
