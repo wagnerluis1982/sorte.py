@@ -6,6 +6,8 @@ from sortepy.script import main
 
 # Os testes do script são focados na loteria da Quina porque tem menos números
 # para verificar. Caso necessário, testes com outras loterias serão criados.
+# Como todas as loterias possuem testes individuais, isto não é um grande
+# problema.
 class ScriptTest(basetest.BaseTestCase):
     @classmethod
     def setUpClass(cls):
@@ -63,6 +65,13 @@ class ScriptTest(basetest.BaseTestCase):
             linhas = _.output.lines(2, 3)
             for no, linha in enumerate(linhas, 1):
                 _.eq(len([int(x) for x in linha.split()]), i)
+
+    def test_consultar_aposta(_):
+        # consulta de apostas da quina
+        args = (None, 'quina', '-c', '1')
+        main(args, stdout=_.output, cfg_path=basetest.cfg_fixture_path)
+        linha = _.output.line(3)
+        _.eq(linha, "- 25 45 60 76 79\n")
 
 
 class FakeStdOut:

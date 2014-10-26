@@ -72,7 +72,7 @@ def __print_closure(stdout):
     return pf
 
 
-def main(argv=sys.argv, stdout=sys.stdout):
+def main(argv=sys.argv, stdout=sys.stdout, cfg_path=None):
     # Redefine 'print' para usar outra stdout passado como parâmetro
     global print
     print = __print_closure(stdout)
@@ -110,7 +110,7 @@ def main(argv=sys.argv, stdout=sys.stdout):
 
     nome = args[0]
     try:
-        loteria = loterica.Loteria(nome.lower())
+        loteria = loterica.Loteria(nome.lower(), cfg_path=cfg_path)
     except loterica.LoteriaNaoSuportada:
         return error("ERRO: loteria '%s' não suportada" % nome, code=3)
 
