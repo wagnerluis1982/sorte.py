@@ -85,32 +85,32 @@ class ScriptTest(basetest.BaseTestCase):
         main(args, stdout=_.output, cfg_path=basetest.cfg_fixture_path)
         linhas = _.output.lines(2, 4)
         _.eq(linhas, ["- aposta: 01 25 39 44 76\n",
-                      "  acertou: 2\n",
-                      "  ganhou: 0,00\n"])
+                      "  acertou:\n",
+                      "    2: R$ 0,00\n"])
 
     def test_conferir_VARIAS_apostas(_):
         args = (None, 'quina', '-c', '1', '1,25,39,44,76', '25,39,45,66,76')
         main(args, stdout=_.output, cfg_path=basetest.cfg_fixture_path)
         linhas = _.output.lines(2, 4)
         _.eq(linhas, ["- aposta: 01 25 39 44 76\n",
-                      "  acertou: 2\n",
-                      "  ganhou: 0,00\n"])
+                      "  acertou:\n",
+                      "    2: R$ 0,00\n"])
         linhas = _.output.lines(5, 7)
         _.eq(linhas, ["- aposta: 25 39 45 66 76\n",
-                      "  acertou: 3\n",
-                      "  ganhou: 42.982,00\n"])
+                      "  acertou:\n",
+                      "    3: R$ 42.982,00\n"])
 
     def test_conferir_apostas_em_VARIOS_concursos(_):
         args = (None, 'quina', '-c', '1', '-c', '2', '13,25,58,64,70')
         main(args, stdout=_.output, cfg_path=basetest.cfg_fixture_path)
         linhas = _.output.lines(2, 4)
         _.eq(linhas, ["- aposta: 13 25 58 64 70\n",
-                      "  acertou: 1\n",
-                      "  ganhou: 0,00\n"])
+                      "  acertou:\n",
+                      "    1: R$ 0,00\n"])
         linhas = _.output.lines(6, 8)
         _.eq(linhas, ["- aposta: 13 25 58 64 70\n",
-                      "  acertou: 3\n",
-                      "  ganhou: 32.422,00\n"])
+                      "  acertou:\n",
+                      "    3: R$ 32.422,00\n"])
 
 
 class FakeStdOut:

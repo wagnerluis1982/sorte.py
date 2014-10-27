@@ -83,11 +83,9 @@ def exec_conferir(loteria, concursos, apostas):
         print("# conferência da %s %d" % (loteria.nome, resp[0]['concurso']))
         for r in resp:
             print("- aposta:", ' '.join("%02d" % n for n in r['numeros']))
-            if isinstance(r['acertou'], list):
-                r['acertou'] = ' / '.join(map(str, r['acertou']))
-                r['ganhou'] = ' / '.join(r['ganhou'])
-            print("  acertou:", r['acertou'])
-            print("  ganhou:", r['ganhou'])
+            print("  acertou:")
+            for n, ganhou in zip(r['acertou'], r['ganhou']):
+                print("    %d: R$ %s" % (n,ganhou))
 
 
 def __print_closure(stdout):
