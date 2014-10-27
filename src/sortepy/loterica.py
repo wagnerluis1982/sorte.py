@@ -116,12 +116,15 @@ class Loteria:
             self.util.cache_evict(url)
             raise ResultadoNaoDisponivel(self.nome, concurso)
 
-    def conferir(self, concurso, aposta):
+    def conferir(self, concurso, apostas):
         result = self.consultar(concurso, com_premios=True)
-        acertou = len([1 for n in result['numeros'][0] if n in aposta])
-        resp = {'concurso': concurso, 'numeros': aposta, 'acertou': acertou,
-                'ganhou': result['premios'].get(acertou, '0,00')}
-
+        resp = []
+        for aposta in apostas:
+            acertou = len([1 for n in result['numeros'][0] if n in aposta])
+            resp.append({
+                'concurso': concurso, 'numeros': aposta, 'acertou': acertou,
+                'ganhou': result['premios'].get(acertou, '0,00'),
+            })
         return resp
 
     def _parser(self):
