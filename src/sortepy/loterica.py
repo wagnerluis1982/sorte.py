@@ -55,6 +55,12 @@ LOTERIAS = {
         'marcar': (6, 15), 'numeros': (1, 50), 'nome': "Dupla Sena",
         'resultado': {
             'numeros': [(4, 9), (12, 17)],
+            'premios': {
+                -6: 21,
+                6: 24,
+                5: 25,
+                4: 27,
+            },
         },
     },
 }
@@ -118,6 +124,10 @@ class Loteria:
 
     def conferir(self, concurso, apostas):
         result = self.consultar(concurso, com_premios=True)
+
+        if self.nome == "duplasena":
+            return self._conferir_duplasena(concurso, apostas, result)
+
         resp = []
         for aposta in apostas:
             acertou = len([1 for n in result['numeros'][0] if n in aposta])
@@ -125,6 +135,21 @@ class Loteria:
                 'concurso': result['concurso'], 'numeros': aposta,
                 'acertou': acertou,
                 'ganhou': result['premios'].get(acertou, '0,00'),
+            })
+        return resp
+
+    def _conferir_duplasena(self, concurso, apostas, r):
+        resp = []
+        for aposta in apostas:
+            acertou = [len([1 for n in r['numeros'][i] if n in aposta])
+                       for i in (0, 1)]
+            if acertou[0] == 6:
+                acertou[0] = -6
+            ganhou = [r['premios'].get(acertou[i], '0,00') for i in (0, 1)]
+            resp.append({
+                'concurso': r['concurso'], 'numeros': aposta,
+                'acertou': acertou,
+                'ganhou': ganhou,
             })
         return resp
 
