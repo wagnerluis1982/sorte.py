@@ -122,7 +122,8 @@ class Loteria:
         for aposta in apostas:
             acertou = len([1 for n in result['numeros'][0] if n in aposta])
             resp.append({
-                'concurso': concurso, 'numeros': aposta, 'acertou': acertou,
+                'concurso': result['concurso'], 'numeros': aposta,
+                'acertou': acertou,
                 'ganhou': result['premios'].get(acertou, '0,00'),
             })
         return resp

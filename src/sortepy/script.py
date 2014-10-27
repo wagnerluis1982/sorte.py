@@ -80,7 +80,7 @@ def exec_conferir(loteria, concursos, apostas):
             return error("ERRO: resultado da %s %d não disponível" %
                     err.args, show_help=False, code=6)
 
-        print("# conferência da %s %d" % (loteria.nome, concurso))
+        print("# conferência da %s %d" % (loteria.nome, resp[0]['concurso']))
         for r in resp:
             print("- aposta:")
             print("    numeros:", ' '.join("%02d" % n for n in r['numeros']))
@@ -148,6 +148,8 @@ def main(argv=sys.argv, stdout=sys.stdout, cfg_path=None):
             return exec_conferir(loteria, concursos, apostas)
         else:
             return exec_consultar(loteria, concursos)
+    elif len(args) > 1:
+        return exec_conferir(loteria, [-1], apostas)
     else:
         return exec_gerar(loteria, quantidade or 1, numeros)
 
