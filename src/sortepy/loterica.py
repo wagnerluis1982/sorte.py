@@ -124,34 +124,23 @@ class Loteria:
 
     def conferir(self, concurso, apostas):
         result = self.consultar(concurso, com_premios=True)
-
-        if self.nome == "duplasena":
-            return self._conferir_duplasena(concurso, apostas, result)
-
         resp = []
         for aposta in apostas:
-            acertou = len([1 for n in result['numeros'][0] if n in aposta])
+            acertou = [len([1 for n in res if n in aposta])
+                       for res in result['numeros']]
+            ganhou = self._ganhou(result, acertou[:])
             resp.append({
                 'concurso': result['concurso'], 'numeros': aposta,
-                'acertou': acertou,
-                'ganhou': result['premios'].get(acertou, '0,00'),
-            })
-        return resp
-
-    def _conferir_duplasena(self, concurso, apostas, r):
-        resp = []
-        for aposta in apostas:
-            acertou = [len([1 for n in r['numeros'][i] if n in aposta])
-                       for i in (0, 1)]
-            if acertou[0] == 6:
-                acertou[0] = -6
-            ganhou = [r['premios'].get(acertou[i], '0,00') for i in (0, 1)]
-            resp.append({
-                'concurso': r['concurso'], 'numeros': aposta,
                 'acertou': acertou,
                 'ganhou': ganhou,
             })
         return resp
+
+    def _ganhou(self, result, acertou):
+        if self.nome == "duplasena" and acertou[0] == 6:
+            acertou[0] = -6
+
+        return [result['premios'].get(n, '0,00') for n in acertou]
 
     def _parser(self):
         if self.nome in ('quina', 'megasena', 'duplasena'):
