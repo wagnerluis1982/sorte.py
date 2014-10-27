@@ -141,7 +141,9 @@ def main(argv=sys.argv, stdout=sys.stdout, cfg_path=None):
 
     args = args[1:]
     if len(args) == 0 and usar_stdin:
-        args = sys.stdin.readlines()
+        for linha in sys.stdin.readlines():
+            if not linha.lstrip().startswith('#'):
+                args.append(linha)
     apostas = [[int(n) for n in aposta.split(',')] for aposta in args]
 
     if concursos:

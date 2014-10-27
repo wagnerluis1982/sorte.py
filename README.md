@@ -69,7 +69,7 @@ conforme exemplo.
 
     $ sorte.py quina -c 1325 -i < fezinha-na-quina.txt
 
-*TODO:* As linhas que iniciam por `#` são consideradas comentários.
+As linhas que iniciam por `#` são consideradas comentários.
 
 ### Consultando resultados
 
