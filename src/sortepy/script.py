@@ -103,9 +103,9 @@ def main(argv=sys.argv, stdout=sys.stdout, cfg_path=None):
     try:
         opts, args = getopt.gnu_getopt(argv[1:],
         # opções curtas
-        "hn:q:c:",
+        "hn:q:c:i",
         # opções longas
-        ["help", "numeros=", "quantidade=", "concurso="])
+        ["help", "numeros=", "quantidade=", "concurso=", "stdin"])
     except getopt.GetoptError, err:
         return error("ERRO:", err, code=1)
 
@@ -113,6 +113,7 @@ def main(argv=sys.argv, stdout=sys.stdout, cfg_path=None):
     numeros = None
     quantidade = None
     concursos = []
+    usar_stdin = False
     for option, arg in opts:
         if option in ("-h", "--help"):
             print(help_msg)
@@ -126,6 +127,8 @@ def main(argv=sys.argv, stdout=sys.stdout, cfg_path=None):
                 concursos.append(int(arg))
             else:
                 concursos.append(-1)
+        elif option in ("-i", "--stdin"):
+            usar_stdin = True
 
     if len(args) < 1:
         return error("ERRO: deve ser informado uma loteria", code=2)
@@ -136,9 +139,10 @@ def main(argv=sys.argv, stdout=sys.stdout, cfg_path=None):
     except loterica.LoteriaNaoSuportada:
         return error("ERRO: loteria '%s' não suportada" % nome, code=3)
 
-    apostas = args[1:]
-    for i, aposta in enumerate(apostas):
-        apostas[i] = [int(n) for n in aposta.split(',')]
+    args = args[1:]
+    if len(args) == 0 and usar_stdin:
+        args = sys.stdin.readlines()
+    apostas = [[int(n) for n in aposta.split(',')] for aposta in args]
 
     if concursos:
         if quantidade or numeros:
@@ -147,7 +151,7 @@ def main(argv=sys.argv, stdout=sys.stdout, cfg_path=None):
             return exec_conferir(loteria, concursos, apostas)
         else:
             return exec_consultar(loteria, concursos)
-    elif len(args) > 1:
+    elif len(apostas) > 0:
         return exec_conferir(loteria, [-1], apostas)
     else:
         return exec_gerar(loteria, quantidade or 1, numeros)

@@ -43,8 +43,6 @@ Loterias disponíveis: duplasena, lotofacil, lotomania, megasena, quina.
 
 ### Conferindo apostas
 
-**ATENÇÃO**: Ainda não implementado. Esta é a interface proposta.
-
 Para conferir três apostas do último concurso, execute
 
     $ sorte.py quina '1,23,39,44,50' '5 9 15 50 75' '1-3 30 56'
@@ -66,13 +64,12 @@ padrão, uma por linha até encontrar o EOF (Ctrl-D no Linux).
     5 9 15 50 75
     1-3 30 56
 
-O parâmetro `-i` admite um nome de arquivo como argumento, assim os dois
-comandos abaixo são equivalentes.
+Com o parâmetro `-i`, fica possível a utilização de um arquivo com as apostas,
+conforme exemplo.
 
     $ sorte.py quina -c 1325 -i < fezinha-na-quina.txt
-    $ sorte.py quina -c 1325 -i fezinha-na-quina.txt
 
-As linhas que iniciam por `#` são consideradas comentários.
+*TODO:* As linhas que iniciam por `#` são consideradas comentários.
 
 ### Consultando resultados
 
