@@ -103,6 +103,20 @@ class ScriptTest(basetest.BaseTestCase):
                       "    acertou: 3\n",
                       "    ganhou: 42.982,00\n"])
 
+    def test_conferir_apostas_em_VARIOS_concursos(_):
+        args = (None, 'quina', '-c', '1', '-c', '2', '13,25,58,64,70')
+        main(args, stdout=_.output, cfg_path=basetest.cfg_fixture_path)
+        linhas = _.output.lines(2, 5)
+        _.eq(linhas, ["- aposta:\n",
+                      "    numeros: 13 25 58 64 70\n",
+                      "    acertou: 1\n",
+                      "    ganhou: 0,00\n"])
+        linhas = _.output.lines(7, 10)
+        _.eq(linhas, ["- aposta:\n",
+                      "    numeros: 13 25 58 64 70\n",
+                      "    acertou: 3\n",
+                      "    ganhou: 32.422,00\n"])
+
 
 class FakeStdOut:
     def __init__(self):

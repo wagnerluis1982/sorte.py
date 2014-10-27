@@ -69,22 +69,23 @@ def exec_consultar(loteria, concursos):
                 print('-', ' '.join("%02d" % n for n in res_nums))
 
 
-def exec_conferir(loteria, concurso, apostas):
-    try:
-        resp = loteria.conferir(concurso, apostas)
-    except loterica.LoteriaNaoSuportada, err:
-        return error("ERRO: conferência para '%s' não implementada" %
-                err.args, show_help=False, code=6)
-    except loterica.ResultadoNaoDisponivel, err:
-        return error("ERRO: resultado da %s %d não disponível" %
-                err.args, show_help=False, code=6)
+def exec_conferir(loteria, concursos, apostas):
+    for concurso in concursos:
+        try:
+            resp = loteria.conferir(concurso, apostas)
+        except loterica.LoteriaNaoSuportada, err:
+            return error("ERRO: conferência para '%s' não implementada" %
+                    err.args, show_help=False, code=6)
+        except loterica.ResultadoNaoDisponivel, err:
+            return error("ERRO: resultado da %s %d não disponível" %
+                    err.args, show_help=False, code=6)
 
-    print("# conferência da %s %d" % (loteria.nome, concurso))
-    for r in resp:
-        print("- aposta:")
-        print("    numeros:", ' '.join("%02d" % n for n in r['numeros']))
-        print("    acertou:", r['acertou'])
-        print("    ganhou:", r['ganhou'])
+        print("# conferência da %s %d" % (loteria.nome, concurso))
+        for r in resp:
+            print("- aposta:")
+            print("    numeros:", ' '.join("%02d" % n for n in r['numeros']))
+            print("    acertou:", r['acertou'])
+            print("    ganhou:", r['ganhou'])
 
 
 def __print_closure(stdout):
@@ -144,7 +145,7 @@ def main(argv=sys.argv, stdout=sys.stdout, cfg_path=None):
         if quantidade or numeros:
             return error("ERRO: parâmetros incompatíveis", code=4)
         elif apostas:
-            return exec_conferir(loteria, concursos[-1], apostas)
+            return exec_conferir(loteria, concursos, apostas)
         else:
             return exec_consultar(loteria, concursos)
     else:
