@@ -107,8 +107,7 @@ def main(argv=sys.argv, stdout=sys.stdout, cfg_path=None):
         # opções longas
         ["help", "numeros=", "quantidade=", "concurso="])
     except getopt.GetoptError, err:
-        opt = (len(err.opt) == 1 and '-' or '--') + err.opt
-        return error("ERRO: opção", opt, "desconhecida", code=1)
+        return error("ERRO:", err, code=1)
 
     # Avalia os parâmetros passados
     numeros = None
