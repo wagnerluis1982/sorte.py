@@ -37,18 +37,38 @@ LOTERIAS = {
         'marcar': (6, 15), 'numeros': (1, 60), 'nome': "Mega-Sena",
         'resultado': {
             'numeros': [(28, 33)],
+            'premios': {
+                6: 11,
+                5: 13,
+                4: 15,
+            },
         },
     },
     'lotofacil': {
         'marcar': (15, 18), 'numeros': (1, 25),
         'resultado': {
             'numeros': [(3, 17)],
+            'premios': {
+                15: 19,
+                14: 21,
+                13: 23,
+                12: 25,
+                11: 27,
+            },
         },
     },
     'lotomania': {
         'marcar': (1, 50), 'numeros': (1, 100), 'padrao': 20,
         'resultado': {
             'numeros': [(6, 25)], 'url-script': "_lotomania_pesquisa.asp",
+            'premios': {
+                20: 28,
+                19: 30,
+                18: 32,
+                17: 34,
+                16: 36,
+                0: 38,
+            },
         },
     },
     'duplasena': {

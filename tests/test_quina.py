@@ -12,23 +12,6 @@ class QuinaTest(basetest.LoteriaTestCase):
     concurso = 1
     sorteios = [[25, 45, 60, 76, 79]]
 
-    def test_conferir_aposta(_):
-        apostas = [[1, 25, 39, 44, 76]]
-        resp = _.loto.conferir(_.concurso, apostas)
-        _.is_instance(resp, list)
-        _.eq(resp[0]['concurso'], _.concurso)
-        _.eq(resp[0]['numeros'], apostas[0])
-        _.eq(resp[0]['acertou'], [2])
-        _.eq(resp[0]['ganhou'], ['0,00'])
-
-    def test_conferir_varias_apostas(_):
-        apostas = [[1, 25, 39, 44, 76], [25, 39, 45, 76, 79]]
-        resp = _.loto.conferir(_.concurso, apostas)
-        esperados = {'acertou': ([2], [4]),
-                     'ganhou': (['0,00'], ['1.788.927,00'])}
-        _.is_instance(resp, list)
-        for i in range(len(apostas)):
-            _.eq(resp[i]['concurso'], _.concurso)
-            _.eq(resp[i]['numeros'], apostas[i])
-            _.eq(resp[i]['acertou'], esperados['acertou'][i])
-            _.eq(resp[i]['ganhou'], esperados['ganhou'][i])
+    # atributos do teste 'conferir aposta'
+    apostas = [[1, 25, 39, 44, 76], [25, 39, 45, 76, 79]]
+    esperados = {'acertou': ([2], [4]), 'ganhou': (['0,00'], ['1.788.927,00'])}

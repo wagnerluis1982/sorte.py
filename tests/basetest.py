@@ -37,6 +37,11 @@ class LoteriaTestCase(BaseTestCase):
     # resultados da consulta para o concurso especificado
     sorteios = ()
 
+    # apostas para conferir
+    apostas = ()
+    # resultados esperados das conferências
+    esperados = None
+
     def __init__(self, *args, **kwargs):
         if self.permitidos:
             self.infsup = min(self.permitidos), max(self.permitidos)
@@ -62,6 +67,23 @@ class LoteriaTestCase(BaseTestCase):
         _.is_instance(result, dict)
         _.eq(result['concurso'], _.concurso)
         _.eq(result['numeros'], _.sorteios)
+
+    def test_conferir_aposta(_):
+        resp = _.loto.conferir(_.concurso, _.apostas[:1])
+        _.is_instance(resp, list)
+        _.eq(resp[0]['concurso'], _.concurso)
+        _.eq(resp[0]['numeros'], _.apostas[0])
+        _.eq(resp[0]['acertou'], _.esperados['acertou'][0])
+        _.eq(resp[0]['ganhou'], _.esperados['ganhou'][0])
+
+    def test_conferir_varias_apostas(_):
+        resp = _.loto.conferir(_.concurso, _.apostas)
+        _.is_instance(resp, list)
+        for i in range(len(_.apostas)):
+            _.eq(resp[i]['concurso'], _.concurso)
+            _.eq(resp[i]['numeros'], _.apostas[i])
+            _.eq(resp[i]['acertou'], _.esperados['acertou'][i])
+            _.eq(resp[i]['ganhou'], _.esperados['ganhou'][i])
 
     def check_gerar_aposta(_, n):
         n = n or _.numeros[0]  # número padrão ou informado
