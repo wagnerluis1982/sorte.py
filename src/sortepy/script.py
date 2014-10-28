@@ -3,6 +3,7 @@ from __future__ import print_function
 
 import __builtin__
 import getopt
+import re
 import sys
 
 from . import loterica
@@ -144,7 +145,14 @@ def main(argv=sys.argv, stdout=sys.stdout, cfg_path=None):
         for linha in sys.stdin.readlines():
             if not linha.lstrip().startswith('#'):
                 args.append(linha)
-    apostas = [[int(n) for n in aposta.split(',')] for aposta in args]
+
+    apostas = []
+    for arg in args:
+        aposta = []
+        for n in re.split('[, ]+', arg):
+            fx = map(int, n.split('-', 1))
+            aposta.extend(xrange(fx[0], fx[-1]+1))
+        apostas.append(aposta)
 
     if concursos:
         if quantidade or numeros:
