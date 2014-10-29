@@ -10,7 +10,7 @@ from . import loterica
 
 
 help_msg = ''.join([
-"Uso: %s LOTERIA [opcoes]\n" % sys.argv[0],
+"Uso: %s LOTERIA [opcoes] [APOSTA...]\n" % sys.argv[0],
 """
 O `sorte.py` é um gerador e verificador de apostas de loterias
 Sem opções explícitas é gerada uma aposta da LOTERIA informada
@@ -20,8 +20,14 @@ Opções de geração de apostas:
   -n --numeros      Quantos números para marcar em cada aposta gerada. Se não
                       informado o padrão depende da LOTERIA informada
 
-Opções de consulta:
-  -c --concurso     Número do concurso para consultar ou verificar
+Opções de consulta ou conferência:
+  -c --concurso     Número do concurso para consultar ou conferir. Pode ser
+                      passada várias vezes
+  -i --stdin        Recebe as apostas da entrada padrão, útil para manter as
+                      apostas em um arquivo
+
+  Se houver pelo menos uma aposta como argumento ou a opção -i for passada, o
+    script assume a função de conferência de apostas
 
 Opções gerais:
   -h --help         Mostra esta ajuda e finaliza

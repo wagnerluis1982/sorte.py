@@ -32,7 +32,7 @@ Para ter *uma* aposta gerada, na quantidade padrão da Quina, por exemplo, basta
 
     $ sorte.py quina
 
-Outras opções disponíveis para geração:
+#### Todas as opções de geração
 
     -q --quantidade   Quantas apostas deverão ser geradas. Padrão: 1
     -n --numeros      Quantos números cada aposta gerada terá. Se não informado
@@ -71,19 +71,48 @@ conforme exemplo.
 
 As linhas que iniciam por `#` são consideradas comentários.
 
+#### Conferindo vários concursos
+
+O script permite conferir vários concursos de uma vez, passando o argumento `-c`
+várias vezes:
+
+    $ sorte.py duplasena -c 1130 -c 1131 -i < minhas_apostas.txt
+
+#### Todas as opções de conferência
+
+    -c --concurso     Número do concurso para consultar ou conferir. Pode ser
+                        passada várias vezes
+    -i --stdin        Recebe as apostas da entrada padrão, útil para manter as
+                        apostas em um arquivo
+
 ### Consultando resultados
 
 Para consultar, execute
 
-    $ sorte.py quina -c|--concurso NUM
+    $ sorte.py JOGO -c|--concurso NUM
 
-onde o argumento NUM é o número do concurso em que quer o resultado. Se quiser
+onde o argumento `NUM` é o número do concurso em que quer o resultado. Se quiser
 obter o último resultado disponível, basta passar um argumento vazio, conforme
 comando abaixo.
 
-    $ sorte.py quina -c=
+    $ sorte.py lotofacil -c=
 
-Mais de uma consultas em um mesmo comando é possível, basta passar o argumento
-`-c` várias vezes:
+#### Consultando vários concursos
 
-    $ sorte.py quina -c 1325 -c 1326
+Semelhante à conferência, é possível consultar vários concursos de uma vez,
+passando o argumento `-c` várias vezes:
+
+    $ sorte.py duplasena -c 1130 -c 1131
+
+#### Todas as opções de consulta
+
+    -c --concurso     Número do concurso para consultar ou conferir. Pode ser
+                        passada várias vezes
+
+### TODO
+
+- Destacar os números acertados na conferência
+- Permitir conferir ou consultar passando uma faixa de concursos
+
+        $ sorte.py sena -c 1001-1003
+        $ sorte.py quina -c 1325-1330 -i < minhas_apostas.txt
