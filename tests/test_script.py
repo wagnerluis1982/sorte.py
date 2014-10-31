@@ -70,15 +70,18 @@ class ScriptTest(basetest.BaseTestCase):
         # consulta de apostas da quina
         args = (None, 'quina', '-c', '1')
         main(args, stdout=_.output, cfg_path=basetest.cfg_fixture_path)
-        linha = _.output.line(3)
-        _.eq(linha, "- 25 45 60 76 79\n")
+        linhas = _.output.lines(2, 3)
+        _.eq(linhas, ["quina:\n",
+                      "  1: 25 45 60 76 79\n"])
 
     def test_consultar_VARIOS_resultados(_):
         # consulta de apostas da quina
         args = (None, 'quina', '-c', '1', '-c', '2')
         main(args, stdout=_.output, cfg_path=basetest.cfg_fixture_path)
-        linhas = [_.output.line(3), _.output.line(6)]
-        _.eq(linhas, ["- 25 45 60 76 79\n", "- 13 30 58 63 64\n"])
+        linhas = _.output.lines(2, 4)
+        _.eq(linhas, ["quina:\n",
+                      "  1: 25 45 60 76 79\n",
+                      "  2: 13 30 58 63 64\n"])
 
     def test_conferir_UMA_aposta(_):
         args = (None, 'quina', '-c', '1', '1,25,39,44,76')

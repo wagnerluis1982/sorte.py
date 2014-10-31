@@ -58,6 +58,8 @@ def exec_gerar(loteria, quantidade, numeros):
 
 def exec_consultar(loteria, concursos):
     consultados = set()
+    print("# resultados da", loteria.nome)
+    print("%s:" % loteria.nome)
     for c in concursos:
         if c not in consultados:
             consultados.add(c)
@@ -70,10 +72,9 @@ def exec_consultar(loteria, concursos):
                 return error("ERRO: resultado da %s %d não disponível" %
                         err.args, show_help=False, code=6)
 
-            print("# resultado da %s %d" % (loteria.nome, result['concurso']))
-            print("numeros:")
             for res_nums in result['numeros']:
-                print('-', ' '.join("%02d" % n for n in res_nums))
+                print("  %d:" % result['concurso'],
+                      ' '.join("%02d" % n for n in res_nums))
 
 
 def exec_conferir(loteria, concursos, apostas):
