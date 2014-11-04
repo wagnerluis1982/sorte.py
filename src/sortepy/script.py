@@ -114,8 +114,13 @@ def exec_conferir(loteria, concursos, apostas):
     for resp in resultados:
         print("  %d:" % resp[0]['concurso'])
         for r in resp:
-            print("  - aposta:", ' '.join("%02d" % n for n in r['numeros']))
-            print("    acertou:")
+            print("  - aposta:", end='')
+            for n in r['numeros']:
+                if n in r['acertou'][0]:
+                    print('', underline("%02d" % n), end='')
+                else:
+                    print(" %02d" % n, end='')
+            print("\n    acertou:")
             for acertou, ganhou in zip(r['acertou'], r['ganhou']):
                 print("      %d: R$ %s" % (len(acertou), ganhou))
 
@@ -125,19 +130,25 @@ def exec_conferir(loteria, concursos, apostas):
 
 def __print_closure(stdout):
     def pf(*args, **kwargs):
-        if stdout.isatty() and kwargs.get('underline'):
-            args.insert(0, '\x1b[4m')
-            args.append('\x1b[0m')
-
         kwargs.setdefault('file', stdout)
         __builtin__.print(*args, **kwargs)
     return pf
+
+def __underline_closure(stdout):
+    if stdout.isatty():
+        return lambda arg: "\x1b[4m%s\x1b[0m" % arg
+    else:
+        return lambda arg: arg
 
 
 def main(argv=sys.argv, stdout=sys.stdout, cfg_path=None):
     # Redefine 'print' para usar outra stdout passado como parâmetro
     global print
     print = __print_closure(stdout)
+
+    # Define a função underline global
+    global underline
+    underline = __underline_closure(stdout)
 
     try:
         opts, args = getopt.gnu_getopt(argv[1:],

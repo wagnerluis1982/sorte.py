@@ -112,7 +112,3 @@ Semelhante à conferência, é possível consultar vários concursos de uma vez:
 
     -c --concurso     Número do concurso para consultar ou conferir. Pode ser
                         passada várias vezes
-
-### TODO
-
-- Destacar os números acertados na conferência
