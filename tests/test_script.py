@@ -137,6 +137,9 @@ class FakeStdOut:
             else:
                 buf.extend(lines)
 
+    def isatty(self):
+        return False
+
     def clear(self):
         del self.buf[:]
 

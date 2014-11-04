@@ -146,9 +146,9 @@ class Loteria:
         result = self.consultar(concurso, com_premios=True)
         resp = []
         for aposta in apostas:
-            acertou = [len([1 for n in res if n in aposta])
+            acertou = [[n for n in res if n in aposta]
                        for res in result['numeros']]
-            ganhou = self._ganhou(result, acertou[:])
+            ganhou = self._ganhou(result, acertou)
             resp.append({
                 'concurso': result['concurso'], 'numeros': aposta,
                 'acertou': acertou,
@@ -157,6 +157,7 @@ class Loteria:
         return resp
 
     def _ganhou(self, result, acertou):
+        acertou = [len(t) for t in acertou]
         if self.nome == "duplasena" and acertou[0] == 6:
             acertou[0] = -6
 

@@ -16,5 +16,5 @@ class DuplaSenaTest(basetest.LoteriaTestCase):
 
     # atributos do teste 'conferir aposta'
     apostas = [[1, 7, 41, 48, 50], [25, 39, 44, 76, 79]]
-    esperados = {'acertou': ([4, 1], [0, 1]),
+    esperados = {'acertou': ([[7, 41, 48, 50], [41]], [[], [44]]),
                  'ganhou': (['97,16', '0,00'], ['0,00', '0,00'])}

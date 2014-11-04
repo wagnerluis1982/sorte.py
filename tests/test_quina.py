@@ -14,4 +14,5 @@ class QuinaTest(basetest.LoteriaTestCase):
 
     # atributos do teste 'conferir aposta'
     apostas = [[1, 25, 39, 44, 76], [25, 39, 45, 76, 79]]
-    esperados = {'acertou': ([2], [4]), 'ganhou': (['0,00'], ['1.788.927,00'])}
+    esperados = {'acertou': ([[25, 76]], [[25, 45, 76, 79]]),
+                 'ganhou': (['0,00'], ['1.788.927,00'])}

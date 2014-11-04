@@ -80,15 +80,15 @@ def iter_resultados(fun, args, erros=set()):
 
 
 def exec_consultar(loteria, concursos):
-    print("# resultados da", loteria.nome)
-    print("%s:" % loteria.nome)
-
     erros = set()
     try:
         resultados = iter_resultados(loteria.consultar, (concursos,), erros)
     except loterica.LoteriaNaoSuportada, err:
         return error("ERRO: consulta para '%s' não implementada" %
                      err.args, show_help=False, code=6)
+
+    print("# resultados da", loteria.nome)
+    print("%s:" % loteria.nome)
 
     for result in resultados:
         for res_nums in result['numeros']:
@@ -100,9 +100,6 @@ def exec_consultar(loteria, concursos):
 
 
 def exec_conferir(loteria, concursos, apostas):
-    print("# conferência da", loteria.nome)
-    print("%s:" % loteria.nome)
-
     erros = set()
     try:
         resultados = iter_resultados(loteria.conferir, (concursos, apostas),
@@ -111,13 +108,16 @@ def exec_conferir(loteria, concursos, apostas):
         return error("ERRO: conferência para '%s' não implementada" %
                      err.args, show_help=False, code=6)
 
+    print("# conferência da", loteria.nome)
+    print("%s:" % loteria.nome)
+
     for resp in resultados:
         print("  %d:" % resp[0]['concurso'])
         for r in resp:
             print("  - aposta:", ' '.join("%02d" % n for n in r['numeros']))
             print("    acertou:")
-            for n, ganhou in zip(r['acertou'], r['ganhou']):
-                print("      %d: R$ %s" % (n, ganhou))
+            for acertou, ganhou in zip(r['acertou'], r['ganhou']):
+                print("      %d: R$ %s" % (len(acertou), ganhou))
 
     if erros:
         print("\n  erros:", ', '.join(sorted(map(str, erros))))
@@ -125,6 +125,10 @@ def exec_conferir(loteria, concursos, apostas):
 
 def __print_closure(stdout):
     def pf(*args, **kwargs):
+        if stdout.isatty() and kwargs.get('underline'):
+            args.insert(0, '\x1b[4m')
+            args.append('\x1b[0m')
+
         kwargs.setdefault('file', stdout)
         __builtin__.print(*args, **kwargs)
     return pf

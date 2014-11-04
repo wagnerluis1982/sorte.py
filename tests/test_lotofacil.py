@@ -15,4 +15,7 @@ class LotofacilTest(basetest.LoteriaTestCase):
     # atributos do teste 'conferir aposta'
     apostas = [[1, 2, 4, 6, 7, 9, 10, 11, 12, 14, 15, 17, 23, 24, 25],
                [2, 3, 5, 6, 9, 10, 11, 13, 14, 16, 18, 20, 23, 24, 25]]
-    esperados = {'acertou': ([9], [15]), 'ganhou': (['0,00'], ['49.765,82'])}
+    esperados = {'acertou': ([[2, 6, 9, 10, 11, 14, 23, 24, 25]],
+                             [[2, 3, 5, 6, 9, 10, 11, 13, 14, 16, 18, 20, 23,
+                               24, 25]]),
+                 'ganhou': (['0,00'], ['49.765,82'])}
