@@ -5,6 +5,7 @@ import errno
 import os
 import sqlite3
 import urllib2
+import time
 
 
 def get_config_path(app='sortepy'):
@@ -64,6 +65,7 @@ class Util(object):
 
         # Define atributos de configuração
         self.pages_cache = os.path.join(cache_path, 'paginas.db')
+        self.temp_cache = os.path.join(cache_path, 'paginas-temp.db')
         self.in_cache = True
 
     def download(self, url, in_cache=None):
@@ -98,10 +100,21 @@ class Util(object):
         return conteudo
 
     def cache(self, url, conteudo=None):
-        # Sem contéudo: leitura do cache
+        # Sem conteúdo: leitura do cache
         if conteudo is None:
-            with FileDB.open(self.pages_cache) as db:
-                return db.get(url)
+            try:
+                with FileDB.open(self.pages_cache) as db:
+                    return db[url]
+            except KeyError:
+                with FileDB.open(self.temp_cache) as db_temp:
+                    valor = db_temp.get(url)
+                    if valor:
+                        timestamp, conteudo = valor.split('|', 1)
+                        if time.time() <= int(timestamp) + 1800:
+                            return conteudo
+                        else:
+                            del db_temp[url]
+                    return None
 
         # Do contrário: escrita no cache
         else:
@@ -110,8 +123,11 @@ class Util(object):
 
     def cache_evict(self, url):
         if self.in_cache:
-            with FileDB.open(self.pages_cache) as db:
-                del db[url]
+            with FileDB.open(self.pages_cache) as db, \
+                    FileDB.open(self.temp_cache) as db_temp:
+                if url in db:
+                    db_temp[url] = "%d|" % int(time.time()) + db[url]
+                    del db[url]
 
 
 class FileDB:
