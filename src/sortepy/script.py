@@ -56,9 +56,11 @@ def exec_gerar(loteria, quantidade, numeros):
         print(' '.join("%02d" % n for n in aposta))
 
 
-def iter_resultados(loteria, concursos, erros=set()):
+def iter_resultados(fun, args, erros=set()):
     consultados = set()
 
+    concursos = args[0]
+    args = args[1:]
     while True:
         try:
             c = concursos.pop(0)
@@ -68,7 +70,7 @@ def iter_resultados(loteria, concursos, erros=set()):
         if c not in consultados:
             consultados.add(c)
             try:
-                yield loteria.consultar(c)
+                yield fun(c, *args)
             except loterica.ResultadoNaoDisponivel:
                 erros.add(c)
                 for i in reversed(xrange(len(concursos))):
@@ -83,7 +85,7 @@ def exec_consultar(loteria, concursos):
 
     erros = set()
     try:
-        resultados = iter_resultados(loteria, concursos, erros)
+        resultados = iter_resultados(loteria.consultar, (concursos,), erros)
     except loterica.LoteriaNaoSuportada, err:
         return error("ERRO: consulta para '%s' não implementada" %
                      err.args, show_help=False, code=6)
@@ -101,22 +103,21 @@ def exec_conferir(loteria, concursos, apostas):
     print("# conferência da", loteria.nome)
     print("%s:" % loteria.nome)
 
-    for c in concursos:
-        try:
-            resp = loteria.conferir(c, apostas)
-        except loterica.LoteriaNaoSuportada, err:
-            return error("ERRO: conferência para '%s' não implementada" %
-                    err.args, show_help=False, code=6)
-        except loterica.ResultadoNaoDisponivel, err:
-            return error("ERRO: resultado da %s %d não disponível" %
-                    err.args, show_help=False, code=6)
+    erros = set()
+    try:
+        resultados = iter_resultados(loteria.conferir, (concursos, apostas),
+                                     erros)
+    except loterica.LoteriaNaoSuportada, err:
+        return error("ERRO: conferência para '%s' não implementada" %
+                     err.args, show_help=False, code=6)
 
+    for resp in resultados:
         print("  %d:" % resp[0]['concurso'])
         for r in resp:
             print("  - aposta:", ' '.join("%02d" % n for n in r['numeros']))
             print("    acertou:")
             for n, ganhou in zip(r['acertou'], r['ganhou']):
-                print("      %d: R$ %s" % (n,ganhou))
+                print("      %d: R$ %s" % (n, ganhou))
 
 
 def __print_closure(stdout):
