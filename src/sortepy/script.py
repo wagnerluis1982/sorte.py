@@ -56,40 +56,42 @@ def exec_gerar(loteria, quantidade, numeros):
         print(' '.join("%02d" % n for n in aposta))
 
 
-def _pop_greater_than(lst, e):
-    for i in reversed(xrange(len(lst))):
-        if lst[i] > e:
-            yield lst.pop(i)
-
-
-def exec_consultar(loteria, concursos):
+def iter_resultados(loteria, concursos, erros=set()):
     consultados = set()
-    erros = set()
-
-    print("# resultados da", loteria.nome)
-    print("%s:" % loteria.nome)
 
     while True:
         try:
             c = concursos.pop(0)
         except IndexError:
-            break
+            return
 
         if c not in consultados:
             consultados.add(c)
             try:
-                result = loteria.consultar(c)
-            except loterica.LoteriaNaoSuportada, err:
-                return error("ERRO: consulta para '%s' não implementada" %
-                        err.args, show_help=False, code=6)
-            except loterica.ResultadoNaoDisponivel, err:
+                yield loteria.consultar(c)
+            except loterica.ResultadoNaoDisponivel:
                 erros.add(c)
-                erros.update(_pop_greater_than(concursos, c))
+                for i in reversed(xrange(len(concursos))):
+                    if concursos[i] > c:
+                        erros.add(concursos.pop(i))
                 continue
 
-            for res_nums in result['numeros']:
-                print("  %d:" % result['concurso'],
-                      ' '.join("%02d" % n for n in res_nums))
+
+def exec_consultar(loteria, concursos):
+    print("# resultados da", loteria.nome)
+    print("%s:" % loteria.nome)
+
+    erros = set()
+    try:
+        resultados = iter_resultados(loteria, concursos, erros)
+    except loterica.LoteriaNaoSuportada, err:
+        return error("ERRO: consulta para '%s' não implementada" %
+                     err.args, show_help=False, code=6)
+
+    for result in resultados:
+        for res_nums in result['numeros']:
+            print("  %d:" % result['concurso'],
+                  ' '.join("%02d" % n for n in res_nums))
 
     if erros:
         print("\n  erros:", ', '.join(sorted(map(str, erros))))
