@@ -119,6 +119,9 @@ def exec_conferir(loteria, concursos, apostas):
             for n, ganhou in zip(r['acertou'], r['ganhou']):
                 print("      %d: R$ %s" % (n, ganhou))
 
+    if erros:
+        print("\n  erros:", ', '.join(sorted(map(str, erros))))
+
 
 def __print_closure(stdout):
     def pf(*args, **kwargs):
@@ -157,6 +160,13 @@ def main(argv=sys.argv, stdout=sys.stdout, cfg_path=None):
         elif option in ("-c", "--concurso"):
             if arg.isdigit():
                 concursos.append(int(arg))
+            elif '-' in arg:
+                faixa = arg.split('-')
+                if len(faixa) != 2 or not (faixa[0].isdigit() and
+                                           faixa[1].isdigit()):
+                    return error("ERRO: faixa '%s' inválida" % arg)
+                faixa = map(int, faixa)
+                concursos.extend(range(faixa[0], faixa[1]+1))
             else:
                 concursos.append(-1)
         elif option in ("-i", "--stdin"):

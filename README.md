@@ -74,9 +74,13 @@ As linhas que iniciam por `#` são consideradas comentários.
 #### Conferindo vários concursos
 
 O script permite conferir vários concursos de uma vez, passando o argumento `-c`
-várias vezes:
+várias vezes
 
     $ sorte.py duplasena -c 1130 -c 1131 -i < minhas_apostas.txt
+
+ou informar uma faixa de valores
+
+    $ sorte.py quina -c 1325-1330 -i < fezinha.txt
 
 #### Todas as opções de conferência
 
@@ -99,10 +103,10 @@ comando abaixo.
 
 #### Consultando vários concursos
 
-Semelhante à conferência, é possível consultar vários concursos de uma vez,
-passando o argumento `-c` várias vezes:
+Semelhante à conferência, é possível consultar vários concursos de uma vez:
 
     $ sorte.py duplasena -c 1130 -c 1131
+    $ sorte.py duplasena -c 1136-1145
 
 #### Todas as opções de consulta
 
@@ -112,7 +116,3 @@ passando o argumento `-c` várias vezes:
 ### TODO
 
 - Destacar os números acertados na conferência
-- Permitir conferir ou consultar passando uma faixa de concursos
-
-        $ sorte.py sena -c 1001-1003
-        $ sorte.py quina -c 1325-1330 -i < minhas_apostas.txt
