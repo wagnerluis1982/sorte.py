@@ -96,9 +96,12 @@ def exec_consultar(loteria, concursos):
 
 
 def exec_conferir(loteria, concursos, apostas):
-    for concurso in concursos:
+    print("# conferência da", loteria.nome)
+    print("%s:" % loteria.nome)
+
+    for c in concursos:
         try:
-            resp = loteria.conferir(concurso, apostas)
+            resp = loteria.conferir(c, apostas)
         except loterica.LoteriaNaoSuportada, err:
             return error("ERRO: conferência para '%s' não implementada" %
                     err.args, show_help=False, code=6)
@@ -106,12 +109,12 @@ def exec_conferir(loteria, concursos, apostas):
             return error("ERRO: resultado da %s %d não disponível" %
                     err.args, show_help=False, code=6)
 
-        print("# conferência da %s %d" % (loteria.nome, resp[0]['concurso']))
+        print("  %d:" % resp[0]['concurso'])
         for r in resp:
-            print("- aposta:", ' '.join("%02d" % n for n in r['numeros']))
-            print("  acertou:")
+            print("  - aposta:", ' '.join("%02d" % n for n in r['numeros']))
+            print("    acertou:")
             for n, ganhou in zip(r['acertou'], r['ganhou']):
-                print("    %d: R$ %s" % (n,ganhou))
+                print("      %d: R$ %s" % (n,ganhou))
 
 
 def __print_closure(stdout):
