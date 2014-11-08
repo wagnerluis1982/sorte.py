@@ -42,7 +42,7 @@ def makedirs(caminho):
             raise
 
 
-class Util(object):
+class Util:
     def __init__(self, cfg_path=None):
         # Se o caminho é uma string vazia, não deve ser usado nenhum cache
         # Definido para propósitos de teste
@@ -64,8 +64,8 @@ class Util(object):
         makedirs(cache_path)
 
         # Define atributos de configuração
-        self.pages_cache = os.path.join(cache_path, 'paginas.db')
-        self.temp_cache = os.path.join(cache_path, 'paginas-temp.db')
+        self.pages_db = FileDB.open(os.path.join(cache_path, 'paginas.db'))
+        self.temp_db = FileDB.open(os.path.join(cache_path, 'paginas-temp.db'))
         self.in_cache = True
 
     def download(self, url, in_cache=None):
@@ -103,31 +103,25 @@ class Util(object):
         # Sem conteúdo: leitura do cache
         if conteudo is None:
             try:
-                with FileDB.open(self.pages_cache) as db:
-                    return db[url]
+                return self.pages_db[url]
             except KeyError:
-                with FileDB.open(self.temp_cache) as db_temp:
-                    valor = db_temp.get(url)
-                    if valor:
-                        timestamp, conteudo = valor.split('|', 1)
-                        if time.time() <= int(timestamp) + 1800:
-                            return conteudo
-                        else:
-                            del db_temp[url]
-                    return None
+                valor = self.temp_db.get(url)
+                if valor:
+                    timestamp, conteudo = valor.split('|', 1)
+                    if time.time() <= int(timestamp) + 1800:
+                        return conteudo
+                    else:
+                        del self.temp_db[url]
+                return None
 
         # Do contrário: escrita no cache
         else:
-            with FileDB.open(self.pages_cache) as db:
-                db[url] = conteudo
+            self.pages_db[url] = conteudo
 
     def cache_evict(self, url):
-        if self.in_cache:
-            with FileDB.open(self.pages_cache) as db, \
-                    FileDB.open(self.temp_cache) as db_temp:
-                if url in db:
-                    db_temp[url] = "%d|" % int(time.time()) + db[url]
-                    del db[url]
+        if self.in_cache and url in self.pages_db:
+            self.temp_db[url] = "%d|" % int(time.time()) + self.pages_db[url]
+            del self.pages_db[url]
 
 
 class FileDB:
@@ -147,6 +141,9 @@ class FileDB:
         def close(self):
             self._conn.commit()
             self._conn.close()
+
+        def flush(self):
+            self._conn.commit()
 
         def __del__(self):
             try:

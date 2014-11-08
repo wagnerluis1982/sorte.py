@@ -14,9 +14,12 @@ dist/
 .ropeproject/
 
 # usados pelo eclipse
-.project
-.pydevproject
-.settings/
+/.project
+/.pydevproject
+/.settings/
 
 # backup
 *~
+
+# gerados pelos testes
+/tests/fixtures/config/cache/paginas-temp.db
