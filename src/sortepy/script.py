@@ -134,9 +134,9 @@ def __print_closure(stdout):
         __builtin__.print(*args, **kwargs)
     return pf
 
-def __underline_closure(stdout):
+def __highlight_closure(stdout):
     if stdout.isatty():
-        return lambda arg: "\x1b[4m%s\x1b[0m" % arg
+        return lambda arg: "\x1b[00;33m%s\x1b[00m" % arg
     else:
         return lambda arg: arg
 
@@ -148,7 +148,7 @@ def main(argv=sys.argv, stdout=sys.stdout, cfg_path=None):
 
     # Define a função underline global
     global underline
-    underline = __underline_closure(stdout)
+    underline = __highlight_closure(stdout)
 
     try:
         opts, args = getopt.gnu_getopt(argv[1:],
