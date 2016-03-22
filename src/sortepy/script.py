@@ -99,6 +99,8 @@ def exec_consultar(loteria, concursos):
         print("\n  erros:", ', '.join(sorted(map(str, erros))))
 
 
+hi_acerto = hi_ganho = lambda v: v
+
 def exec_conferir(loteria, concursos, apostas):
     erros = set()
     try:
@@ -122,7 +124,7 @@ def exec_conferir(loteria, concursos, apostas):
                     print(" %02d" % n, end='')
             print("\n    acertou:")
             for acertou, ganhou in zip(r['acertou'], r['ganhou']):
-                print("      %d: R$ %s" % (len(acertou), ganhou))
+                print("      %d: %s" % (len(acertou), hi_ganho("R$ "+ganhou)))
 
     if erros:
         print("\n  erros:", ', '.join(sorted(map(str, erros))))
@@ -150,6 +152,11 @@ def main(argv=sys.argv, stdout=sys.stdout, cfg_path=None):
     # Função de destaque de número acertado
     global hi_acerto
     hi_acerto = __highlight_closure(stdout, color=33)
+
+    # Função de destaque de ganhos
+    global hi_ganho
+    hi_ganho = __highlight_closure(stdout, color=32, spec=0,
+                                   condition=lambda x: x != "R$ 0,00")
 
     try:
         opts, args = getopt.gnu_getopt(argv[1:],
