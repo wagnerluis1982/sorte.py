@@ -117,7 +117,7 @@ def exec_conferir(loteria, concursos, apostas):
             print("  - aposta:", end='')
             for n in r['numeros']:
                 if n in r['acertou'][0]:
-                    print('', underline("%02d" % n), end='')
+                    print('', hi_acerto("%02d" % n), end='')
                 else:
                     print(" %02d" % n, end='')
             print("\n    acertou:")
@@ -134,9 +134,10 @@ def __print_closure(stdout):
         __builtin__.print(*args, **kwargs)
     return pf
 
-def __highlight_closure(stdout):
+def __highlight_closure(stdout, color=0, spec=0, condition=lambda x: True):
     if stdout.isatty():
-        return lambda arg: "\x1b[00;33m%s\x1b[00m" % arg
+        formatting = "\x1b[%02d;%02dm%%s\x1b[00m" % (spec, color)
+        return lambda arg: formatting % arg if condition(arg) else arg
     else:
         return lambda arg: arg
 
@@ -146,9 +147,9 @@ def main(argv=sys.argv, stdout=sys.stdout, cfg_path=None):
     global print
     print = __print_closure(stdout)
 
-    # Define a função underline global
-    global underline
-    underline = __highlight_closure(stdout)
+    # Função de destaque de número acertado
+    global hi_acerto
+    hi_acerto = __highlight_closure(stdout, color=33)
 
     try:
         opts, args = getopt.gnu_getopt(argv[1:],
