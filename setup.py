@@ -7,7 +7,7 @@ PACKAGE_DIR = 'src'
 
 setup(
     name = "sorte.py",
-    version = "0.0.2",
+    version = "0.0.3.dev1",
     author = "Wagner Macedo",
     author_email = "wagnerluis1982@gmail.com",
     description = "Geração e conferência de apostas de loterias",
