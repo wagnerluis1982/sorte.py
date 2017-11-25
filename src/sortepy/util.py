@@ -89,10 +89,9 @@ class Util:
 
             charset = page.headers.get_param('charset')
             if charset is not None:
-                try:
-                    conteudo = str(conteudo, charset)
-                except (UnicodeDecodeError, LookupError):
-                    pass
+                conteudo = conteudo.decode(charset)
+            else:
+                conteudo = conteudo.decode()
 
             if in_cache:
                 self.cache(url, conteudo)
@@ -148,7 +147,7 @@ class FileDB:
         def __del__(self):
             try:
                 self.close()
-            except sqlite3.ProgrammingError:
+            except sqlite3.Error:
                 pass
 
         def _create_schema(self):
