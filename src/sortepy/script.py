@@ -1,7 +1,7 @@
 # encoding=utf8
-from __future__ import print_function
 
-import __builtin__
+
+import builtins
 import getopt
 import re
 import sys
@@ -45,13 +45,13 @@ def error(*args, **kwargs):
 def exec_gerar(loteria, quantidade, numeros):
     try:
         aposta1 = loteria.gerar_aposta(numeros)
-    except loterica.QuantidadeInvalida, err:
+    except loterica.QuantidadeInvalida as err:
         return error("ERRO: não dá para gerar aposta da %s com %d números" %
                 err.args, show_help=False, code=5)
 
     print("# gerador da", loteria.nome)
     print(' '.join("%02d" % n for n in aposta1))
-    for i in xrange(2, quantidade+1):
+    for i in range(2, quantidade+1):
         aposta = loteria.gerar_aposta(numeros)
         print(' '.join("%02d" % n for n in aposta))
 
@@ -73,7 +73,7 @@ def iter_resultados(fun, args, erros=set()):
                 yield fun(c, *args)
             except loterica.ResultadoNaoDisponivel:
                 erros.add(c)
-                for i in reversed(xrange(len(concursos))):
+                for i in reversed(range(len(concursos))):
                     if concursos[i] > c:
                         erros.add(concursos.pop(i))
                 continue
@@ -83,7 +83,7 @@ def exec_consultar(loteria, concursos):
     erros = set()
     try:
         resultados = iter_resultados(loteria.consultar, (concursos,), erros)
-    except loterica.LoteriaNaoSuportada, err:
+    except loterica.LoteriaNaoSuportada as err:
         return error("ERRO: consulta para '%s' não implementada" %
                      err.args, show_help=False, code=6)
 
@@ -106,7 +106,7 @@ def exec_conferir(loteria, concursos, apostas):
     try:
         resultados = iter_resultados(loteria.conferir, (concursos, apostas),
                                      erros)
-    except loterica.LoteriaNaoSuportada, err:
+    except loterica.LoteriaNaoSuportada as err:
         return error("ERRO: conferência para '%s' não implementada" %
                      err.args, show_help=False, code=6)
 
@@ -133,7 +133,7 @@ def exec_conferir(loteria, concursos, apostas):
 def __print_closure(stdout):
     def pf(*args, **kwargs):
         kwargs.setdefault('file', stdout)
-        __builtin__.print(*args, **kwargs)
+        builtins.print(*args, **kwargs)
     return pf
 
 def __highlight_closure(stdout, color=0, spec=0, condition=lambda x: True):
@@ -164,7 +164,7 @@ def main(argv=sys.argv, stdout=sys.stdout, cfg_path=None):
         "hn:q:c:i",
         # opções longas
         ["help", "numeros=", "quantidade=", "concurso=", "stdin"])
-    except getopt.GetoptError, err:
+    except getopt.GetoptError as err:
         return error("ERRO:", err, code=1)
 
     # Avalia os parâmetros passados
@@ -188,8 +188,8 @@ def main(argv=sys.argv, stdout=sys.stdout, cfg_path=None):
                 if len(faixa) != 2 or not (faixa[0].isdigit() and
                                            faixa[1].isdigit()):
                     return error("ERRO: faixa '%s' inválida" % arg)
-                faixa = map(int, faixa)
-                concursos.extend(range(faixa[0], faixa[1]+1))
+                faixa = list(map(int, faixa))
+                concursos.extend(list(range(faixa[0], faixa[1]+1)))
             else:
                 concursos.append(-1)
         elif option in ("-i", "--stdin"):
@@ -214,8 +214,8 @@ def main(argv=sys.argv, stdout=sys.stdout, cfg_path=None):
     for arg in args:
         aposta = []
         for n in re.split('[, ]+', arg):
-            fx = map(int, n.split('-', 1))
-            aposta.extend(xrange(fx[0], fx[-1]+1))
+            fx = list(map(int, n.split('-', 1)))
+            aposta.extend(range(fx[0], fx[-1]+1))
         apostas.append(aposta)
 
     if concursos:

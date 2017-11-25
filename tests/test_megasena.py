@@ -8,7 +8,7 @@ class MegaSenaTest(basetest.LoteriaTestCase):
     # atributos do teste 'gerar aposta'
     nome = "megasena"
     permitidos = set(range(1, 61))  # de 1 a 60
-    numeros = range(6, 16)  # de 6 a 15
+    numeros = list(range(6, 16))  # de 6 a 15
 
     # atributos do teste 'consultar resultado'
     concurso = 1

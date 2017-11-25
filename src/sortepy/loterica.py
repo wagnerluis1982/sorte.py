@@ -1,6 +1,6 @@
 import random
 
-from HTMLParser import HTMLParser
+from html.parser import HTMLParser
 
 from . import util
 
@@ -90,14 +90,14 @@ class Loteria:
         nome = APELIDOS.get(nome, nome)
         try:
             c = LOTERIAS[nome]
-        except KeyError, err:
+        except KeyError as err:
             raise LoteriaNaoSuportada(err.message)
 
         self.settings = c
         self.nome = nome
         self.util = util.Util(cfg_path)
 
-        self._range = xrange(c['numeros'][0], c['numeros'][1] + 1)
+        self._range = range(c['numeros'][0], c['numeros'][1] + 1)
         self._min = c['marcar'][0]
         self._max = c['marcar'][1]
         self._padrao = c.get('padrao', self._min)
@@ -126,7 +126,7 @@ class Loteria:
         conteudo_html = self.util.download(url, in_cache=concurso > 0)
         parser.feed(conteudo_html)
 
-        pos_nums = [xrange(p[0], p[1]+1) for p in posicao['numeros']]
+        pos_nums = [range(p[0], p[1]+1) for p in posicao['numeros']]
         dados = parser.data()
         try:
             result = {

@@ -8,7 +8,7 @@ class DuplaSenaTest(basetest.LoteriaTestCase):
     # atributos do teste 'gerar aposta'
     nome = "duplasena"
     permitidos = set(range(1, 51))  # de 1 a 50
-    numeros = range(6, 16)  # de 6 a 15
+    numeros = list(range(6, 16))  # de 6 a 15
 
     # atributos do teste 'consultar resultado'
     concurso = 1

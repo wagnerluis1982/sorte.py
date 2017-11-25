@@ -2,8 +2,8 @@
 
 import basetest
 
-from BaseHTTPServer import HTTPServer
-from SimpleHTTPServer import SimpleHTTPRequestHandler
+from http.server import HTTPServer
+from http.server import SimpleHTTPRequestHandler
 
 import atexit
 import os
@@ -32,7 +32,7 @@ CONTEUDO_ASCII = """<!DOCTYPE html>
 </html>
 """
 # 'pagina_iso-8859-1.html' ou 'pagina_utf-8.html'
-CONTEUDO_ENCODING = u"""<!DOCTYPE html>
+CONTEUDO_ENCODING = """<!DOCTYPE html>
 <html>
     <head>
         <meta charset="%s" />
@@ -68,13 +68,13 @@ class DownloadTest(basetest.BaseTestCase):
     def test_download_pagina_iso88591(_):
         url = _.base_url + '/pagina_iso-8859-1.html'
         conteudo = _.util.download(url)
-        _.is_instance(conteudo, unicode)
+        _.is_instance(conteudo, str)
         _.eq(conteudo, CONTEUDO_ENCODING % 'ISO-8859-1')
 
     def test_download_pagina_utf8(_):
         url = _.base_url + '/pagina_utf-8.html'
         conteudo = _.util.download(url)
-        _.is_instance(conteudo, unicode)
+        _.is_instance(conteudo, str)
         _.eq(conteudo, CONTEUDO_ENCODING % 'UTF-8')
 
     def test_download_pagina_charset_unknown(_):
@@ -91,7 +91,7 @@ class CacheTest(basetest.BaseTestCase):
 
     def test_gravar_e_ler_cache(_):
         # gravação
-        put_txt = u'Minha terra tem palmeiras, Onde canta o Sabiá'
+        put_txt = 'Minha terra tem palmeiras, Onde canta o Sabiá'
         _.util.cache('dias.txt', put_txt)
 
         # leitura
@@ -128,7 +128,7 @@ class FileDBTest(basetest.BaseTestCase):
 
     def test_guardar_e_recuperar_valor(_):
         chave = 'cumprimento'
-        valor = u'Olá, amigo, tudo bem?'
+        valor = 'Olá, amigo, tudo bem?'
         _.db[chave] = valor
         _.db.close()
 
@@ -139,7 +139,7 @@ class FileDBTest(basetest.BaseTestCase):
 
     def test_excluir_chave(_):
         chave = 'inutil'
-        valor = u'Nada'
+        valor = 'Nada'
         _.db[chave] = valor
         _.ok(chave in _.db, "chave '%s' não existe" % chave)
 

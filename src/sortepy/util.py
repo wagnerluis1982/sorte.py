@@ -1,10 +1,10 @@
 # encoding=utf8
 
-import cookielib
+import http.cookiejar
 import errno
 import os
 import sqlite3
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import time
 
 
@@ -79,18 +79,18 @@ class Util:
         # Ou faz o download
         if conteudo is None:
             # As páginas de resultado de loterias exigem cookies
-            cj = cookielib.CookieJar()
-            opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
+            cj = http.cookiejar.CookieJar()
+            opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
             # A adição desse cookie dobra o tempo de resposta
             opener.addheaders.append(("Cookie", "security=true"))
 
             page = opener.open(url)
             conteudo = page.read()
 
-            charset = page.headers.getparam('charset')
+            charset = page.headers.get_param('charset')
             if charset is not None:
                 try:
-                    conteudo = unicode(conteudo, charset)
+                    conteudo = str(conteudo, charset)
                 except (UnicodeDecodeError, LookupError):
                     pass
 

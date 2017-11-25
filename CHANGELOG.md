@@ -5,7 +5,8 @@ Todas as mudanças de destaque nesse projeto será documentado neste arquivo.
 ## [Não publicado]
 
 ### Adicionado
-- Arquivo de changelog
+- Projeto convertido para Python 3.
+- Arquivo de changelog.
 
 ### Modificado
 - Usa 'entry_points' em vez de 'scripts' no `setup.py`.
