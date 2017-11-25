@@ -154,7 +154,7 @@ class FileDB:
         def _create_schema(self):
             cursor = self._cur
             try:
-                cursor.execute("CREATE TABLE map (key PRIMARY KEY, value)")
+                cursor.execute("CREATE TABLE map (key TEXT PRIMARY KEY, value TEXT)")
                 self._write_dbversion(self.__version__)
             # caso a tabela 'map' já exista
             except sqlite3.OperationalError:
