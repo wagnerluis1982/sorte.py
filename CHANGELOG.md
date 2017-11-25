@@ -7,6 +7,9 @@ Todas as mudanças de destaque nesse projeto será documentado neste arquivo.
 ### Adicionado
 - Arquivo de changelog
 
+### Modificado
+- Usa 'entry_points' em vez de 'scripts' no `setup.py`.
+
 ## [0.0.2] - 2016-03-22
 
 ### Adicionado

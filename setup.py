@@ -16,7 +16,11 @@ setup(
     url = "https://github.com/wagnerluis1982/sorte-py",
     package_dir = {'': PACKAGE_DIR},
     packages = find_packages(PACKAGE_DIR),
-    scripts = ['scripts/sorte.py'],
+    entry_points = {
+        "console_scripts": [
+            "sorte.py = sortepy.script:main",
+        ],
+    },
     classifiers = [
         "Development Status :: 3 - Alpha",
         "Environment :: Console",
