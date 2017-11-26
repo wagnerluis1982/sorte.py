@@ -2,7 +2,7 @@
 
 Todas as mudanças de destaque nesse projeto será documentado neste arquivo. 
 
-## [Não publicado]
+## [0.0.3] - 2017-11-26
 
 ### Adicionado
 - Projeto convertido para Python 3.
