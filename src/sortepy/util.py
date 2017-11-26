@@ -133,16 +133,15 @@ class FileDB:
         __version__ = 0  # por enquanto não serve para nada
 
         def __init__(self, filename):
-            self._conn = sqlite3.connect(filename)
-            self._cur = self._conn.cursor()
+            self._con = sqlite3.connect(filename)
             self._create_schema()
 
         def close(self):
-            self._conn.commit()
-            self._conn.close()
+            self._con.commit()
+            self._con.close()
 
         def flush(self):
-            self._conn.commit()
+            self._con.commit()
 
         def __del__(self):
             try:
@@ -151,22 +150,19 @@ class FileDB:
                 pass
 
         def _create_schema(self):
-            cursor = self._cur
             try:
-                cursor.execute("CREATE TABLE map (key TEXT PRIMARY KEY, value TEXT)")
+                self._con.execute("CREATE TABLE map (key TEXT PRIMARY KEY, value TEXT)")
                 self._write_dbversion(self.__version__)
             # caso a tabela 'map' já exista
             except sqlite3.OperationalError:
                 pass
 
         def _read_dbversion(self):
-            cursor = self._cur
-            (dbversion,) = cursor.execute('PRAGMA user_version').fetchone()
+            (dbversion,) = self._con.execute('PRAGMA user_version').fetchone()
             return dbversion
 
         def _write_dbversion(self, version):
-            cursor = self._cur
-            cursor.execute('PRAGMA user_version = %d' % version)
+            self._con.execute('PRAGMA user_version = %d' % version)
 
         def get(self, key, default=None):
             try:
@@ -175,15 +171,13 @@ class FileDB:
                 return default
 
         def __setitem__(self, key, value):
-            cursor = self._cur
             try:
-                cursor.execute("INSERT INTO map VALUES (?, ?)", (key, value))
+                self._con.execute("INSERT INTO map VALUES (?, ?)", (key, value))
             except sqlite3.IntegrityError:
-                cursor.execute("UPDATE map SET value=? WHERE key=?",
-                               (value, key))
+                self._con.execute("UPDATE map SET value=? WHERE key=?", (value, key))
 
         def __getitem__(self, key):
-            cursor = self._cur
+            cursor = self._con.cursor()
             cursor.execute("SELECT value FROM map WHERE key=?", (key,))
             result = cursor.fetchone()
             if result:
@@ -192,11 +186,10 @@ class FileDB:
                 raise KeyError(key)
 
         def __delitem__(self, key):
-            cursor = self._cur
-            cursor.execute("DELETE FROM map WHERE key=?", (key,))
+            self._con.execute("DELETE FROM map WHERE key=?", (key,))
 
         def __contains__(self, key):
-            cursor = self._cur
+            cursor = self._con.cursor()
             cursor.execute("SELECT 1 FROM map WHERE key=?", (key,))
             return cursor.fetchall() != []
 
