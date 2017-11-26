@@ -4,7 +4,7 @@ import http.cookiejar
 import errno
 import os
 import sqlite3
-import urllib.request, urllib.error, urllib.parse
+import urllib.request
 import time
 
 
