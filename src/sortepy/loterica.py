@@ -91,7 +91,7 @@ class Loteria:
         try:
             c = LOTERIAS[nome]
         except KeyError as err:
-            raise LoteriaNaoSuportada(err.message)
+            raise LoteriaNaoSuportada(err)
 
         self.settings = c
         self.nome = nome

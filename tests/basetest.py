@@ -27,7 +27,7 @@ class BaseTestCase(TestCase):
 class LoteriaTestCase(BaseTestCase):
     nome = ""
     # set com a faixa completa de números que podem ser apostados
-    permitidos = ()
+    permitidos = frozenset()
     # tuple com a quantidade de números para gerar as apostas, primeiro
     # elemento é a aposta na quantidade padrão
     numeros = ()

@@ -10,6 +10,7 @@ Todas as mudanças de destaque nesse projeto será documentado neste arquivo.
 
 ### Modificado
 - Usa 'entry_points' em vez de 'scripts' no `setup.py`.
+- Correções de bugs e otimizações no sistema de cache.
 
 ## [0.0.2] - 2016-03-22
 

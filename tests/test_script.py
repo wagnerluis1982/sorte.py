@@ -152,5 +152,5 @@ class FakeStdOut:
         buf = self.buf
         assert 1 <= i <= len(buf), "linha %d fora da faixa" % i
         assert 1 <= j <= len(buf), "linha %d fora da faixa" % i
-        assert i <= j, 'i=%d > j=%d' (i, j)
+        assert i <= j, 'i=%d > j=%d' % (i, j)
         return buf[i-1:j]

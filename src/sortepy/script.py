@@ -1,6 +1,5 @@
 # encoding=utf8
 
-
 import builtins
 import getopt
 import re
@@ -189,7 +188,7 @@ def main(argv=sys.argv, stdout=sys.stdout, cfg_path=None):
                                            faixa[1].isdigit()):
                     return error("ERRO: faixa '%s' inválida" % arg)
                 faixa = list(map(int, faixa))
-                concursos.extend(list(range(faixa[0], faixa[1]+1)))
+                concursos.extend(range(faixa[0], faixa[1]+1))
             else:
                 concursos.append(-1)
         elif option in ("-i", "--stdin"):
