@@ -21,6 +21,9 @@ dist/
 # usados pelo pycharm
 /.idea/
 
+# usados pelo shell
+/.venv
+
 # backup
 *~
 
