@@ -122,7 +122,7 @@ class Loteria:
         if result:
             return result
 
-        result = self._download(concurso, com_premios)
+        result = self._download(concurso)
         self._store(result)
 
         return result
@@ -134,7 +134,7 @@ class Loteria:
                 return {(int(k) if k.isdecimal() else k):v for k, v in obj.items()}
             return json.loads(result, object_hook=int_key)
 
-    def _download(self, concurso, com_premios):
+    def _download(self, concurso):
         parser = self._parser()
         if parser is None:
             raise LoteriaNaoSuportada(self.nome)
@@ -153,15 +153,15 @@ class Loteria:
         pos_nums = [range(p[0], p[1]+1) for p in posicao['numeros']]
         dados = parser.data()
         try:
-            result = {
+            premios = {}
+            for qnt, pos_premio in sorted(posicao['premios'].items()):
+                premios[qnt] = dados[pos_premio]
+
+            return {
                 'concurso': int(dados[posicao.get('concurso', 0)]),
                 'numeros': [[int(dados[i]) for i in r] for r in pos_nums],
+                'premios': premios,
             }
-            if True:
-                result['premios'] = {}
-                for qnt, pos_premio in sorted(posicao['premios'].items()):
-                    result['premios'][qnt] = dados[pos_premio]
-            return result
         except ValueError:
             self.util.cache_evict(url)
             raise ResultadoNaoDisponivel(self.nome, concurso)
