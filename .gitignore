@@ -28,4 +28,4 @@ dist/
 *~
 
 # gerados pelos testes
-/tests/fixtures/config/cache/paginas-temp.db
+/tests/fixtures/config/
