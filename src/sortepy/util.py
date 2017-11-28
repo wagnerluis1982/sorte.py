@@ -60,13 +60,16 @@ class Util:
                 return
 
         # Cria diretórios de configuração, se não existirem
-        cache_path = os.path.join(cfg_path, 'cache')
-        makedirs(cache_path)
+        self.cache_path = os.path.join(cfg_path, 'cache')
+        makedirs(self.cache_path)
 
         # Define atributos de configuração
-        self.pages_db = FileDB.open(os.path.join(cache_path, 'paginas.db'))
-        self.temp_db = FileDB.open(os.path.join(cache_path, 'paginas-temp.db'))
+        self.pages_db = self.get_db('paginas')
+        self.temp_db = self.get_db('paginas-temp')
         self.in_cache = True
+
+    def get_db(self, name):
+        return FileDB.open(os.path.join(self.cache_path, name + '.db'))
 
     def download(self, url, in_cache=None):
         in_cache = in_cache if isinstance(in_cache, bool) else self.in_cache
