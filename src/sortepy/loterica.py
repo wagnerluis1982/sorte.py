@@ -1,3 +1,4 @@
+import json
 import random
 
 from html.parser import HTMLParser
@@ -96,6 +97,7 @@ class Loteria:
         self.settings = c
         self.nome = nome
         self.util = util.Util(cfg_path)
+        self.loteria_db = self.util.get_db('loteria')
 
         self._range = range(c['numeros'][0], c['numeros'][1] + 1)
         self._min = c['marcar'][0]
@@ -111,6 +113,28 @@ class Loteria:
         return tuple(sorted(result))
 
     def consultar(self, concurso=0, com_premios=False):
+        """Obtém o resultado do sorteio de um concurso.
+
+        Primeiramente, é verificado se o resultado já existe em cache no banco de dados.
+        Caso negativo, faz o download e armazena para uso futuro.
+        """
+        result = self._cache(concurso, com_premios)
+        if result:
+            return result
+
+        result = self._download(concurso, com_premios)
+        self._store(concurso, result)
+
+        return result
+
+    def _cache(self, concurso, com_premios):
+        result = self.loteria_db.get('%s|%s' % (self.nome, concurso))
+        if result:
+            def int_key(obj):
+                return {(int(k) if k.isdecimal() else k):v for k, v in obj.items()}
+            return json.loads(result, object_hook=int_key)
+
+    def _download(self, concurso, com_premios):
         parser = self._parser()
         if parser is None:
             raise LoteriaNaoSuportada(self.nome)
@@ -119,7 +143,7 @@ class Loteria:
         if posicao is None:
             raise LoteriaNaoSuportada(self.nome)
 
-        if com_premios and posicao.get('premios') is None:
+        if posicao.get('premios') is None:
             raise LoteriaNaoSuportada(self.nome)
 
         url = self._url(concurso)
@@ -133,7 +157,7 @@ class Loteria:
                 'concurso': int(dados[posicao.get('concurso', 0)]),
                 'numeros': [[int(dados[i]) for i in r] for r in pos_nums],
             }
-            if com_premios:
+            if True:
                 result['premios'] = {}
                 for qnt, pos_premio in sorted(posicao['premios'].items()):
                     result['premios'][qnt] = dados[pos_premio]
@@ -141,6 +165,9 @@ class Loteria:
         except ValueError:
             self.util.cache_evict(url)
             raise ResultadoNaoDisponivel(self.nome, concurso)
+
+    def _store(self, concurso, result):
+        self.loteria_db['%s|%s' % (self.nome, concurso)] = json.dumps(result)
 
     def conferir(self, concurso, apostas):
         result = self.consultar(concurso, com_premios=True)
