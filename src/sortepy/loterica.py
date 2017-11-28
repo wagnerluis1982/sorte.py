@@ -123,7 +123,7 @@ class Loteria:
             return result
 
         result = self._download(concurso, com_premios)
-        self._store(concurso, result)
+        self._store(result)
 
         return result
 
@@ -166,8 +166,8 @@ class Loteria:
             self.util.cache_evict(url)
             raise ResultadoNaoDisponivel(self.nome, concurso)
 
-    def _store(self, concurso, result):
-        self.loteria_db['%s|%s' % (self.nome, concurso)] = json.dumps(result)
+    def _store(self, result):
+        self.loteria_db['%s|%s' % (self.nome, result['concurso'])] = json.dumps(result)
 
     def conferir(self, concurso, apostas):
         result = self.consultar(concurso, com_premios=True)

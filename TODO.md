@@ -1,8 +1,5 @@
 # A fazer
 
-## Versão 0.0.4
-- Também guardar em cache as informações de consulta do último concurso.
-
 ## Versão 0.0.5
 - Exibir informações de ganhadores na saída da consulta.
 
