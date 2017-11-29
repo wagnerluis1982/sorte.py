@@ -97,7 +97,7 @@ class Loteria:
         self.settings = c
         self.nome = nome
         self.util = util.Util(cfg_path)
-        self.loteria_db = self.util.get_db('loteria')
+        self.loteria_db = self.util.get_mapdb('loteria')
 
         self._range = range(c['numeros'][0], c['numeros'][1] + 1)
         self._min = c['marcar'][0]

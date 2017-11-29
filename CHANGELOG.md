@@ -5,8 +5,9 @@ Todas as mudanças de destaque nesse projeto será documentado neste arquivo.
 ## [Não publicado]
 
 ### Modificado
-- Estrutura do cache de forma a otimizar consultas, não é mais preciso repetir o _parse_ das páginas.
+- Nova estrutura do cache de forma a otimizar consultas, não é mais preciso repetir o _parse_ das páginas.
 - Também guarda em cache as informações de consulta do último concurso.
+- Apenas um banco de dados para o cache, com várias tabelas (com nomes diferentes para evitar colisão).
 
 ## [0.0.3] - 2017-11-26
 

@@ -60,16 +60,18 @@ class Util:
                 self.in_cache = False
                 return
 
-        # Cria diretórios de configuração, se não existirem
-        self.cache_path = os.path.join(cfg_path, 'cache')
-        makedirs(self.cache_path)
+        # Cria diretório de configuração, se não existir
+        makedirs(cfg_path)
+
+        # caminho do arquivo de cache
+        self.cache_path = os.path.join(cfg_path, 'cache.db')
 
         # Define atributos de configuração
-        self.pages_db = self.get_db('paginas')
+        self.pages_db = self.get_mapdb('paginas')
         self.in_cache = True
 
-    def get_db(self, name):
-        return FileDB.open(os.path.join(self.cache_path, name + '.db'))
+    def get_mapdb(self, name):
+        return FileDB.open(self.cache_path, name)
 
     def download(self, url, in_cache=None):
         in_cache = in_cache if isinstance(in_cache, bool) else self.in_cache
@@ -140,15 +142,16 @@ class Util:
 
 class FileDB:
     @staticmethod
-    def open(filename):
-        db = FileDB._SQLite3(filename)
+    def open(filename, prefix=''):
+        db = FileDB._SQLite3(filename, prefix)
         return db
 
     class _SQLite3(object):
         __version__ = 0  # por enquanto não serve para nada
 
-        def __init__(self, filename):
+        def __init__(self, filename, prefix=''):
             self._con = sqlite3.connect(filename)
+            self._table = prefix + 'map'
             self._create_schema()
 
         def close(self):
@@ -166,7 +169,7 @@ class FileDB:
 
         def _create_schema(self):
             try:
-                self._con.execute("CREATE TABLE map (key TEXT PRIMARY KEY, value TEXT)")
+                self._con.execute("CREATE TABLE %s (key TEXT PRIMARY KEY, value TEXT)" % self._table)
                 self._write_dbversion(self.__version__)
             # caso a tabela 'map' já exista
             except sqlite3.OperationalError:
@@ -188,13 +191,13 @@ class FileDB:
         def __setitem__(self, key, value):
             with self._con as con:
                 try:
-                    con.execute("INSERT INTO map VALUES (?, ?)", (key, value))
+                    con.execute("INSERT INTO %s VALUES (?, ?)" % self._table, (key, value))
                 except sqlite3.IntegrityError:
-                    con.execute("UPDATE map SET value=? WHERE key=?", (value, key))
+                    con.execute("UPDATE %s SET value=? WHERE key=?" % self._table, (value, key))
 
         def __getitem__(self, key):
             cursor = self._con.cursor()
-            cursor.execute("SELECT value FROM map WHERE key=?", (key,))
+            cursor.execute("SELECT value FROM %s WHERE key=?" % self._table, (key,))
             result = cursor.fetchone()
             if result:
                 return result[0]
@@ -203,11 +206,11 @@ class FileDB:
 
         def __delitem__(self, key):
             with self._con as con:
-                con.execute("DELETE FROM map WHERE key=?", (key,))
+                con.execute("DELETE FROM %s WHERE key=?" % self._table, (key,))
 
         def __contains__(self, key):
             cursor = self._con.cursor()
-            cursor.execute("SELECT 1 FROM map WHERE key=?", (key,))
+            cursor.execute("SELECT 1 FROM %s WHERE key=?" % self._table, (key,))
             return cursor.fetchall() != []
 
         def __enter__(self):
