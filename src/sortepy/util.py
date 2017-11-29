@@ -3,6 +3,7 @@
 import http.cookiejar
 import errno
 import os
+import re
 import sqlite3
 import urllib.request
 import time
@@ -65,7 +66,6 @@ class Util:
 
         # Define atributos de configuração
         self.pages_db = self.get_db('paginas')
-        self.temp_db = self.get_db('paginas-temp')
         self.in_cache = True
 
     def get_db(self, name):
@@ -104,26 +104,38 @@ class Util:
     def cache(self, url, conteudo=None):
         # Sem conteúdo: leitura do cache
         if conteudo is None:
-            try:
-                return self.pages_db[url]
-            except KeyError:
-                valor = self.temp_db.get(url)
-                if valor:
-                    timestamp, conteudo = valor.split('|', 1)
-                    if time.time() <= int(timestamp) + 1800:
-                        return conteudo
-                    else:
-                        del self.temp_db[url]
+            if url not in self.pages_db:
                 return None
+
+            # obtém a entrada do cache
+            result = self.pages_db[url]
+
+            # se for uma entrada suja, verifica se já venceu o tempo para ficar nesse estado
+            if self.is_dirty(result):
+                timestamp, _ = result.split('|', 1)
+                if time.time() > int(timestamp) + 1800:
+                    del self.pages_db[url]
+                return None
+            else:
+                return result
 
         # Do contrário: escrita no cache
         else:
             self.pages_db[url] = conteudo
 
-    def cache_evict(self, url):
+    def blame(self, url):
+        """Marca o resultado de uma URL como inválida.
+
+        Isso é feito, registrando o horário em que esse método foi chamado.
+        """
         if self.in_cache and url in self.pages_db:
-            self.temp_db[url] = "%d|" % int(time.time()) + self.pages_db[url]
-            del self.pages_db[url]
+            self.pages_db[url] = "%d|" % int(time.time())
+
+    DIRTY_RE = re.compile(r'^[0-9]+\|')
+
+    @classmethod
+    def is_dirty(cls, s):
+        return cls.DIRTY_RE.match(s)
 
 
 class FileDB:

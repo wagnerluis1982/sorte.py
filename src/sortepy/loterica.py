@@ -163,7 +163,7 @@ class Loteria:
                 'premios': premios,
             }
         except ValueError:
-            self.util.cache_evict(url)
+            self.util.blame(url)
             raise ResultadoNaoDisponivel(self.nome, concurso)
 
     def _store(self, result):
