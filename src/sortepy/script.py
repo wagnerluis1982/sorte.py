@@ -95,7 +95,9 @@ def exec_consultar(loteria, concursos):
                   ' '.join("%02d" % n for n in res_nums))
 
     if erros:
-        print("\n  erros:", ', '.join(sorted(map(str, erros))))
+        if 'result' in vars():
+            print()
+        print("  erros:", ', '.join(sorted(map(str, erros))))
 
 
 hi_acerto = hi_ganho = lambda v: v
@@ -126,7 +128,9 @@ def exec_conferir(loteria, concursos, apostas):
                 print("      %d: %s" % (len(acertou), hi_ganho("R$ "+ganhou)))
 
     if erros:
-        print("\n  erros:", ', '.join(sorted(map(str, erros))))
+        if 'resp' in vars():
+            print()
+        print("  erros:", ', '.join(sorted(map(str, erros))))
 
 
 def __print_closure(stdout):
