@@ -162,7 +162,7 @@ class Loteria:
                 'numeros': [[int(dados[i]) for i in r] for r in pos_nums],
                 'premios': premios,
             }
-        except ValueError:
+        except (IndexError, ValueError):
             self.util.blame(url)
             raise ResultadoNaoDisponivel(self.nome, concurso)
 
