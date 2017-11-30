@@ -192,7 +192,7 @@ class Loteria:
 
     def _parser(self):
         if self.nome in ('quina', 'megasena', 'duplasena'):
-            return QuinaParser()
+            return LoteriaNewParser()
         else:
             return LoteriaParser()
 
@@ -229,7 +229,7 @@ class LoteriaParser(HTMLParser):
             self._data.append(data)
 
 
-class QuinaParser(LoteriaParser):
+class LoteriaNewParser(LoteriaParser):
     def reset(self):
         LoteriaParser.reset(self)
 
