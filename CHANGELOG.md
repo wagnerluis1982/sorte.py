@@ -2,7 +2,7 @@
 
 Todas as mudanças de destaque nesse projeto será documentado neste arquivo. 
 
-## [Não publicado]
+## [0.0.4] - 2017-11-29
 
 ### Modificado
 - Nova estrutura do cache de forma a otimizar consultas, não é mais preciso repetir o _parse_ das páginas.
