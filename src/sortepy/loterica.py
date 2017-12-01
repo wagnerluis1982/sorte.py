@@ -213,7 +213,7 @@ class LoteriaParser(HTMLParser):
         return ''.join(self._data).split('|')
 
     def reset(self):
-        HTMLParser.reset(self)
+        super().reset()
 
         self._capture = True
         self._data = []
@@ -231,33 +231,34 @@ class LoteriaParser(HTMLParser):
 
 class LoteriaNewParser(LoteriaParser):
     def reset(self):
-        LoteriaParser.reset(self)
+        super().reset()
 
         self._capture_list = False
         self._capture_number = False
         self._numbers = []
 
     def handle_starttag(self, tag, attrs):
-        LoteriaParser.handle_starttag(self, tag, attrs)
-
-        if tag == "li":
-            self._capture_number = True
+        super().handle_starttag(tag, attrs)
 
         if tag == "ul":
             self._capture_list = True
 
-    def handle_endtag(self, tag):
-        LoteriaParser.handle_endtag(self, tag)
+        elif tag == "li" and self._capture_list:
+            self._capture_number = True
 
-        if tag == "li":
+    def handle_endtag(self, tag):
+        super().handle_endtag(tag)
+
+        if tag == "li" and self._capture_list:
             self._capture_number = False
 
-        if tag == "ul" and self._capture_list and len(self._numbers) > 0:
+        elif tag == "ul" and len(self._numbers) > 0:
             self._data.append('|' + '|'.join(self._numbers) + '|')
+            self._capture_list = False
             self._numbers = []
 
     def handle_data(self, data):
-        LoteriaParser.handle_data(self, data)
+        super().handle_data(data)
 
         if self._capture_number:
             self._numbers.append(data)
