@@ -1,18 +1,13 @@
 # encoding=utf8
 
-import basetest
-
+import os
+import threading
 from http.server import HTTPServer
 from http.server import SimpleHTTPRequestHandler
 
-import atexit
-import os
-import shutil
-import tempfile
-import threading
-
+import basetest
 import sortepy.util
-
+from basetest import tempdir
 
 # Diretório de páginas: '/tests/fixtures/paginas'
 PAGES_DIR = os.path.join(os.path.dirname(__file__), 'fixtures', 'paginas')
@@ -184,9 +179,3 @@ class FixtureHttpServer(object):
     def stop(self):
         self.httpd.shutdown()
         self.httpd.server_close()
-
-
-def tempdir(custom_prefix='sortepy-'):
-    newdir = tempfile.mkdtemp(prefix=custom_prefix)
-    atexit.register(shutil.rmtree, newdir)
-    return newdir

@@ -1,16 +1,22 @@
 # encoding=utf8
 
-import sys
+import atexit
 import os
-
+import shutil
+import tempfile
 from unittest import TestCase
 
-# preparando paths do projeto para os testes
-test_path = os.path.dirname(__file__)
-cfg_fixture_path = os.path.join(test_path, 'fixtures', 'config')
-sys.path.append(os.path.join(test_path, '..', 'src'))
-
 from sortepy.loterica import Loteria
+
+
+def tempdir(custom_prefix='sortepy-'):
+    newdir = tempfile.mkdtemp(prefix=custom_prefix)
+    atexit.register(shutil.rmtree, newdir)
+    return newdir
+
+
+# preparando paths do projeto para os testes
+cfg_fixture_path = tempdir()
 
 
 class BaseTestCase(TestCase):
