@@ -243,6 +243,9 @@ class LoteriaParser(HTMLParser):
         if self._capture:
             self._data.append(data)
 
+    def error(self, message):
+        raise RuntimeError(message)
+
 
 class LoteriaNewParser(LoteriaParser):
     def reset(self, **kwargs):
