@@ -25,64 +25,19 @@ APELIDOS = {
 LOTERIAS = {
     'quina': {
         'marcar': (5, 7), 'numeros': (1, 80),
-        'resultado': {
-            'numeros': [(21, 25)],
-            'premios': {
-                5: 7,
-                4: 9,
-                3: 11,
-            },
-        },
     },
     'megasena': {
         'marcar': (6, 15), 'numeros': (1, 60), 'nome': "Mega-Sena",
-        'resultado': {
-            'numeros': [(28, 33)],
-            'premios': {
-                6: 11,
-                5: 13,
-                4: 15,
-            },
-        },
     },
     'lotofacil': {
         'marcar': (15, 18), 'numeros': (1, 25),
-        'resultado': {
-            'numeros': [(3, 17)],
-            'premios': {
-                15: 19,
-                14: 21,
-                13: 23,
-                12: 25,
-                11: 27,
-            },
-        },
     },
     'lotomania': {
         'marcar': (1, 50), 'numeros': (1, 100), 'padrao': 20,
-        'resultado': {
-            'numeros': [(6, 25)], 'url-script': "_lotomania_pesquisa.asp",
-            'premios': {
-                20: 28,
-                19: 30,
-                18: 32,
-                17: 34,
-                16: 36,
-                0: 38,
-            },
-        },
+        'url-script': "_lotomania_pesquisa.asp",
     },
     'duplasena': {
         'marcar': (6, 15), 'numeros': (1, 50), 'nome': "Dupla Sena",
-        'resultado': {
-            'numeros': [(4, 9), (12, 17)],
-            'premios': {
-                -6: 21,
-                6: 24,
-                5: 25,
-                4: 27,
-            },
-        },
     },
 }
 
@@ -137,34 +92,19 @@ class Loteria:
     def _download(self, concurso):
         parser = self._parser()
         if parser is None:
-            raise LoteriaNaoSuportada(self.nome)
-
-        posicao = self.settings.get('resultado')
-        if posicao is None:
-            raise LoteriaNaoSuportada(self.nome)
-
-        if posicao.get('premios') is None:
-            raise LoteriaNaoSuportada(self.nome)
+            raise NotImplementedError("parser")
 
         url = self._url(concurso)
         conteudo_html = self.util.download(url, in_cache=concurso > 0)
+
         parser.feed(conteudo_html)
+        result = parser.data()
 
-        pos_nums = [range(p[0], p[1]+1) for p in posicao['numeros']]
-        dados = parser.data()
-        try:
-            premios = {}
-            for qnt, pos_premio in sorted(posicao['premios'].items()):
-                premios[qnt] = dados[pos_premio]
-
-            return {
-                'concurso': int(dados[posicao.get('concurso', 0)]),
-                'numeros': [[int(dados[i]) for i in r] for r in pos_nums],
-                'premios': premios,
-            }
-        except (IndexError, ValueError):
+        if result is None:
             self.util.blame(url)
             raise ResultadoNaoDisponivel(self.nome, concurso)
+        else:
+            return result
 
     def _store(self, result):
         self.loteria_db['%s|%s' % (self.nome, result['concurso'])] = json.dumps(result)
@@ -192,15 +132,15 @@ class Loteria:
 
     def _parser(self):
         if self.nome in ('quina', 'megasena', 'duplasena'):
-            return LoteriaNewParser()
+            return LoteriaNewParser(self.nome)
         else:
-            return LoteriaParser()
+            return LoteriaParser(self.nome)
 
     def _url(self, concurso,
              base="http://www1.caixa.gov.br/loterias/loterias/%(loteria)s/",
              script="%(loteria)s_pesquisa_new.asp",
              query="?submeteu=sim&opcao=concurso&txtConcurso=%(concurso)d"):
-        script = self.settings['resultado'].get('url-script', script)
+        script = self.settings.get('url-script', script)
         if concurso <= 0:
             return (base+script) % {'loteria': self.nome}
         else:
@@ -209,11 +149,86 @@ class Loteria:
 
 
 class LoteriaParser(HTMLParser):
-    def data(self):
-        return ''.join(self._data).split('|')
+    SPECS = {
+        'quina': {
+            'numeros': [(21, 25)],
+            'premios': {
+                5: 7,
+                4: 9,
+                3: 11,
+            },
+        },
+        'megasena': {
+            'numeros': [(28, 33)],
+            'premios': {
+                6: 11,
+                5: 13,
+                4: 15,
+            },
+        },
+        'lotofacil': {
+            'numeros': [(3, 17)],
+            'premios': {
+                15: 19,
+                14: 21,
+                13: 23,
+                12: 25,
+                11: 27,
+            },
+        },
+        'lotomania': {
+            'numeros': [(6, 25)],
+            'premios': {
+                20: 28,
+                19: 30,
+                18: 32,
+                17: 34,
+                16: 36,
+                0: 38,
+            },
+        },
+        'duplasena': {
+            'numeros': [(4, 9), (12, 17)],
+            'premios': {
+                -6: 21,
+                6: 24,
+                5: 25,
+                4: 27,
+            },
+        },
+    }
 
-    def reset(self):
-        super().reset()
+    def __init__(self, nome, *, convert_charrefs=True):
+        self._spec = self.SPECS.get(nome)
+        if self._spec is None:
+            raise NotImplementedError("spec")
+        if 'premios' not in self._spec:
+            raise NotImplementedError("spec[premios]")
+
+        super().__init__(convert_charrefs=convert_charrefs)
+        self.reset(init=True)
+
+    def data(self):
+        spec = self._spec
+        dados = ''.join(self._data).split('|')
+
+        pos_nums = [range(p[0], p[1] + 1) for p in spec['numeros']]
+        try:
+            premios = {}
+            for qnt, pos_premio in sorted(spec['premios'].items()):
+                premios[qnt] = dados[pos_premio]
+
+            return {
+                'concurso': int(dados[spec.get('concurso', 0)]),
+                'numeros': [[int(dados[i]) for i in r] for r in pos_nums],
+                'premios': premios,
+            }
+        except (IndexError, ValueError):
+            return None
+
+    def reset(self, init=False):
+        if not init:
+            super().reset()
 
         self._capture = True
         self._data = []
@@ -230,8 +245,8 @@ class LoteriaParser(HTMLParser):
 
 
 class LoteriaNewParser(LoteriaParser):
-    def reset(self):
-        super().reset()
+    def reset(self, **kwargs):
+        super().reset(**kwargs)
 
         self._capture_list = False
         self._capture_number = False

@@ -2,6 +2,11 @@
 
 Todas as mudanças de destaque nesse projeto será documentado neste arquivo. 
 
+## [Não publicado]
+
+### Modificado
+- Refatorações no código.
+
 ## [0.0.4] - 2017-11-29
 
 ### Modificado
@@ -34,7 +39,6 @@ Todas as mudanças de destaque nesse projeto será documentado neste arquivo.
 ### Modificado
 - Gerador lotomania: 20 números por padrão.
 - Script refeito para ter saída mais bem formatada.
-- 
 
 ## [0.0.1] - 2014-04-04
 
