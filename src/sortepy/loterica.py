@@ -90,9 +90,7 @@ class Loteria:
             return json.loads(result, object_hook=int_key)
 
     def _download(self, concurso):
-        parser = self._parser()
-        if parser is None:
-            raise NotImplementedError("parser")
+        parser = LoteriaParser(self.nome)
 
         url = self._url(concurso)
         conteudo_html = self.util.download(url, in_cache=concurso > 0)
@@ -130,12 +128,6 @@ class Loteria:
 
         return [result['premios'].get(n, '0,00') for n in acertou]
 
-    def _parser(self):
-        if self.nome in ('quina', 'megasena', 'duplasena'):
-            return LoteriaNewParser(self.nome)
-        else:
-            return LoteriaParser(self.nome)
-
     def _url(self, concurso,
              base="http://www1.caixa.gov.br/loterias/loterias/%(loteria)s/",
              script="%(loteria)s_pesquisa_new.asp",
@@ -148,7 +140,8 @@ class Loteria:
                                           'concurso': concurso}
 
 
-class LoteriaParser(HTMLParser):
+class LoteriaParser:
+    NEW = 1
     SPECS = {
         'quina': {
             'numeros': [(21, 25)],
@@ -157,6 +150,7 @@ class LoteriaParser(HTMLParser):
                 4: 9,
                 3: 11,
             },
+            'parser': NEW,
         },
         'megasena': {
             'numeros': [(28, 33)],
@@ -165,6 +159,7 @@ class LoteriaParser(HTMLParser):
                 5: 13,
                 4: 15,
             },
+            'parser': NEW,
         },
         'lotofacil': {
             'numeros': [(3, 17)],
@@ -195,22 +190,28 @@ class LoteriaParser(HTMLParser):
                 5: 25,
                 4: 27,
             },
+            'parser': NEW,
         },
     }
 
-    def __init__(self, nome, *, convert_charrefs=True):
+    def __init__(self, nome):
         self._spec = self.SPECS.get(nome)
         if self._spec is None:
-            raise NotImplementedError("spec")
+            raise NotImplementedError("parser")
         if 'premios' not in self._spec:
-            raise NotImplementedError("spec[premios]")
+            raise NotImplementedError("parser: premios")
 
-        super().__init__(convert_charrefs=convert_charrefs)
-        self.reset(init=True)
+        if self._spec.get('parser') == self.NEW:
+            self._parser = _NewParser()
+        else:
+            self._parser = _OldParser()
+
+    def __getattr__(self, name):
+        return getattr(self._parser, name)
 
     def data(self):
         spec = self._spec
-        dados = ''.join(self._data).split('|')
+        dados = ''.join(self._parser.data).split('|')
 
         pos_nums = [range(p[0], p[1] + 1) for p in spec['numeros']]
         try:
@@ -226,9 +227,14 @@ class LoteriaParser(HTMLParser):
         except (IndexError, ValueError):
             return None
 
-    def reset(self, init=False):
-        if not init:
-            super().reset()
+
+class _OldParser(HTMLParser):
+    @property
+    def data(self):
+        return self._data
+
+    def reset(self):
+        super().reset()
 
         self._capture = True
         self._data = []
@@ -247,9 +253,9 @@ class LoteriaParser(HTMLParser):
         raise RuntimeError(message)
 
 
-class LoteriaNewParser(LoteriaParser):
-    def reset(self, **kwargs):
-        super().reset(**kwargs)
+class _NewParser(_OldParser):
+    def reset(self):
+        super().reset()
 
         self._capture_list = False
         self._capture_number = False
