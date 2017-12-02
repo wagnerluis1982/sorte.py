@@ -1,10 +1,9 @@
 # encoding=utf8
 
 import os
-import threading
+import multiprocessing
 import unittest
-from http.server import HTTPServer
-from http.server import SimpleHTTPRequestHandler
+import http.server
 
 import sortepy.util
 from basetest import tempdir
@@ -152,7 +151,7 @@ class FileDBTest(unittest.TestCase):
         assert self.db[chave] == 'valor2'
 
 
-class FixtureRequestHandler(SimpleHTTPRequestHandler):
+class FixtureRequestHandler(http.server.SimpleHTTPRequestHandler):
     def log_message(self, *args, **kwargs):
         # Desabilitando mensagens de log no terminal.
         pass
@@ -163,20 +162,18 @@ class FixtureRequestHandler(SimpleHTTPRequestHandler):
             if charset in path:
                 return "text/html; charset=%s" % charset
         # Se não achou um charset retorna mimetype default
-        return SimpleHTTPRequestHandler.guess_type(self, path)
+        return super().guess_type(path)
 
 
-class FixtureHttpServer(object):
+class FixtureHttpServer(multiprocessing.Process):
     def __init__(self):
-        os.chdir(PAGES_DIR)
-        httpd = HTTPServer(('127.0.0.1', 0), FixtureRequestHandler)
-        self.thread = threading.Thread(target=httpd.serve_forever)
-        self.httpd = httpd
-        self.port = httpd.server_port
+        super().__init__()
+        self.httpd = http.server.HTTPServer(('127.0.0.1', 0), FixtureRequestHandler)
+        self.port = self.httpd.server_port
 
-    def start(self):
-        self.thread.start()
+    def run(self):
+        os.chdir(PAGES_DIR)
+        self.httpd.serve_forever()
 
     def stop(self):
-        self.httpd.shutdown()
-        self.httpd.server_close()
+        self.terminate()
