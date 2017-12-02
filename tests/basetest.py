@@ -1,7 +1,6 @@
 # encoding=utf8
 
 import atexit
-import os
 import shutil
 import tempfile
 from unittest import TestCase
@@ -56,49 +55,49 @@ class LoteriaTestCase(BaseTestCase):
     def setUp(self):
         self.loto = Loteria(self.nome, cfg_path=cfg_fixture_path)
 
-    def test_gerar_aposta(_):
+    def test_gerar_aposta(self):
         # gerar aposta na quantidade padrão
-        aposta = _.check_gerar_aposta(None)
+        aposta = self.check_gerar_aposta(None)
 
         # outra aposta para identificar se realmente é aleatório
-        aposta2 = _.loto.gerar_aposta()
-        _.not_eq(aposta, aposta2, "segunda aposta igual à primeira")
+        aposta2 = self.loto.gerar_aposta()
+        self.not_eq(aposta, aposta2, "segunda aposta igual à primeira")
 
         # apostas com outras quantidades de números
-        for n in _.numeros[1:]:
-            _.check_gerar_aposta(n)
+        for n in self.numeros[1:]:
+            self.check_gerar_aposta(n)
 
-    def test_consultar_resultado(_):
-        result = _.loto.consultar(_.concurso)
-        _.is_instance(result, dict)
-        _.eq(result['concurso'], _.concurso)
-        _.eq(result['numeros'], _.sorteios)
+    def test_consultar_resultado(self):
+        result = self.loto.consultar(self.concurso)
+        self.is_instance(result, dict)
+        self.eq(result['concurso'], self.concurso)
+        self.eq(result['numeros'], self.sorteios)
 
-    def test_conferir_aposta(_):
-        resp = _.loto.conferir(_.concurso, _.apostas[:1])
-        _.is_instance(resp, list)
-        _.eq(resp[0]['concurso'], _.concurso)
-        _.eq(resp[0]['numeros'], _.apostas[0])
-        _.eq(resp[0]['acertou'], _.esperados['acertou'][0])
-        _.eq(resp[0]['ganhou'], _.esperados['ganhou'][0])
+    def test_conferir_aposta(self):
+        resp = self.loto.conferir(self.concurso, self.apostas[:1])
+        self.is_instance(resp, list)
+        self.eq(resp[0]['concurso'], self.concurso)
+        self.eq(resp[0]['numeros'], self.apostas[0])
+        self.eq(resp[0]['acertou'], self.esperados['acertou'][0])
+        self.eq(resp[0]['ganhou'], self.esperados['ganhou'][0])
 
-    def test_conferir_varias_apostas(_):
-        resp = _.loto.conferir(_.concurso, _.apostas)
-        _.is_instance(resp, list)
-        for i in range(len(_.apostas)):
-            _.eq(resp[i]['concurso'], _.concurso)
-            _.eq(resp[i]['numeros'], _.apostas[i])
-            _.eq(resp[i]['acertou'], _.esperados['acertou'][i])
-            _.eq(resp[i]['ganhou'], _.esperados['ganhou'][i])
+    def test_conferir_varias_apostas(self):
+        resp = self.loto.conferir(self.concurso, self.apostas)
+        self.is_instance(resp, list)
+        for i in range(len(self.apostas)):
+            self.eq(resp[i]['concurso'], self.concurso)
+            self.eq(resp[i]['numeros'], self.apostas[i])
+            self.eq(resp[i]['acertou'], self.esperados['acertou'][i])
+            self.eq(resp[i]['ganhou'], self.esperados['ganhou'][i])
 
-    def check_gerar_aposta(_, n):
-        n = n or _.numeros[0]  # número padrão ou informado
+    def check_gerar_aposta(self, n):
+        n = n or self.numeros[0]  # número padrão ou informado
 
-        aposta = _.loto.gerar_aposta(n)
-        _.is_instance(aposta, tuple)
-        _.eq(len(aposta), n, "aposta não tem %d números" % n)
-        _.eq(len(set(aposta)), n, "aposta não tem %d números diferentes" % n)
-        _.ok(_.permitidos.issuperset(aposta),
-             "aposta não está entre %d e %d" % _.infsup)
+        aposta = self.loto.gerar_aposta(n)
+        self.is_instance(aposta, tuple)
+        self.eq(len(aposta), n, "aposta não tem %d números" % n)
+        self.eq(len(set(aposta)), n, "aposta não tem %d números diferentes" % n)
+        self.ok(self.permitidos.issuperset(aposta),
+             "aposta não está entre %d e %d" % self.infsup)
 
         return aposta

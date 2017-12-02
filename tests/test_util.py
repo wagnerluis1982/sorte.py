@@ -56,26 +56,26 @@ class DownloadTest(basetest.BaseTestCase):
     def tearDownClass(cls):
         cls.server.stop()
 
-    def test_download_pagina(_):
-        url = _.base_url + '/pagina_ascii.html'
-        _.eq(_.util.download(url), CONTEUDO_ASCII)
+    def test_download_pagina(self):
+        url = self.base_url + '/pagina_ascii.html'
+        self.eq(self.util.download(url), CONTEUDO_ASCII)
 
-    def test_download_pagina_iso88591(_):
-        url = _.base_url + '/pagina_iso-8859-1.html'
-        conteudo = _.util.download(url)
-        _.is_instance(conteudo, str)
-        _.eq(conteudo, CONTEUDO_ENCODING % 'ISO-8859-1')
+    def test_download_pagina_iso88591(self):
+        url = self.base_url + '/pagina_iso-8859-1.html'
+        conteudo = self.util.download(url)
+        self.is_instance(conteudo, str)
+        self.eq(conteudo, CONTEUDO_ENCODING % 'ISO-8859-1')
 
-    def test_download_pagina_utf8(_):
-        url = _.base_url + '/pagina_utf-8.html'
-        conteudo = _.util.download(url)
-        _.is_instance(conteudo, str)
-        _.eq(conteudo, CONTEUDO_ENCODING % 'UTF-8')
+    def test_download_pagina_utf8(self):
+        url = self.base_url + '/pagina_utf-8.html'
+        conteudo = self.util.download(url)
+        self.is_instance(conteudo, str)
+        self.eq(conteudo, CONTEUDO_ENCODING % 'UTF-8')
 
-    def test_download_pagina_charset_unknown(_):
-        url = _.base_url + '/pagina_unknown.html'
-        conteudo = _.util.download(url)
-        _.is_instance(conteudo, str)
+    def test_download_pagina_charset_unknown(self):
+        url = self.base_url + '/pagina_unknown.html'
+        conteudo = self.util.download(url)
+        self.is_instance(conteudo, str)
 
 
 class CacheTest(basetest.BaseTestCase):
@@ -84,19 +84,19 @@ class CacheTest(basetest.BaseTestCase):
     def setUp(self):
         self.util = sortepy.util.Util(cfg_path=tempdir())
 
-    def test_gravar_e_ler_cache(_):
+    def test_gravar_e_ler_cache(self):
         # gravação
         put_txt = 'Minha terra tem palmeiras, Onde canta o Sabiá'
-        _.util.cache('dias.txt', put_txt)
+        self.util.cache('dias.txt', put_txt)
 
         # leitura
-        got_txt = _.util.cache('dias.txt')
-        _.eq(put_txt, got_txt)
+        got_txt = self.util.cache('dias.txt')
+        self.eq(put_txt, got_txt)
 
         # leitura falha
-        _.is_none(_.util.cache('nao_existe'))
+        self.is_none(self.util.cache('nao_existe'))
 
-    def test_guardar_e_recuperar_download(_):
+    def test_guardar_e_recuperar_download(self):
         server = FixtureHttpServer()
         server.start()
         base_url = "http://127.0.0.1:%d" % server.port
@@ -104,14 +104,14 @@ class CacheTest(basetest.BaseTestCase):
         # baixa conteúdo e verifica se está em cache
         url = base_url + '/pagina_ascii.html'
         try:
-            _.util.download(url)
-            _.eq(_.util.cache(url), CONTEUDO_ASCII)
+            self.util.download(url)
+            self.eq(self.util.cache(url), CONTEUDO_ASCII)
         finally:
             server.stop()
 
         # verifica se mesmo sem o servidor disponível o download ainda é feito
         # usando o cache
-        _.eq(_.util.download(url), CONTEUDO_ASCII)
+        self.eq(self.util.download(url), CONTEUDO_ASCII)
 
 
 class FileDBTest(basetest.BaseTestCase):
@@ -121,34 +121,34 @@ class FileDBTest(basetest.BaseTestCase):
         self.arquivo = os.path.join(tempdir(), 'test.db')
         self.db = sortepy.util.FileDB.open(self.arquivo)
 
-    def test_guardar_e_recuperar_valor(_):
+    def test_guardar_e_recuperar_valor(self):
         chave = 'cumprimento'
         valor = 'Olá, amigo, tudo bem?'
-        _.db[chave] = valor
-        _.db.close()
+        self.db[chave] = valor
+        self.db.close()
 
         # depois de fechar a base, tenta reabrir e ver se o valor continua lá
-        db = sortepy.util.FileDB.open(_.arquivo)
-        _.eq(db[chave], valor)
+        db = sortepy.util.FileDB.open(self.arquivo)
+        self.eq(db[chave], valor)
         db.close()
 
-    def test_excluir_chave(_):
+    def test_excluir_chave(self):
         chave = 'inutil'
         valor = 'Nada'
-        _.db[chave] = valor
-        _.ok(chave in _.db, "chave '%s' não existe" % chave)
+        self.db[chave] = valor
+        self.ok(chave in self.db, "chave '%s' não existe" % chave)
 
-        del _.db[chave]
-        _.ok(chave not in _.db, "chave '%s' não foi excluída" % chave)
-        _.db.close()
+        del self.db[chave]
+        self.ok(chave not in self.db, "chave '%s' não foi excluída" % chave)
+        self.db.close()
 
-    def test_redefinir_valor(_):
+    def test_redefinir_valor(self):
         chave = 'chave'
-        _.db[chave] = 'valor1'
-        _.eq(_.db[chave], 'valor1')
+        self.db[chave] = 'valor1'
+        self.eq(self.db[chave], 'valor1')
 
-        _.db[chave] = 'valor2'
-        _.eq(_.db[chave], 'valor2')
+        self.db[chave] = 'valor2'
+        self.eq(self.db[chave], 'valor2')
 
 
 class FixtureRequestHandler(SimpleHTTPRequestHandler):
