@@ -2,10 +2,10 @@
 
 import os
 import threading
+import unittest
 from http.server import HTTPServer
 from http.server import SimpleHTTPRequestHandler
 
-import basetest
 import sortepy.util
 from basetest import tempdir
 
@@ -42,7 +42,8 @@ CONTEUDO_ENCODING = """<!DOCTYPE html>
 </html>
 """
 
-class DownloadTest(basetest.BaseTestCase):
+
+class DownloadTest(unittest.TestCase):
     'Util.download'
 
     @classmethod
@@ -58,27 +59,27 @@ class DownloadTest(basetest.BaseTestCase):
 
     def test_download_pagina(self):
         url = self.base_url + '/pagina_ascii.html'
-        self.eq(self.util.download(url), CONTEUDO_ASCII)
+        assert self.util.download(url) == CONTEUDO_ASCII
 
     def test_download_pagina_iso88591(self):
         url = self.base_url + '/pagina_iso-8859-1.html'
         conteudo = self.util.download(url)
-        self.is_instance(conteudo, str)
-        self.eq(conteudo, CONTEUDO_ENCODING % 'ISO-8859-1')
+        assert isinstance(conteudo, str)
+        assert conteudo == CONTEUDO_ENCODING % 'ISO-8859-1'
 
     def test_download_pagina_utf8(self):
         url = self.base_url + '/pagina_utf-8.html'
         conteudo = self.util.download(url)
-        self.is_instance(conteudo, str)
-        self.eq(conteudo, CONTEUDO_ENCODING % 'UTF-8')
+        assert isinstance(conteudo, str)
+        assert conteudo == CONTEUDO_ENCODING % 'UTF-8'
 
     def test_download_pagina_charset_unknown(self):
         url = self.base_url + '/pagina_unknown.html'
         conteudo = self.util.download(url)
-        self.is_instance(conteudo, str)
+        assert isinstance(conteudo, str)
 
 
-class CacheTest(basetest.BaseTestCase):
+class CacheTest(unittest.TestCase):
     'Util.cache'
 
     def setUp(self):
@@ -91,10 +92,10 @@ class CacheTest(basetest.BaseTestCase):
 
         # leitura
         got_txt = self.util.cache('dias.txt')
-        self.eq(put_txt, got_txt)
+        assert put_txt == got_txt
 
         # leitura falha
-        self.is_none(self.util.cache('nao_existe'))
+        assert self.util.cache('nao_existe') is None
 
     def test_guardar_e_recuperar_download(self):
         server = FixtureHttpServer()
@@ -105,16 +106,16 @@ class CacheTest(basetest.BaseTestCase):
         url = base_url + '/pagina_ascii.html'
         try:
             self.util.download(url)
-            self.eq(self.util.cache(url), CONTEUDO_ASCII)
+            assert self.util.cache(url) == CONTEUDO_ASCII
         finally:
             server.stop()
 
         # verifica se mesmo sem o servidor disponível o download ainda é feito
         # usando o cache
-        self.eq(self.util.download(url), CONTEUDO_ASCII)
+        assert self.util.download(url) == CONTEUDO_ASCII
 
 
-class FileDBTest(basetest.BaseTestCase):
+class FileDBTest(unittest.TestCase):
     'FileDB'
 
     def setUp(self):
@@ -129,26 +130,26 @@ class FileDBTest(basetest.BaseTestCase):
 
         # depois de fechar a base, tenta reabrir e ver se o valor continua lá
         db = sortepy.util.FileDB.open(self.arquivo)
-        self.eq(db[chave], valor)
+        assert db[chave] == valor
         db.close()
 
     def test_excluir_chave(self):
         chave = 'inutil'
         valor = 'Nada'
         self.db[chave] = valor
-        self.ok(chave in self.db, "chave '%s' não existe" % chave)
+        assert chave in self.db, "chave '%s' não existe" % chave
 
         del self.db[chave]
-        self.ok(chave not in self.db, "chave '%s' não foi excluída" % chave)
+        assert chave not in self.db, "chave '%s' não foi excluída" % chave
         self.db.close()
 
     def test_redefinir_valor(self):
         chave = 'chave'
         self.db[chave] = 'valor1'
-        self.eq(self.db[chave], 'valor1')
+        assert self.db[chave] == 'valor1'
 
         self.db[chave] = 'valor2'
-        self.eq(self.db[chave], 'valor2')
+        assert self.db[chave] == 'valor2'
 
 
 class FixtureRequestHandler(SimpleHTTPRequestHandler):

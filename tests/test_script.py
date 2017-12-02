@@ -1,14 +1,16 @@
 # encoding=utf8
 
-import basetest
+import unittest
 
+import basetest
 from sortepy.script import main
+
 
 # Os testes do script são focados na loteria da Quina porque tem menos números
 # para verificar. Caso necessário, testes com outras loterias serão criados.
 # Como todas as loterias possuem testes individuais, isto não é um grande
 # problema.
-class ScriptTest(basetest.BaseTestCase):
+class ScriptTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.output = FakeStdOut()
@@ -21,7 +23,7 @@ class ScriptTest(basetest.BaseTestCase):
         args = (None, 'quina')
         main(args, stdout=self.output)
         linha = self.output.line(2)
-        self.eq(len([int(x) for x in linha.split()]), 5)
+        assert len([int(x) for x in linha.split()]) == 5
 
     def test_gerar_UMA_aposta_nao_padrao(self):
         # geração de aposta da quina com mais de 5 números
@@ -31,14 +33,14 @@ class ScriptTest(basetest.BaseTestCase):
             args = (None, 'quina', '-n', str(i))
             main(args, stdout=self.output)
             linha = self.output.line(2)
-            self.eq(len([int(x) for x in linha.split()]), i)
+            assert len([int(x) for x in linha.split()]) == i
 
             # opções longas
             self.output.clear()
             args = (None, 'quina', '--numeros=%d' % i)
             main(args, stdout=self.output)
             linha = self.output.line(2)
-            self.eq(len([int(x) for x in linha.split()]), i)
+            assert len([int(x) for x in linha.split()]) == i
 
     def test_gerar_VARIAS_apostas(self):
         # geração de apostas da quina padrão com 5 números
@@ -46,7 +48,7 @@ class ScriptTest(basetest.BaseTestCase):
         main(args, stdout=self.output)
         linhas = self.output.lines(2, 3)
         for no, linha in enumerate(linhas, 1):
-            self.eq(len([int(x) for x in linha.split()]), 5)
+            assert len([int(x) for x in linha.split()]) == 5
 
         # geração de aposta da quina com mais de 5 números
         for i in (6, 7):
@@ -56,7 +58,7 @@ class ScriptTest(basetest.BaseTestCase):
             main(args, stdout=self.output)
             linhas = self.output.lines(2, 3)
             for no, linha in enumerate(linhas, 1):
-                self.eq(len([int(x) for x in linha.split()]), i)
+                assert len([int(x) for x in linha.split()]) == i
 
             # opções longas
             self.output.clear()
@@ -64,63 +66,63 @@ class ScriptTest(basetest.BaseTestCase):
             main(args, stdout=self.output)
             linhas = self.output.lines(2, 3)
             for no, linha in enumerate(linhas, 1):
-                self.eq(len([int(x) for x in linha.split()]), i)
+                assert len([int(x) for x in linha.split()]) == i
 
     def test_consultar_UM_resultado(self):
         # consulta de apostas da quina
         args = (None, 'quina', '-c', '1')
         main(args, stdout=self.output, cfg_path=basetest.cfg_fixture_path)
         linhas = self.output.lines(2, 3)
-        self.eq(linhas, ["quina:\n",
-                      "  1: 25 45 60 76 79\n"])
+        assert linhas == ["quina:\n",
+                          "  1: 25 45 60 76 79\n"]
 
     def test_consultar_VARIOS_resultados(self):
         # consulta de apostas da quina
         args = (None, 'quina', '-c', '1', '-c', '2')
         main(args, stdout=self.output, cfg_path=basetest.cfg_fixture_path)
         linhas = self.output.lines(2, 4)
-        self.eq(linhas, ["quina:\n",
-                      "  1: 25 45 60 76 79\n",
-                      "  2: 13 30 58 63 64\n"])
+        assert linhas == ["quina:\n",
+                          "  1: 25 45 60 76 79\n",
+                          "  2: 13 30 58 63 64\n"]
 
     def test_conferir_UMA_aposta(self):
         args = (None, 'quina', '-c', '1', '1,25,39,44,76')
         main(args, stdout=self.output, cfg_path=basetest.cfg_fixture_path)
         linhas = self.output.lines(2, 6)
-        self.eq(linhas, ["quina:\n",
-                      "  1:\n",
-                      "  - aposta: 01 25 39 44 76\n",
-                      "    acertou:\n",
-                      "      2: R$ 0,00\n"])
+        assert linhas == ["quina:\n",
+                          "  1:\n",
+                          "  - aposta: 01 25 39 44 76\n",
+                          "    acertou:\n",
+                          "      2: R$ 0,00\n"]
 
     def test_conferir_VARIAS_apostas(self):
         args = (None, 'quina', '-c', '1', '1,25,39,44,76', '25,39,45,66,76')
         main(args, stdout=self.output, cfg_path=basetest.cfg_fixture_path)
         linhas = self.output.lines(2, 6)
-        self.eq(linhas, ["quina:\n",
-                      "  1:\n",
-                      "  - aposta: 01 25 39 44 76\n",
-                      "    acertou:\n",
-                      "      2: R$ 0,00\n"])
+        assert linhas == ["quina:\n",
+                          "  1:\n",
+                          "  - aposta: 01 25 39 44 76\n",
+                          "    acertou:\n",
+                          "      2: R$ 0,00\n"]
         linhas = self.output.lines(7, 9)
-        self.eq(linhas, ["  - aposta: 25 39 45 66 76\n",
-                      "    acertou:\n",
-                      "      3: R$ 42.982,00\n"])
+        assert linhas == ["  - aposta: 25 39 45 66 76\n",
+                          "    acertou:\n",
+                          "      3: R$ 42.982,00\n"]
 
     def test_conferir_apostas_em_VARIOS_concursos(self):
         args = (None, 'quina', '-c', '1', '-c', '2', '13,25,58,64,70')
         main(args, stdout=self.output, cfg_path=basetest.cfg_fixture_path)
         linhas = self.output.lines(2, 6)
-        self.eq(linhas, ["quina:\n",
-                      "  1:\n",
-                      "  - aposta: 13 25 58 64 70\n",
-                      "    acertou:\n",
-                      "      1: R$ 0,00\n"])
+        assert linhas == ["quina:\n",
+                          "  1:\n",
+                          "  - aposta: 13 25 58 64 70\n",
+                          "    acertou:\n",
+                          "      1: R$ 0,00\n"]
         linhas = self.output.lines(7, 10)
-        self.eq(linhas, ["  2:\n",
-                      "  - aposta: 13 25 58 64 70\n",
-                      "    acertou:\n",
-                      "      3: R$ 32.422,00\n"])
+        assert linhas == ["  2:\n",
+                          "  - aposta: 13 25 58 64 70\n",
+                          "    acertou:\n",
+                          "      3: R$ 32.422,00\n"]
 
 
 class FakeStdOut:

@@ -6,6 +6,7 @@ Todas as mudanças de destaque nesse projeto será documentado neste arquivo.
 
 ### Modificado
 - Refatorações no código.
+- Testes reformatados para usar com `pytest`.
 
 ## [0.0.4] - 2017-11-29
 
