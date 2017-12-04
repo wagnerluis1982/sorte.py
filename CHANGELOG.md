@@ -2,7 +2,10 @@
 
 Todas as mudanças de destaque nesse projeto será documentado neste arquivo. 
 
-## [Não publicado]
+## [0.0.5] - 2017-12-04
+
+### Adicionado
+- Exibe informações de ganhadores na saída da consulta.
 
 ### Modificado
 - Otimizações diversas no código.

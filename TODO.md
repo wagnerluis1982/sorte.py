@@ -1,8 +1,5 @@
 # A fazer
 
-## Versão 0.0.5
-- Exibir informações de ganhadores na saída da consulta.
-
 ## Versão 0.0.6
 - Adicionar suporte à consulta e conferência da Loteria Federal.
 

@@ -91,8 +91,14 @@ def exec_consultar(loteria, concursos):
 
     for result in resultados:
         for res_nums in result['numeros']:
-            print("  %d:" % result['concurso'],
-                  ' '.join("%02d" % n for n in res_nums))
+            print("  -")
+            print("   concurso: %d" % result['concurso'])
+            print("   numeros:", ' '.join("%02d" % n for n in res_nums))
+            print("   premios:")
+
+            premios = result['premios']
+            for n in sorted(premios, reverse=True):
+                print("     %d: R$ %s" % (n, premios[n]))
 
     if erros:
         if 'result' in vars():

@@ -75,7 +75,13 @@ class ScriptTest(unittest.TestCase):
         readlines = run_script(args)
         linhas = readlines[1:]
         assert linhas == ["quina:\n",
-                          "  1: 25 45 60 76 79\n"]
+                          "  -\n",
+                          "   concurso: 1\n",
+                          "   numeros: 25 45 60 76 79\n",
+                          "   premios:\n",
+                          "     5: R$ 75.731.225,00\n",
+                          "     4: R$ 1.788.927,00\n",
+                          "     3: R$ 42.982,00\n"]
 
     def test_consultar_VARIOS_resultados(self):
         # consulta de apostas da quina
@@ -83,8 +89,20 @@ class ScriptTest(unittest.TestCase):
         readlines = run_script(args)
         linhas = readlines[1:]
         assert linhas == ["quina:\n",
-                          "  1: 25 45 60 76 79\n",
-                          "  2: 13 30 58 63 64\n"]
+                          "  -\n",
+                          "   concurso: 1\n",
+                          "   numeros: 25 45 60 76 79\n",
+                          "   premios:\n",
+                          "     5: R$ 75.731.225,00\n",
+                          "     4: R$ 1.788.927,00\n",
+                          "     3: R$ 42.982,00\n",
+                          "  -\n",
+                          "   concurso: 2\n",
+                          "   numeros: 13 30 58 63 64\n",
+                          "   premios:\n",
+                          "     5: R$ 118.499.397,00\n",
+                          "     4: R$ 1.128.565,00\n",
+                          "     3: R$ 32.422,00\n"]
 
     def test_conferir_UMA_aposta(self):
         args = (None, 'quina', '-c', '1', '1,25,39,44,76')
