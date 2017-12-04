@@ -1,15 +1,12 @@
-# encoding=utf8
-
 import os
-import multiprocessing
 import unittest
-import http.server
 
 import sortepy.util
 from basetest import tempdir
 
-# Diretório de páginas: '/tests/fixtures/paginas'
-PAGES_DIR = os.path.join(os.path.dirname(__file__), 'fixtures', 'paginas')
+import fixtures
+fixtures.start_server()
+
 # Conteúdo para 'pagina_ascii.html'
 CONTEUDO_ASCII = """<!DOCTYPE html>
 <html>
@@ -47,33 +44,26 @@ class DownloadTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.server = FixtureHttpServer()
-        cls.server.start()
-        cls.base_url = "http://127.0.0.1:%d" % cls.server.port
         cls.util = sortepy.util.Util(cfg_path='')
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.server.stop()
-
     def test_download_pagina(self):
-        url = self.base_url + '/pagina_ascii.html'
+        url = fixtures.server_url + '/paginas/pagina_ascii.html'
         assert self.util.download(url) == CONTEUDO_ASCII
 
     def test_download_pagina_iso88591(self):
-        url = self.base_url + '/pagina_iso-8859-1.html'
+        url = fixtures.server_url + '/paginas/pagina_iso-8859-1.html'
         conteudo = self.util.download(url)
         assert isinstance(conteudo, str)
         assert conteudo == CONTEUDO_ENCODING % 'ISO-8859-1'
 
     def test_download_pagina_utf8(self):
-        url = self.base_url + '/pagina_utf-8.html'
+        url = fixtures.server_url + '/paginas/pagina_utf-8.html'
         conteudo = self.util.download(url)
         assert isinstance(conteudo, str)
         assert conteudo == CONTEUDO_ENCODING % 'UTF-8'
 
     def test_download_pagina_charset_unknown(self):
-        url = self.base_url + '/pagina_unknown.html'
+        url = fixtures.server_url + '/paginas/pagina_unknown.html'
         conteudo = self.util.download(url)
         assert isinstance(conteudo, str)
 
@@ -97,17 +87,10 @@ class CacheTest(unittest.TestCase):
         assert self.util.cache('nao_existe') is None
 
     def test_guardar_e_recuperar_download(self):
-        server = FixtureHttpServer()
-        server.start()
-        base_url = "http://127.0.0.1:%d" % server.port
-
         # baixa conteúdo e verifica se está em cache
-        url = base_url + '/pagina_ascii.html'
-        try:
-            self.util.download(url)
-            assert self.util.cache(url) == CONTEUDO_ASCII
-        finally:
-            server.stop()
+        url = fixtures.server_url + '/paginas/pagina_ascii.html'
+        self.util.download(url)
+        assert self.util.cache(url) == CONTEUDO_ASCII
 
         # verifica se mesmo sem o servidor disponível o download ainda é feito
         # usando o cache
@@ -149,31 +132,3 @@ class FileDBTest(unittest.TestCase):
 
         self.db[chave] = 'valor2'
         assert self.db[chave] == 'valor2'
-
-
-class FixtureRequestHandler(http.server.SimpleHTTPRequestHandler):
-    def log_message(self, *args, **kwargs):
-        # Desabilitando mensagens de log no terminal.
-        pass
-
-    def guess_type(self, path):
-        # Se nome do arquivo indica um charset retorna 'text/html' e charset
-        for charset in ('ascii', 'iso-8859-1', 'utf-8'):
-            if charset in path:
-                return "text/html; charset=%s" % charset
-        # Se não achou um charset retorna mimetype default
-        return super().guess_type(path)
-
-
-class FixtureHttpServer(multiprocessing.Process):
-    def __init__(self):
-        super().__init__()
-        self.httpd = http.server.HTTPServer(('127.0.0.1', 0), FixtureRequestHandler)
-        self.port = self.httpd.server_port
-
-    def run(self):
-        os.chdir(PAGES_DIR)
-        self.httpd.serve_forever()
-
-    def stop(self):
-        self.terminate()
