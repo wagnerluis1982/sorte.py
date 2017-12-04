@@ -27,7 +27,7 @@ def start_server():
 start_server.status = 0
 
 
-class FixtureRequestHandler(http.server.SimpleHTTPRequestHandler):
+class FixtureRequestHandler(http.server.CGIHTTPRequestHandler):
     def log_message(self, *args, **kwargs):
         # Desabilitando mensagens de log no terminal.
         pass

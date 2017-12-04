@@ -1,11 +1,13 @@
-# encoding=utf8
-
 import atexit
 import shutil
 import tempfile
 import unittest
 
 from sortepy.loterica import Loteria
+
+# patch para classe de loteria utilizar o servidor interno
+import patchs
+patchs.loteria_class()
 
 
 def tempdir(custom_prefix='sortepy-'):
