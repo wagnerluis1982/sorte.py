@@ -5,8 +5,9 @@ Todas as mudanças de destaque nesse projeto será documentado neste arquivo.
 ## [Não publicado]
 
 ### Modificado
-- Refatorações no código.
+- Otimizações diversas no código.
 - Testes reformatados para usar com `pytest`.
+- Servidor de testes com script CGI para simular a página de resultados.
 
 ## [0.0.4] - 2017-11-29
 
