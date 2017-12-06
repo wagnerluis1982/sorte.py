@@ -2,6 +2,8 @@
 
 ## Versão 0.0.6
 - Adicionar suporte à consulta e conferência da Loteria Federal.
+- Corrigir a duplasena para obter corretamente os prêmios do segundo sorteio.
+- Melhorar a saída para a consulta de duplasena.
 
 ## Versão 0.0.7
 - Esquema de tabela mais apropriada para guardar os resultados: atualmente existe uma única coluna onde armazena um JSON com todas as informações de resultado.

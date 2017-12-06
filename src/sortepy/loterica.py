@@ -1,3 +1,4 @@
+import collections
 import json
 import random
 
@@ -87,7 +88,12 @@ class Loteria:
         if result:
             def int_key(obj):
                 return {(int(k) if k.isdecimal() else k):v for k, v in obj.items()}
-            return json.loads(result, object_hook=int_key)
+
+            # convert `(k, v)` de volta para `dict`
+            result = json.loads(result, object_hook=int_key)
+            result['premios'] = collections.OrderedDict(result['premios'])
+
+            return result
 
     def _download(self, concurso):
         parser = LoteriaParser(self.nome)
@@ -105,6 +111,10 @@ class Loteria:
             return result
 
     def _store(self, result):
+        # converte `dict` para `(k, v)`: garante os prêmios na ordem devolvida pelo parser
+        result = result.copy()
+        result['premios'] = list(result['premios'].items())
+        # armazena no cache
         self.loteria_db['%s|%s' % (self.nome, result['concurso'])] = json.dumps(result)
 
     def conferir(self, concurso, apostas):
@@ -215,8 +225,8 @@ class LoteriaParser:
 
         pos_nums = [range(p[0], p[1] + 1) for p in spec['numeros']]
         try:
-            premios = {}
-            for qnt, pos_premio in sorted(spec['premios'].items()):
+            premios = collections.OrderedDict()
+            for qnt, pos_premio in sorted(spec['premios'].items(), reverse=True):
                 premios[qnt] = dados[pos_premio]
 
             return {

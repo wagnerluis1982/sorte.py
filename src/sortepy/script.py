@@ -97,7 +97,7 @@ def exec_consultar(loteria, concursos):
             print("   premios:")
 
             premios = result['premios']
-            for n in sorted(premios, reverse=True):
+            for n in premios:
                 print("     %d: R$ %s" % (n, premios[n]))
 
     if erros:
