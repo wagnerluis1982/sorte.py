@@ -12,7 +12,8 @@ def loteria_class():
             'obter-loteria.py',                        # script
             '?nome=%(loteria)s&concurso=%(concurso)s'  # query
         )
-        del sortepy.loterica.LOTERIAS['lotomania']['url-script']
+        for settings in sortepy.loterica.LOTERIAS.values():
+            settings.pop('url-script', None)
         # marca que o patch já foi feito
         loteria_class.done = True
 

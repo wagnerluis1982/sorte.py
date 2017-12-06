@@ -19,6 +19,10 @@ class ResultadoNaoDisponivel(Exception):
     pass
 
 
+# tipos de loteria
+K_COMMON = 0
+K_TICKET = 1
+
 APELIDOS = {
     'sena': 'megasena',
 }
@@ -40,7 +44,13 @@ LOTERIAS = {
     'duplasena': {
         'marcar': (6, 15), 'numeros': (1, 50), 'nome': "Dupla Sena",
     },
+    'federal': {
+        # essa loteria não gera números
+        'url-script': "federal_pesquisa.asp",
+        'kind': K_TICKET,
+    },
 }
+
 
 class Loteria:
     def __init__(self, nome, cfg_path=None):
@@ -55,6 +65,14 @@ class Loteria:
         self.util = util.Util(cfg_path)
         self.loteria_db = self.util.get_mapdb('loteria')
 
+        # Se for uma loteria do tipo TICKET. não há gerador, assim substitui
+        # método `gerar_aposta()` e encerra.
+        kind = c.get('kind', K_COMMON)
+        if kind == K_TICKET:
+            self.gerar_aposta = lambda *a, **k: None
+            return
+
+        # atributos do gerador de números
         self._range = range(c['numeros'][0], c['numeros'][1] + 1)
         self._min = c['marcar'][0]
         self._max = c['marcar'][1]
@@ -202,6 +220,12 @@ class LoteriaParser:
             },
             'parser': NEW,
         },
+        'federal': {
+            'concurso': 2,
+            'numeros': (6, 8, 10, 12, 14),
+            'premios': (7, 9, 11, 13, 15),
+            'kind': K_TICKET,
+        },
     }
 
     def __init__(self, nome):
@@ -223,17 +247,40 @@ class LoteriaParser:
         spec = self._spec
         dados = ''.join(self._parser.data).split('|')
 
+        kind = spec.get('kind', K_COMMON)
+        if kind == K_COMMON:
+            numeros, premios = self.__common(spec, dados)
+        else:
+            numeros, premios = self.__ticket(spec, dados)
+
+        return {
+            'concurso': int(dados[spec.get('concurso', 0)]),
+            'numeros': numeros,
+            'premios': premios,
+        }
+
+    @staticmethod
+    def __common(spec, dados):
         pos_nums = [range(p[0], p[1] + 1) for p in spec['numeros']]
         try:
+            numeros = [[int(dados[i]) for i in r] for r in pos_nums]
             premios = collections.OrderedDict()
             for qnt, pos_premio in sorted(spec['premios'].items(), reverse=True):
                 premios[qnt] = dados[pos_premio]
 
-            return {
-                'concurso': int(dados[spec.get('concurso', 0)]),
-                'numeros': [[int(dados[i]) for i in r] for r in pos_nums],
-                'premios': premios,
-            }
+            return numeros, premios
+        except (IndexError, ValueError):
+            return None
+
+    @staticmethod
+    def __ticket(spec, dados):
+        try:
+            premios = collections.OrderedDict()
+            for pos_ticket, pos_premio in zip(spec['numeros'], spec['premios']):
+                ticket = int(dados[pos_ticket].replace('.', ''))
+                premios[ticket] = dados[pos_premio]
+
+            return None, premios
         except (IndexError, ValueError):
             return None
 

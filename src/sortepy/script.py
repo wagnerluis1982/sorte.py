@@ -90,7 +90,21 @@ def exec_consultar(loteria, concursos):
     print("%s:" % loteria.nome)
 
     for result in resultados:
-        for res_nums in result['numeros']:
+        _numeros = result.get('numeros', ())
+
+        # esse resultado não cria a chave 'numeros'
+        if not _numeros:
+            print("  -")
+            print("   concurso: %d" % result['concurso'])
+            print("   premios:")
+
+            premios = result['premios']
+            for n in premios:
+                print("     %d: R$ %s" % (n, premios[n]))
+            continue
+
+        # a chave 'numeros' está presente
+        for res_nums in _numeros:
             print("  -")
             print("   concurso: %d" % result['concurso'])
             print("   numeros:", ' '.join("%02d" % n for n in res_nums))
