@@ -4,6 +4,9 @@ Todas as mudanças de destaque nesse projeto será documentado neste arquivo.
 
 ## [Não publicado]
 
+### Adicionado
+- Suporte à consulta e conferência da Loteria Federal.
+
 ### Modificado
 - Nova estrutura de JSON para o cache, que mantém a ordem dos prêmios retornado pelo parser.
 

@@ -1,7 +1,6 @@
 # A fazer
 
 ## Versão 0.0.6
-- Adicionar suporte à consulta e conferência da Loteria Federal.
 - Corrigir a duplasena para obter corretamente os prêmios do segundo sorteio.
 - Melhorar a saída para a consulta de duplasena.
 

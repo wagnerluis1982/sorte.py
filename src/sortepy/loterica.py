@@ -67,8 +67,8 @@ class Loteria:
 
         # Se for uma loteria do tipo TICKET. não há gerador, assim substitui
         # método `gerar_aposta()` e encerra.
-        kind = c.get('kind', K_COMMON)
-        if kind == K_TICKET:
+        self._kind = c.get('kind', K_COMMON)
+        if self._kind == K_TICKET:
             self.gerar_aposta = lambda *a, **k: None
             return
 
@@ -139,8 +139,12 @@ class Loteria:
         result = self.consultar(concurso, com_premios=True)
         resp = []
         for aposta in apostas:
-            acertou = [[n for n in res if n in aposta]
-                       for res in result['numeros']]
+            if self._kind == K_COMMON:
+                acertou = [[n for n in res if n in aposta]
+                           for res in result['numeros']]
+            else:
+                acertou = [aposta for res in result['premios'] if [res] == aposta]
+
             ganhou = self._ganhou(result, acertou)
             resp.append({
                 'concurso': result['concurso'], 'numeros': aposta,
@@ -150,9 +154,12 @@ class Loteria:
         return resp
 
     def _ganhou(self, result, acertou):
-        acertou = [len(t) for t in acertou]
-        if self.nome == "duplasena" and acertou[0] == 6:
-            acertou[0] = -6
+        if self._kind == K_COMMON:
+            acertou = [len(t) for t in acertou]
+            if self.nome == "duplasena" and acertou[0] == 6:
+                acertou[0] = -6
+        else:
+            acertou = [v for [v] in acertou] or [None]
 
         return [result['premios'].get(n, '0,00') for n in acertou]
 
