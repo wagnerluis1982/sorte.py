@@ -256,9 +256,14 @@ class LoteriaParser:
 
         kind = spec.get('kind', K_COMMON)
         if kind == K_COMMON:
-            numeros, premios = self.__common(spec, dados)
+            subdados = self.__common(spec, dados)
         else:
-            numeros, premios = self.__ticket(spec, dados)
+            subdados = self.__ticket(spec, dados)
+
+        if subdados:
+            numeros, premios = subdados
+        else:
+            return None
 
         return {
             'concurso': int(dados[spec.get('concurso', 0)]),
