@@ -14,14 +14,16 @@ preenchidos manualmente.
 Instalação
 ----------
 
+AVISO: `sorte.py` requer no mínimo o Python 3 para a instalação com sucesso.
+
 Para instalar, basta baixar o projeto, descompactar e executar, estando no
 diretório do projeto
 
-    $ python setup.py install
+    $ python3 setup.py install
 
 Ou, você pode executar o `pip` diretamente
 
-    $ pip install git+https://github.com/wagnerluis1982/sorte-py
+    $ pip3 install git+https://github.com/wagnerluis1982/sorte-py
 
 Modo de uso
 -----------
