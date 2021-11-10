@@ -25,6 +25,13 @@ Ou, você pode executar o `pip` diretamente
 
     $ pip3 install git+https://github.com/wagnerluis1982/sorte-py
 
+Licença
+-------
+
+O código fonte é licenciado sob a licença [GPLv3].
+
+[GPLv3]: http://licencas.softwarelivre.org/gpl-3.0.pt-br.html
+
 Modo de uso
 -----------
 
