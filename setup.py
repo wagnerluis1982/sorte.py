@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = "sorte.py",
-    version = "0.0.6.dev1",
+    version = "0.1.0.dev1",
     author = "Wagner Macedo",
     author_email = "wagnerluis1982@gmail.com",
     description = "Geração e conferência de apostas de loterias",
