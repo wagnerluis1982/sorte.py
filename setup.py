@@ -3,8 +3,6 @@
 import codecs
 from setuptools import setup, find_packages
 
-PACKAGE_DIR = 'src'
-
 setup(
     name = "sorte.py",
     version = "0.0.6.dev1",
@@ -14,8 +12,7 @@ setup(
     long_description = codecs.open("README", 'r', encoding='utf-8').read(),
     license = "GPLv3",
     url = "https://github.com/wagnerluis1982/sorte-py",
-    package_dir = {'': PACKAGE_DIR},
-    packages = find_packages(PACKAGE_DIR),
+    packages = find_packages(),
     entry_points = {
         "console_scripts": [
             "sorte.py = sortepy.script:main",
