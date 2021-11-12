@@ -1,4 +1,6 @@
+import functools
 import io
+import sys
 import unittest
 
 import basetest
@@ -6,7 +8,14 @@ import sortepy.script
 
 def run_script(args):
     output = io.StringIO()
-    sortepy.script.main(args, stdout=output, stderr=output, cfg_path=basetest.cfg_fixture_path)
+
+    # Redefine 'print' para usar outra stdout passado como parâmetro
+    sortepy.script.print = functools.partial(print, file=output)
+
+    # Redefine 'error' para usar outra stderr passada como parâmetro
+    sortepy.script.error = functools.partial(sortepy.script.error, file=output)
+
+    sortepy.script.main(args, cfg_path=basetest.cfg_fixture_path)
     output.seek(0)
     return output.readlines()
 

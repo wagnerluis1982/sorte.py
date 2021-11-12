@@ -34,17 +34,34 @@ Opções gerais:
 O valor de LOTERIA pode ser: """, ', '.join(sorted(loterica.LOTERIAS))])
 
 
-def error(*args, **kwargs):
+def error(*args, show_help=True, code=255, **kwargs):
     print(*args, **kwargs)
-    if kwargs.get('show_help', True):
+    if show_help:
         print(help_msg)
-    return kwargs.get('code', 255)
+    return code
 
 
-def exec_gerar(loteria: loterica.Loteria, quantidade, numeros):
+def exec_gerar(loteria: loterica.Loteria, quantidade: int, numeros: int) -> int:
+    """Executa a geração de números para apostas
+
+    Parameters
+    ----------
+    loteria : Loteria
+        Identifica a loteria usada para a geração de números
+    quantidade : int
+        O total de apostas para gerar
+    numeros : int
+        O total de números gerados em cada aposta
+
+    Returns
+    -------
+    int
+        Código de erro
+    """    
+    if loteria.kind == loterica.K_TICKET:
+        return error("ERRO: loteria %s não gera apostas porque é tipo ticket" % loteria.nome,
+                     show_help=False, code=5)
     try:
-        if loteria.kind == loterica.K_TICKET:
-            return error("ERRO: loteria %s não gera apostas porque é tipo ticket" % loteria.nome)
         for i in range(1, quantidade+1):
             aposta = loteria.gerar_aposta(numeros)
             if i == 1:
@@ -153,30 +170,22 @@ def exec_conferir(loteria, concursos, apostas):
         print("  erros:", ', '.join(sorted(map(str, erros))))
 
 
-def __highlight_closure(stdout, color=0, spec=0, condition=lambda x: True):
-    if stdout.isatty():
+def __highlight_closure(color=0, spec=0, condition=lambda x: True):
+    if sys.stdout.isatty():
         formatting = "\x1b[%02d;%02dm%%s\x1b[00m" % (spec, color)
         return lambda arg: formatting % arg if condition(arg) else arg
     else:
         return lambda arg: arg
 
 
-def main(argv=sys.argv, stdout=sys.stdout, stderr=sys.stderr, cfg_path=None):
-    # Redefine 'print' para usar outra stdout passado como parâmetro
-    global print
-    print = functools.partial(print, file=stdout)
-
-    # Redefine 'error' para usar outra stderr passada como parâmetro
-    global error
-    error = functools.partial(error, file=stderr)
-
+def main(argv=sys.argv, cfg_path=None):
     # Função de destaque de número acertado
     global hi_acerto
-    hi_acerto = __highlight_closure(stdout, color=33)
+    hi_acerto = __highlight_closure(color=33)
 
     # Função de destaque de ganhos
     global hi_ganho
-    hi_ganho = __highlight_closure(stdout, color=32, spec=0,
+    hi_ganho = __highlight_closure(color=32, spec=0,
                                    condition=lambda x: x != "R$ 0,00")
 
     try:
