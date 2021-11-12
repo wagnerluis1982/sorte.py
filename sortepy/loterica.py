@@ -56,30 +56,29 @@ class Loteria:
     def __init__(self, nome, cfg_path=None):
         nome = APELIDOS.get(nome, nome)
         try:
-            c = LOTERIAS[nome]
+            self.settings = LOTERIAS[nome]
         except KeyError as err:
             raise LoteriaNaoSuportada(err)
 
-        self.settings = c
         self.nome = nome
         self.util = util.Util(cfg_path)
         self.loteria_db = self.util.get_mapdb('loteria')
 
         # Se for uma loteria do tipo TICKET. não há gerador, assim substitui
         # método `gerar_aposta()` e encerra.
-        self._kind = c.get('kind', K_COMMON)
+        self._kind = self.settings.get('kind', K_COMMON)
         if self._kind == K_TICKET:
             self.gerar_aposta = lambda *a, **k: None
             return
 
         # atributos do gerador de números
-        self._range = range(c['numeros'][0], c['numeros'][1] + 1)
-        self._min = c['marcar'][0]
-        self._max = c['marcar'][1]
-        self._padrao = c.get('padrao', self._min)
+        self._range = range(self.settings['numeros'][0], self.settings['numeros'][1] + 1)
+        self._min = self.settings['marcar'][0]
+        self._max = self.settings['marcar'][1]
+        self._padrao = self.settings.get('padrao', self._min)
 
-    def gerar_aposta(self, marcar=None):
-        if marcar is None:
+    def gerar_aposta(self, marcar: int = None):
+        if marcar in (None, 0):
             marcar = self._padrao
         if not (self._min <= marcar <= self._max):
             raise QuantidadeInvalida(self.nome, marcar)

@@ -41,18 +41,16 @@ def error(*args, **kwargs):
     return kwargs.get('code', 255)
 
 
-def exec_gerar(loteria, quantidade, numeros):
+def exec_gerar(loteria: loterica.Loteria, quantidade, numeros):
     try:
-        aposta1 = loteria.gerar_aposta(numeros)
+        for i in range(1, quantidade+1):
+            aposta = loteria.gerar_aposta(numeros)
+            if i == 1:
+                print("# gerador da", loteria.nome)
+            print(' '.join("%02d" % n for n in aposta))
     except loterica.QuantidadeInvalida as err:
         return error("ERRO: não dá para gerar aposta da %s com %d números" %
                 err.args, show_help=False, code=5)
-
-    print("# gerador da", loteria.nome)
-    print(' '.join("%02d" % n for n in aposta1))
-    for i in range(2, quantidade+1):
-        aposta = loteria.gerar_aposta(numeros)
-        print(' '.join("%02d" % n for n in aposta))
 
 
 def iter_resultados(fun, args, erros=set()):
