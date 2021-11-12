@@ -7,7 +7,9 @@ AVISO
 -----
 
 `sorte.py` não consegue fazer mais consultas (o que também afeta as conferências),
-desde que a Caixa mudou drasticamente o sistema. Este problema está sendo investigado (veja https://github.com/wagnerluis1982/sorte.py/pull/3).
+desde que a Caixa mudou drasticamente o sistema. Este problema está sendo investigado.
+
+Veja https://github.com/wagnerluis1982/sorte.py/pull/4
 
 ---
 
