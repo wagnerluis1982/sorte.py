@@ -1,4 +1,5 @@
 import os
+import sqlite3
 import unittest
 
 import sortepy.util
@@ -100,35 +101,82 @@ class CacheTest(unittest.TestCase):
 class FileDBTest(unittest.TestCase):
     'FileDB'
 
+    latest_version = 1
+
     def setUp(self):
         self.arquivo = os.path.join(tempdir(), 'test.db')
-        self.db = sortepy.util.FileDB.open(self.arquivo)
 
     def test_guardar_e_recuperar_valor(self):
         chave = 'cumprimento'
         valor = 'Olá, amigo, tudo bem?'
-        self.db[chave] = valor
-        self.db.close()
+        db = self._open_db()
+        db[chave] = valor
+        db.close()
 
         # depois de fechar a base, tenta reabrir e ver se o valor continua lá
-        db = sortepy.util.FileDB.open(self.arquivo)
+        db = self._open_db()
         assert db[chave] == valor
         db.close()
 
     def test_excluir_chave(self):
         chave = 'inutil'
         valor = 'Nada'
-        self.db[chave] = valor
-        assert chave in self.db, "chave '%s' não existe" % chave
+        db = self._open_db()
+        db[chave] = valor
+        assert chave in db, "chave '%s' não existe" % chave
 
-        del self.db[chave]
-        assert chave not in self.db, "chave '%s' não foi excluída" % chave
-        self.db.close()
+        del db[chave]
+        assert chave not in db, "chave '%s' não foi excluída" % chave
+        db.close()
 
     def test_redefinir_valor(self):
         chave = 'chave'
-        self.db[chave] = 'valor1'
-        assert self.db[chave] == 'valor1'
+        db = self._open_db()
+        db[chave] = 'valor1'
+        assert db[chave] == 'valor1'
 
-        self.db[chave] = 'valor2'
-        assert self.db[chave] == 'valor2'
+        db[chave] = 'valor2'
+        assert db[chave] == 'valor2'
+
+    def test_upgrade_from_version_0(self):
+        # cria tabela na v0
+        table = 'testmap'
+
+        key = 'tarzan'
+        value = 'jane'
+
+        conn = sqlite3.connect(self.arquivo)
+        conn.execute('PRAGMA user_version = %d' % 0)
+        conn.execute("CREATE TABLE %s (key TEXT PRIMARY KEY, value TEXT)" % table)
+        conn.execute("INSERT INTO %s VALUES (?, ?)" % table, (key, value))
+        conn.close()
+
+        # depois de iniciar o FileDB
+        db = self._open_db()
+        db.close()
+
+        # eu espero que o banco tenha sido convertido
+        conn = sqlite3.connect(self.arquivo)
+        (dbversion,) = conn.execute('PRAGMA user_version').fetchone()
+        assert dbversion == self.latest_version
+
+        # e a tabela tenha sido atualizada
+        descriptions = self._table_descriptions(conn, table)
+        assert descriptions['key'] == {'type': 'TEXT', 'notnull': True, 'dflt_value': None, 'pk': True}
+        assert descriptions['value'] == {'type': 'TEXT', 'notnull': True, 'dflt_value': None, 'pk': False}
+        assert descriptions['ttl'] == {'type': 'INT', 'notnull': False, 'dflt_value': None, 'pk': False}
+
+    def _open_db(self):
+        return sortepy.util.FileDB.open(self.arquivo)
+
+    def _table_descriptions(self, conn, table):
+        descriptions = conn.execute('PRAGMA table_info(%s)' % table).fetchall()
+        return {
+            row[1]: {
+                'type': row[2],
+                'notnull': row[3],
+                'dflt_value': row[4],
+                'pk': row[5],
+            }
+            for row in descriptions
+        }

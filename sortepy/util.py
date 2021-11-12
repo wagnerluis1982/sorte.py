@@ -63,15 +63,14 @@ class Util:
         # Cria diretório de configuração, se não existir
         makedirs(cfg_path)
 
-        # caminho do arquivo de cache
-        self.cache_path = os.path.join(cfg_path, 'cache.db')
-
         # Define atributos de configuração
+        self.__cfg_path = cfg_path
         self.pages_db = self.get_mapdb('paginas')
         self.in_cache = True
 
     def get_mapdb(self, name):
-        return FileDB.open(self.cache_path, name)
+        db_path = os.path.join(self.__cfg_path, '%s.db' % name)
+        return FileDB.open(db_path)
 
     def download(self, url, in_cache=None):
         in_cache = in_cache if isinstance(in_cache, bool) else self.in_cache
@@ -142,12 +141,13 @@ class Util:
 
 class FileDB:
     @staticmethod
-    def open(filename, prefix=''):
+    def open(filename):
+        (prefix, _) = os.path.splitext(os.path.basename(filename))
         db = FileDB._SQLite3(filename, prefix)
         return db
 
     class _SQLite3(object):
-        __version__ = 0  # por enquanto não serve para nada
+        __version__ = 1
 
         def __init__(self, filename, prefix=''):
             self._con = sqlite3.connect(filename)
@@ -169,11 +169,18 @@ class FileDB:
 
         def _create_schema(self):
             try:
-                self._con.execute("CREATE TABLE %s (key TEXT PRIMARY KEY, value TEXT)" % self._table)
-                self._write_dbversion(self.__version__)
-            # caso a tabela 'map' já exista
+                self._con.execute('BEGIN EXCLUSIVE TRANSACTION')
+                self._con.execute("CREATE TABLE %s (key TEXT NOT NULL PRIMARY KEY, value TEXT NOT NULL, ttl INT)" % self._table)
+            # caso a tabela 'map' já exista, inicia-se o processo de migração
             except sqlite3.OperationalError:
-                pass
+                sql = self._migration_script()
+                self._con.executescript(sql)
+            finally:
+                self._con.commit()
+                self._write_dbversion(self.__version__)
+
+        def _is_latest_version(self):
+            return self._read_dbversion() == self.__version__
 
         def _read_dbversion(self):
             (dbversion,) = self._con.execute('PRAGMA user_version').fetchone()
@@ -181,6 +188,30 @@ class FileDB:
 
         def _write_dbversion(self, version):
             self._con.execute('PRAGMA user_version = %d' % version)
+
+        def _migration_script(self):
+            # se versão for a mais atual, não é preciso criar esquema!
+            dbversion = self._read_dbversion()
+            if dbversion == self.__version__:
+                return ""
+            if dbversion == 0:
+                sql_template = """
+                    -- 1. Cria tabela temporária com o novo esquema
+                    CREATE TABLE temp_{table} (key TEXT NOT NULL PRIMARY KEY, value TEXT NOT NULL, ttl INT);
+
+                    -- 2. Copia dados da tabela atual para a temporária
+                    INSERT INTO temp_{table}(key, value)
+                    SELECT key, value FROM {table};
+
+                    -- 3. Drop tabela atual
+                    DROP TABLE {table};
+
+                    -- 4. Renomeia tabela temporária
+                    ALTER TABLE temp_{table}
+                    RENAME TO {table};
+                """
+                return sql_template.format(table=self._table)
+            return ""
 
         def get(self, key, default=None):
             try:
@@ -191,7 +222,7 @@ class FileDB:
         def __setitem__(self, key, value):
             with self._con as con:
                 try:
-                    con.execute("INSERT INTO %s VALUES (?, ?)" % self._table, (key, value))
+                    con.execute("INSERT INTO %s(key, value) VALUES (?, ?)" % self._table, (key, value))
                 except sqlite3.IntegrityError:
                     con.execute("UPDATE %s SET value=? WHERE key=?" % self._table, (value, key))
 

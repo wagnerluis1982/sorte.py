@@ -10,6 +10,7 @@ Todas as mudanças de destaque nesse projeto será documentado neste arquivo.
 ### Modificado
 - Nova estrutura de JSON para o cache, que mantém a ordem dos prêmios retornado pelo parser.
 - Licença do projeto agora é [GPLv3].
+- Caches agora são gravados em arquivos SQLite separados. Necessário para facilitar migrações.
 
 [GPLv3]: http://licencas.softwarelivre.org/gpl-3.0.pt-br.html
 
