@@ -6,7 +6,7 @@ import sortepy.script
 
 def run_script(args):
     output = io.StringIO()
-    sortepy.script.main(args, stdout=output, cfg_path=basetest.cfg_fixture_path)
+    sortepy.script.main(args, stdout=output, stderr=output, cfg_path=basetest.cfg_fixture_path)
     output.seek(0)
     return output.readlines()
 
@@ -68,6 +68,12 @@ class ScriptTest(unittest.TestCase):
             assert len(linhas) == 2
             for no, linha in enumerate(linhas, 1):
                 assert len([int(x) for x in linha.split()]) == i
+
+    def test_gerar_aposta_para_loteria_ticket_NAO_disponivel(self):
+        args = (None, 'federal')
+        readlines = run_script(args)
+        linha = readlines[0]
+        assert linha == "ERRO: loteria federal não gera apostas porque é tipo ticket\n"
 
     def test_consultar_UM_resultado(self):
         # consulta de apostas da quina

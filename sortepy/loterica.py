@@ -53,6 +53,8 @@ LOTERIAS = {
 
 
 class Loteria:
+    kind = property(lambda self: self._kind)
+    
     def __init__(self, nome, cfg_path=None):
         nome = APELIDOS.get(nome, nome)
         try:

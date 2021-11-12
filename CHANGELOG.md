@@ -14,6 +14,9 @@ Todas as mudanças de destaque nesse projeto será documentado neste arquivo.
 
 [GPLv3]: http://licencas.softwarelivre.org/gpl-3.0.pt-br.html
 
+### Corrigido
+- Exibe erro amigável quando tenta gerar aposta da Loteria Federal, em vez do traceback.
+
 ## [0.0.5] - 2017-12-04
 
 ### Adicionado

@@ -1,6 +1,6 @@
 # encoding=utf8
 
-import builtins
+import functools
 import getopt
 import re
 import sys
@@ -35,7 +35,7 @@ O valor de LOTERIA pode ser: """, ', '.join(sorted(loterica.LOTERIAS))])
 
 
 def error(*args, **kwargs):
-    print(*args, file=sys.stderr)
+    print(*args, **kwargs)
     if kwargs.get('show_help', True):
         print(help_msg)
     return kwargs.get('code', 255)
@@ -43,6 +43,8 @@ def error(*args, **kwargs):
 
 def exec_gerar(loteria: loterica.Loteria, quantidade, numeros):
     try:
+        if loteria.kind == loterica.K_TICKET:
+            return error("ERRO: loteria %s não gera apostas porque é tipo ticket" % loteria.nome)
         for i in range(1, quantidade+1):
             aposta = loteria.gerar_aposta(numeros)
             if i == 1:
@@ -151,12 +153,6 @@ def exec_conferir(loteria, concursos, apostas):
         print("  erros:", ', '.join(sorted(map(str, erros))))
 
 
-def __print_closure(stdout):
-    def pf(*args, **kwargs):
-        kwargs.setdefault('file', stdout)
-        builtins.print(*args, **kwargs)
-    return pf
-
 def __highlight_closure(stdout, color=0, spec=0, condition=lambda x: True):
     if stdout.isatty():
         formatting = "\x1b[%02d;%02dm%%s\x1b[00m" % (spec, color)
@@ -165,10 +161,14 @@ def __highlight_closure(stdout, color=0, spec=0, condition=lambda x: True):
         return lambda arg: arg
 
 
-def main(argv=sys.argv, stdout=sys.stdout, cfg_path=None):
+def main(argv=sys.argv, stdout=sys.stdout, stderr=sys.stderr, cfg_path=None):
     # Redefine 'print' para usar outra stdout passado como parâmetro
     global print
-    print = __print_closure(stdout)
+    print = functools.partial(print, file=stdout)
+
+    # Redefine 'error' para usar outra stderr passada como parâmetro
+    global error
+    error = functools.partial(error, file=stderr)
 
     # Função de destaque de número acertado
     global hi_acerto
