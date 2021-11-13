@@ -21,6 +21,9 @@ dist/
 # usados pelo pycharm
 /.idea/
 
+# usados pelo vscode
+/.vscode/
+
 # usados pelo shell
 /.venv
 
