@@ -8,10 +8,12 @@ Todas as mudanças de destaque nesse projeto será documentado neste arquivo.
 - Suporte à consulta e conferência da Loteria Federal.
 
 ### Modificado
+- Projeto migrado de `setup.py` para [poetry]
 - Nova estrutura de JSON para o cache, que mantém a ordem dos prêmios retornado pelo parser.
 - Licença do projeto agora é [GPLv3].
 - Caches agora são gravados em arquivos SQLite separados. Necessário para facilitar migrações.
 
+[poetry]: https://python-poetry.org
 [GPLv3]: http://licencas.softwarelivre.org/gpl-3.0.pt-br.html
 
 ### Corrigido
