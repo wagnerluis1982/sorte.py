@@ -1,6 +1,6 @@
 # Changelog
 
-Todas as mudanças de destaque nesse projeto será documentado neste arquivo. 
+Todas as mudanças de destaque nesse projeto será documentado neste arquivo.
 
 ## [Não publicado]
 

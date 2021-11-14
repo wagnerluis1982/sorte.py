@@ -1,27 +1,27 @@
 # encoding=utf8
 
-import http.cookiejar
 import errno
+import http.cookiejar
 import os
 import re
 import sqlite3
-import urllib.request
 import time
+import urllib.request
 
 
-def get_config_path(app='sortepy'):
+def get_config_path(app="sortepy"):
     """Obtém o caminho de configuração de acordo com o SO
 
     Por enquanto é suportado os sistemas POSIX e Windows (NT)
     """
     # Linux, UNIX, BSD, ...
-    if os.name == 'posix':
-        prefixo = '.config/'
+    if os.name == "posix":
+        prefixo = ".config/"
         profile_dir = os.environ.get("HOME")
 
     # Windows 2000, XP, Vista, 7, 8, ...
-    elif os.name == 'nt':
-        prefixo = ''
+    elif os.name == "nt":
+        prefixo = ""
         profile_dir = os.environ.get("APPDATA")
 
     # Se nenhum SO suportado foi detectado, lança uma exceção
@@ -47,7 +47,7 @@ class Util:
     def __init__(self, cfg_path=None):
         # Se o caminho é uma string vazia, não deve ser usado nenhum cache
         # Definido para propósitos de teste
-        if cfg_path == '':
+        if cfg_path == "":
             self.in_cache = False
             return
 
@@ -65,11 +65,11 @@ class Util:
 
         # Define atributos de configuração
         self.__cfg_path = cfg_path
-        self.pages_db = self.get_mapdb('paginas')
+        self.pages_db = self.get_mapdb("paginas")
         self.in_cache = True
 
     def get_mapdb(self, name):
-        db_path = os.path.join(self.__cfg_path, '%s.db' % name)
+        db_path = os.path.join(self.__cfg_path, "%s.db" % name)
         return FileDB.open(db_path)
 
     def download(self, url, in_cache=None):
@@ -91,7 +91,7 @@ class Util:
             page = opener.open(url)
             conteudo = page.read()
 
-            charset = page.headers.get_param('charset')
+            charset = page.headers.get_param("charset")
             if charset is not None:
                 conteudo = conteudo.decode(charset)
             else:
@@ -113,7 +113,7 @@ class Util:
 
             # se for uma entrada suja, verifica se já venceu o tempo para ficar nesse estado
             if self.is_dirty(result):
-                timestamp, _ = result.split('|', 1)
+                timestamp, _ = result.split("|", 1)
                 if time.time() > int(timestamp) + 1800:
                     del self.pages_db[url]
                 return None
@@ -132,7 +132,7 @@ class Util:
         if self.in_cache and url in self.pages_db:
             self.pages_db[url] = "%d|" % int(time.time())
 
-    DIRTY_RE = re.compile(r'^[0-9]+\|')
+    DIRTY_RE = re.compile(r"^[0-9]+\|")
 
     @classmethod
     def is_dirty(cls, s):
@@ -149,9 +149,9 @@ class FileDB:
     class _SQLite3(object):
         __version__ = 1
 
-        def __init__(self, filename, prefix=''):
+        def __init__(self, filename, prefix=""):
             self._con = sqlite3.connect(filename)
-            self._table = prefix + 'map'
+            self._table = prefix + "map"
             self._create_schema()
 
         def close(self):
@@ -169,8 +169,11 @@ class FileDB:
 
         def _create_schema(self):
             try:
-                self._con.execute('BEGIN EXCLUSIVE TRANSACTION')
-                self._con.execute("CREATE TABLE %s (key TEXT NOT NULL PRIMARY KEY, value TEXT NOT NULL, ttl INT)" % self._table)
+                self._con.execute("BEGIN EXCLUSIVE TRANSACTION")
+                self._con.execute(
+                    "CREATE TABLE %s (key TEXT NOT NULL PRIMARY KEY, value TEXT NOT NULL, ttl INT)"
+                    % self._table
+                )
             # caso a tabela 'map' já exista, inicia-se o processo de migração
             except sqlite3.OperationalError:
                 sql = self._migration_script()
@@ -183,11 +186,11 @@ class FileDB:
             return self._read_dbversion() == self.__version__
 
         def _read_dbversion(self):
-            (dbversion,) = self._con.execute('PRAGMA user_version').fetchone()
+            (dbversion,) = self._con.execute("PRAGMA user_version").fetchone()
             return dbversion
 
         def _write_dbversion(self, version):
-            self._con.execute('PRAGMA user_version = %d' % version)
+            self._con.execute("PRAGMA user_version = %d" % version)
 
         def _migration_script(self):
             # se versão for a mais atual, não é preciso criar esquema!
@@ -222,9 +225,14 @@ class FileDB:
         def __setitem__(self, key, value):
             with self._con as con:
                 try:
-                    con.execute("INSERT INTO %s(key, value) VALUES (?, ?)" % self._table, (key, value))
+                    con.execute(
+                        "INSERT INTO %s(key, value) VALUES (?, ?)" % self._table,
+                        (key, value),
+                    )
                 except sqlite3.IntegrityError:
-                    con.execute("UPDATE %s SET value=? WHERE key=?" % self._table, (value, key))
+                    con.execute(
+                        "UPDATE %s SET value=? WHERE key=?" % self._table, (value, key)
+                    )
 
         def __getitem__(self, key):
             cursor = self._con.cursor()

@@ -24,37 +24,45 @@ K_COMMON = 0
 K_TICKET = 1
 
 APELIDOS = {
-    'sena': 'megasena',
+    "sena": "megasena",
 }
 
 LOTERIAS = {
-    'quina': {
-        'marcar': (5, 7), 'numeros': (1, 80),
+    "quina": {
+        "marcar": (5, 7),
+        "numeros": (1, 80),
     },
-    'megasena': {
-        'marcar': (6, 15), 'numeros': (1, 60), 'nome': "Mega-Sena",
+    "megasena": {
+        "marcar": (6, 15),
+        "numeros": (1, 60),
+        "nome": "Mega-Sena",
     },
-    'lotofacil': {
-        'marcar': (15, 18), 'numeros': (1, 25),
+    "lotofacil": {
+        "marcar": (15, 18),
+        "numeros": (1, 25),
     },
-    'lotomania': {
-        'marcar': (1, 50), 'numeros': (1, 100), 'padrao': 20,
-        'url-script': "_lotomania_pesquisa.asp",
+    "lotomania": {
+        "marcar": (1, 50),
+        "numeros": (1, 100),
+        "padrao": 20,
+        "url-script": "_lotomania_pesquisa.asp",
     },
-    'duplasena': {
-        'marcar': (6, 15), 'numeros': (1, 50), 'nome': "Dupla Sena",
+    "duplasena": {
+        "marcar": (6, 15),
+        "numeros": (1, 50),
+        "nome": "Dupla Sena",
     },
-    'federal': {
+    "federal": {
         # essa loteria não gera números
-        'url-script': "federal_pesquisa.asp",
-        'kind': K_TICKET,
+        "url-script": "federal_pesquisa.asp",
+        "kind": K_TICKET,
     },
 }
 
 
 class Loteria:
     kind = property(lambda self: self._kind)
-    
+
     def __init__(self, nome, cfg_path=None):
         nome = APELIDOS.get(nome, nome)
         try:
@@ -64,20 +72,22 @@ class Loteria:
 
         self.nome = nome
         self.util = util.Util(cfg_path)
-        self.loteria_db = self.util.get_mapdb('loteria')
+        self.loteria_db = self.util.get_mapdb("loteria")
 
         # Se for uma loteria do tipo TICKET. não há gerador, assim substitui
         # método `gerar_aposta()` e encerra.
-        self._kind = self.settings.get('kind', K_COMMON)
+        self._kind = self.settings.get("kind", K_COMMON)
         if self._kind == K_TICKET:
             self.gerar_aposta = lambda *a, **k: None
             return
 
         # atributos do gerador de números
-        self._range = range(self.settings['numeros'][0], self.settings['numeros'][1] + 1)
-        self._min = self.settings['marcar'][0]
-        self._max = self.settings['marcar'][1]
-        self._padrao = self.settings.get('padrao', self._min)
+        self._range = range(
+            self.settings["numeros"][0], self.settings["numeros"][1] + 1
+        )
+        self._min = self.settings["marcar"][0]
+        self._max = self.settings["marcar"][1]
+        self._padrao = self.settings.get("padrao", self._min)
 
     def gerar_aposta(self, marcar: int = None):
         if marcar in (None, 0):
@@ -103,14 +113,15 @@ class Loteria:
         return result
 
     def _cache(self, concurso, com_premios):
-        result = self.loteria_db.get('%s|%s' % (self.nome, concurso))
+        result = self.loteria_db.get("%s|%s" % (self.nome, concurso))
         if result:
+
             def int_key(obj):
-                return {(int(k) if k.isdecimal() else k):v for k, v in obj.items()}
+                return {(int(k) if k.isdecimal() else k): v for k, v in obj.items()}
 
             # convert `(k, v)` de volta para `dict`
             result = json.loads(result, object_hook=int_key)
-            result['premios'] = collections.OrderedDict(result['premios'])
+            result["premios"] = collections.OrderedDict(result["premios"])
 
             return result
 
@@ -132,26 +143,28 @@ class Loteria:
     def _store(self, result):
         # converte `dict` para `(k, v)`: garante os prêmios na ordem devolvida pelo parser
         result = result.copy()
-        result['premios'] = list(result['premios'].items())
+        result["premios"] = list(result["premios"].items())
         # armazena no cache
-        self.loteria_db['%s|%s' % (self.nome, result['concurso'])] = json.dumps(result)
+        self.loteria_db["%s|%s" % (self.nome, result["concurso"])] = json.dumps(result)
 
     def conferir(self, concurso, apostas):
         result = self.consultar(concurso, com_premios=True)
         resp = []
         for aposta in apostas:
             if self._kind == K_COMMON:
-                acertou = [[n for n in res if n in aposta]
-                           for res in result['numeros']]
+                acertou = [[n for n in res if n in aposta] for res in result["numeros"]]
             else:
-                acertou = [aposta for res in result['premios'] if [res] == aposta]
+                acertou = [aposta for res in result["premios"] if [res] == aposta]
 
             ganhou = self._ganhou(result, acertou)
-            resp.append({
-                'concurso': result['concurso'], 'numeros': aposta,
-                'acertou': acertou,
-                'ganhou': ganhou,
-            })
+            resp.append(
+                {
+                    "concurso": result["concurso"],
+                    "numeros": aposta,
+                    "acertou": acertou,
+                    "ganhou": ganhou,
+                }
+            )
         return resp
 
     def _ganhou(self, result, acertou):
@@ -162,44 +175,49 @@ class Loteria:
         else:
             acertou = [v for [v] in acertou] or [None]
 
-        return [result['premios'].get(n, '0,00') for n in acertou]
+        return [result["premios"].get(n, "0,00") for n in acertou]
 
-    def _url(self, concurso,
-             base="http://www1.caixa.gov.br/loterias/loterias/%(loteria)s/",
-             script="%(loteria)s_pesquisa_new.asp",
-             query="?submeteu=sim&opcao=concurso&txtConcurso=%(concurso)d"):
-        script = self.settings.get('url-script', script)
+    def _url(
+        self,
+        concurso,
+        base="http://www1.caixa.gov.br/loterias/loterias/%(loteria)s/",
+        script="%(loteria)s_pesquisa_new.asp",
+        query="?submeteu=sim&opcao=concurso&txtConcurso=%(concurso)d",
+    ):
+        script = self.settings.get("url-script", script)
         if concurso <= 0:
-            return (base+script) % {'loteria': self.nome}
+            return (base + script) % {"loteria": self.nome}
         else:
-            return (base+script+query) % {'loteria': self.nome,
-                                          'concurso': concurso}
+            return (base + script + query) % {
+                "loteria": self.nome,
+                "concurso": concurso,
+            }
 
 
 class LoteriaParser:
     NEW = 1
     SPECS = {
-        'quina': {
-            'numeros': [(21, 25)],
-            'premios': {
+        "quina": {
+            "numeros": [(21, 25)],
+            "premios": {
                 5: 7,
                 4: 9,
                 3: 11,
             },
-            'parser': NEW,
+            "parser": NEW,
         },
-        'megasena': {
-            'numeros': [(28, 33)],
-            'premios': {
+        "megasena": {
+            "numeros": [(28, 33)],
+            "premios": {
                 6: 11,
                 5: 13,
                 4: 15,
             },
-            'parser': NEW,
+            "parser": NEW,
         },
-        'lotofacil': {
-            'numeros': [(3, 17)],
-            'premios': {
+        "lotofacil": {
+            "numeros": [(3, 17)],
+            "premios": {
                 15: 19,
                 14: 21,
                 13: 23,
@@ -207,9 +225,9 @@ class LoteriaParser:
                 11: 27,
             },
         },
-        'lotomania': {
-            'numeros': [(6, 25)],
-            'premios': {
+        "lotomania": {
+            "numeros": [(6, 25)],
+            "premios": {
                 20: 28,
                 19: 30,
                 18: 32,
@@ -218,21 +236,21 @@ class LoteriaParser:
                 0: 38,
             },
         },
-        'duplasena': {
-            'numeros': [(4, 9), (12, 17)],
-            'premios': {
+        "duplasena": {
+            "numeros": [(4, 9), (12, 17)],
+            "premios": {
                 -6: 21,
                 6: 24,
                 5: 25,
                 4: 27,
             },
-            'parser': NEW,
+            "parser": NEW,
         },
-        'federal': {
-            'concurso': 2,
-            'numeros': (6, 8, 10, 12, 14),
-            'premios': (7, 9, 11, 13, 15),
-            'kind': K_TICKET,
+        "federal": {
+            "concurso": 2,
+            "numeros": (6, 8, 10, 12, 14),
+            "premios": (7, 9, 11, 13, 15),
+            "kind": K_TICKET,
         },
     }
 
@@ -240,10 +258,10 @@ class LoteriaParser:
         self._spec = self.SPECS.get(nome)
         if self._spec is None:
             raise NotImplementedError("parser")
-        if 'premios' not in self._spec:
+        if "premios" not in self._spec:
             raise NotImplementedError("parser: premios")
 
-        if self._spec.get('parser') == self.NEW:
+        if self._spec.get("parser") == self.NEW:
             self._parser = _NewParser()
         else:
             self._parser = _OldParser()
@@ -253,9 +271,9 @@ class LoteriaParser:
 
     def data(self):
         spec = self._spec
-        dados = ''.join(self._parser.data).split('|')
+        dados = "".join(self._parser.data).split("|")
 
-        kind = spec.get('kind', K_COMMON)
+        kind = spec.get("kind", K_COMMON)
         if kind == K_COMMON:
             subdados = self.__common(spec, dados)
         else:
@@ -267,18 +285,18 @@ class LoteriaParser:
             return None
 
         return {
-            'concurso': int(dados[spec.get('concurso', 0)]),
-            'numeros': numeros,
-            'premios': premios,
+            "concurso": int(dados[spec.get("concurso", 0)]),
+            "numeros": numeros,
+            "premios": premios,
         }
 
     @staticmethod
     def __common(spec, dados):
-        pos_nums = [range(p[0], p[1] + 1) for p in spec['numeros']]
+        pos_nums = [range(p[0], p[1] + 1) for p in spec["numeros"]]
         try:
             numeros = [[int(dados[i]) for i in r] for r in pos_nums]
             premios = collections.OrderedDict()
-            for qnt, pos_premio in sorted(spec['premios'].items(), reverse=True):
+            for qnt, pos_premio in sorted(spec["premios"].items(), reverse=True):
                 premios[qnt] = dados[pos_premio]
 
             return numeros, premios
@@ -289,8 +307,8 @@ class LoteriaParser:
     def __ticket(spec, dados):
         try:
             premios = collections.OrderedDict()
-            for pos_ticket, pos_premio in zip(spec['numeros'], spec['premios']):
-                ticket = int(dados[pos_ticket].replace('.', ''))
+            for pos_ticket, pos_premio in zip(spec["numeros"], spec["premios"]):
+                ticket = int(dados[pos_ticket].replace(".", ""))
                 premios[ticket] = dados[pos_premio]
 
             return None, premios
@@ -347,7 +365,7 @@ class _NewParser(_OldParser):
             self._capture_number = False
 
         elif tag == "ul" and len(self._numbers) > 0:
-            self._data.append('|' + '|'.join(self._numbers) + '|')
+            self._data.append("|" + "|".join(self._numbers) + "|")
             self._capture_list = False
             self._numbers = []
 

@@ -3,6 +3,7 @@ import http.server
 import multiprocessing
 import os
 
+
 # diretório onde o servidor irá iniciar
 FIXTURES_DIR = os.path.join(os.path.dirname(__file__))
 
@@ -34,7 +35,7 @@ class FixtureRequestHandler(http.server.CGIHTTPRequestHandler):
 
     def guess_type(self, path):
         # Se nome do arquivo indica um charset retorna 'text/html' e charset
-        for charset in ('ascii', 'iso-8859-1', 'utf-8'):
+        for charset in ("ascii", "iso-8859-1", "utf-8"):
             if charset in path:
                 return "text/html; charset=%s" % charset
         # Se não achou um charset retorna mimetype default
@@ -44,7 +45,7 @@ class FixtureRequestHandler(http.server.CGIHTTPRequestHandler):
 class FixtureHttpServer(multiprocessing.Process):
     def __init__(self):
         super().__init__()
-        self.httpd = http.server.HTTPServer(('127.0.0.1', 0), FixtureRequestHandler)
+        self.httpd = http.server.HTTPServer(("127.0.0.1", 0), FixtureRequestHandler)
         self.port = self.httpd.server_port
 
     def run(self):

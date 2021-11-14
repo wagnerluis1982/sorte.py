@@ -26,7 +26,27 @@ python = "^3.8"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"
+pre-commit = "^2.15.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = [
+    "tests",
+]
+
+[tool.isort]
+profile = "black"
+atomic = true
+skip_gitignore = true
+force_single_line = true
+lines_after_imports = 2
+lines_between_types = 1
+src_paths = ["sortepy", "tests"]
+known_first_party = "sortepy"
+
+[tool.black]
+line-length = 88

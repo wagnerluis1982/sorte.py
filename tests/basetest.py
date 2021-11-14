@@ -3,14 +3,16 @@ import shutil
 import tempfile
 import unittest
 
-from sortepy.loterica import Loteria
-
 # patch para classe de loteria utilizar o servidor interno
 import patchs
+
+from sortepy.loterica import Loteria
+
+
 patchs.loteria_class()
 
 
-def tempdir(custom_prefix='sortepy-'):
+def tempdir(custom_prefix="sortepy-"):
     newdir = tempfile.mkdtemp(prefix=custom_prefix)
     atexit.register(shutil.rmtree, newdir)
     return newdir
@@ -61,34 +63,35 @@ class LoteriaTestCase(unittest.TestCase):
     def test_consultar_resultado(self):
         result = self.loto.consultar(self.concurso)
         assert isinstance(result, dict)
-        assert result['concurso'] == self.concurso
-        assert result['numeros'] == self.sorteios
+        assert result["concurso"] == self.concurso
+        assert result["numeros"] == self.sorteios
 
     def test_conferir_aposta(self):
         resp = self.loto.conferir(self.concurso, self.apostas[:1])
         assert isinstance(resp, list)
-        assert resp[0]['concurso'] == self.concurso
-        assert resp[0]['numeros'] == self.apostas[0]
-        assert resp[0]['acertou'] == self.esperados['acertou'][0]
-        assert resp[0]['ganhou'] == self.esperados['ganhou'][0]
+        assert resp[0]["concurso"] == self.concurso
+        assert resp[0]["numeros"] == self.apostas[0]
+        assert resp[0]["acertou"] == self.esperados["acertou"][0]
+        assert resp[0]["ganhou"] == self.esperados["ganhou"][0]
 
     def test_conferir_varias_apostas(self):
         resp = self.loto.conferir(self.concurso, self.apostas)
         assert isinstance(resp, list)
         for i in range(len(self.apostas)):
-            assert resp[i]['concurso'] == self.concurso
-            assert resp[i]['numeros'] == self.apostas[i]
-            assert resp[i]['acertou'] == self.esperados['acertou'][i]
-            assert resp[i]['ganhou'] == self.esperados['ganhou'][i]
+            assert resp[i]["concurso"] == self.concurso
+            assert resp[i]["numeros"] == self.apostas[i]
+            assert resp[i]["acertou"] == self.esperados["acertou"][i]
+            assert resp[i]["ganhou"] == self.esperados["ganhou"][i]
 
     def check_gerar_aposta(self, n):
         n = n or self.numeros[0]  # número padrão ou informado
 
         aposta = self.loto.gerar_aposta(n)
         assert isinstance(aposta, tuple)
-        assert len(aposta) == n,      "aposta não tem %d números" % n
+        assert len(aposta) == n, "aposta não tem %d números" % n
         assert len(set(aposta)) == n, "aposta não tem %d números diferentes" % n
-        assert self.permitidos.issuperset(aposta), \
+        assert self.permitidos.issuperset(aposta), (
             "aposta não está entre %d e %d" % self.infsup
+        )
 
         return aposta

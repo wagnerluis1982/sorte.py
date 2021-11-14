@@ -2,7 +2,7 @@ import basetest
 
 
 class FederalTest(basetest.LoteriaTestCase):
-    'Loteria Federal'
+    "Loteria Federal"
 
     # atributos do teste de consulta
     nome = "federal"
@@ -17,15 +17,17 @@ class FederalTest(basetest.LoteriaTestCase):
 
     # atributos dos testes de conferência de bilhetes
     apostas = [[37715], [24797], [12345]]
-    esperados = {'acertou': ([[37715]], [[24797]], []),
-                 'ganhou': (['700.000,00'], ['24.700,00'], ['0,00'])}
+    esperados = {
+        "acertou": ([[37715]], [[24797]], []),
+        "ganhou": (["700.000,00"], ["24.700,00"], ["0,00"]),
+    }
 
     # teste com as regras específicas da federal
     def test_consultar_resultado(self):
         result = self.loto.consultar(self.concurso)
         assert isinstance(result, dict)
-        assert result['concurso'] == self.concurso
-        assert result['premios'] == self.premios
+        assert result["concurso"] == self.concurso
+        assert result["premios"] == self.premios
 
     # testes da superclasse removidos
     test_gerar_aposta = None

@@ -2,8 +2,9 @@
 
 import basetest
 
+
 class MegaSenaTest(basetest.LoteriaTestCase):
-    'Mega Sena'
+    "Mega Sena"
 
     # atributos do teste 'gerar aposta'
     nome = "megasena"
@@ -16,5 +17,7 @@ class MegaSenaTest(basetest.LoteriaTestCase):
 
     # atributos do teste 'conferir aposta'
     apostas = [[4, 25, 30, 41, 52, 59], [25, 39, 45, 50, 51, 52]]
-    esperados = {'acertou': ([[4, 30, 41, 52]], [[52]]),
-                 'ganhou': (['330,21'], ['0,00'])}
+    esperados = {
+        "acertou": ([[4, 30, 41, 52]], [[52]]),
+        "ganhou": (["330,21"], ["0,00"]),
+    }

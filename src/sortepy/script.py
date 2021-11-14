@@ -1,6 +1,3 @@
-# encoding=utf8
-
-import functools
 import getopt
 import re
 import sys
@@ -8,9 +5,10 @@ import sys
 from . import loterica
 
 
-help_msg = ''.join([
-"Uso: %s LOTERIA [opcoes] [APOSTA...]\n" % sys.argv[0],
-"""
+help_msg = "".join(
+    [
+        "Uso: %s LOTERIA [opcoes] [APOSTA...]\n" % sys.argv[0],
+        """
 O `sorte.py` é um gerador e verificador de apostas de loterias
 Sem opções explícitas é gerada uma aposta da LOTERIA informada
 
@@ -31,7 +29,10 @@ Opções de consulta ou conferência:
 Opções gerais:
   -h --help         Mostra esta ajuda e finaliza
 
-O valor de LOTERIA pode ser: """, ', '.join(sorted(loterica.LOTERIAS))])
+O valor de LOTERIA pode ser: """,
+        ", ".join(sorted(loterica.LOTERIAS)),
+    ]
+)
 
 
 def error(*args, show_help=True, code=255, **kwargs):
@@ -57,19 +58,25 @@ def exec_gerar(loteria: loterica.Loteria, quantidade: int, numeros: int) -> int:
     -------
     int
         Código de erro
-    """    
+    """
     if loteria.kind == loterica.K_TICKET:
-        return error("ERRO: loteria %s não gera apostas porque é tipo ticket" % loteria.nome,
-                     show_help=False, code=5)
+        return error(
+            "ERRO: loteria %s não gera apostas porque é tipo ticket" % loteria.nome,
+            show_help=False,
+            code=5,
+        )
     try:
-        for i in range(1, quantidade+1):
+        for i in range(1, quantidade + 1):
             aposta = loteria.gerar_aposta(numeros)
             if i == 1:
                 print("# gerador da", loteria.nome)
-            print(' '.join("%02d" % n for n in aposta))
+            print(" ".join("%02d" % n for n in aposta))
     except loterica.QuantidadeInvalida as err:
-        return error("ERRO: não dá para gerar aposta da %s com %d números" %
-                err.args, show_help=False, code=5)
+        return error(
+            "ERRO: não dá para gerar aposta da %s com %d números" % err.args,
+            show_help=False,
+            code=5,
+        )
 
 
 def iter_resultados(fun, args, erros=set()):
@@ -100,22 +107,25 @@ def exec_consultar(loteria, concursos):
     try:
         resultados = iter_resultados(loteria.consultar, (concursos,), erros)
     except loterica.LoteriaNaoSuportada as err:
-        return error("ERRO: consulta para '%s' não implementada" %
-                     err.args, show_help=False, code=6)
+        return error(
+            "ERRO: consulta para '%s' não implementada" % err.args,
+            show_help=False,
+            code=6,
+        )
 
     print("# resultados da", loteria.nome)
     print("%s:" % loteria.nome)
 
     for result in resultados:
-        _numeros = result.get('numeros', ())
+        _numeros = result.get("numeros", ())
 
         # esse resultado não cria a chave 'numeros'
         if not _numeros:
             print("  -")
-            print("   concurso: %d" % result['concurso'])
+            print("   concurso: %d" % result["concurso"])
             print("   premios:")
 
-            premios = result['premios']
+            premios = result["premios"]
             for n in premios:
                 print("     %d: R$ %s" % (n, premios[n]))
             continue
@@ -123,51 +133,51 @@ def exec_consultar(loteria, concursos):
         # a chave 'numeros' está presente
         for res_nums in _numeros:
             print("  -")
-            print("   concurso: %d" % result['concurso'])
-            print("   numeros:", ' '.join("%02d" % n for n in res_nums))
+            print("   concurso: %d" % result["concurso"])
+            print("   numeros:", " ".join("%02d" % n for n in res_nums))
             print("   premios:")
 
-            premios = result['premios']
+            premios = result["premios"]
             for n in premios:
                 print("     %d: R$ %s" % (n, premios[n]))
 
     if erros:
-        if 'result' in vars():
+        if "result" in vars():
             print()
-        print("  erros:", ', '.join(sorted(map(str, erros))))
+        print("  erros:", ", ".join(sorted(map(str, erros))))
 
-
-hi_acerto = hi_ganho = lambda v: v
 
 def exec_conferir(loteria, concursos, apostas):
     erros = set()
     try:
-        resultados = iter_resultados(loteria.conferir, (concursos, apostas),
-                                     erros)
+        resultados = iter_resultados(loteria.conferir, (concursos, apostas), erros)
     except loterica.LoteriaNaoSuportada as err:
-        return error("ERRO: conferência para '%s' não implementada" %
-                     err.args, show_help=False, code=6)
+        return error(
+            "ERRO: conferência para '%s' não implementada" % err.args,
+            show_help=False,
+            code=6,
+        )
 
     print("# conferência da", loteria.nome)
     print("%s:" % loteria.nome)
 
     for resp in resultados:
-        print("  %d:" % resp[0]['concurso'])
+        print("  %d:" % resp[0]["concurso"])
         for r in resp:
-            print("  - aposta:", end='')
-            for n in r['numeros']:
-                if n in r['acertou'][0]:
-                    print('', hi_acerto("%02d" % n), end='')
+            print("  - aposta:", end="")
+            for n in r["numeros"]:
+                if n in r["acertou"][0]:
+                    print("", hi_acerto("%02d" % n), end="")
                 else:
-                    print(" %02d" % n, end='')
+                    print(" %02d" % n, end="")
             print("\n    acertou:")
-            for acertou, ganhou in zip(r['acertou'], r['ganhou']):
-                print("      %d: %s" % (len(acertou), hi_ganho("R$ "+ganhou)))
+            for acertou, ganhou in zip(r["acertou"], r["ganhou"]):
+                print("      %d: %s" % (len(acertou), hi_ganho("R$ " + ganhou)))
 
     if erros:
-        if 'resp' in vars():
+        if "resp" in vars():
             print()
-        print("  erros:", ', '.join(sorted(map(str, erros))))
+        print("  erros:", ", ".join(sorted(map(str, erros))))
 
 
 def __highlight_closure(color=0, spec=0, condition=lambda x: True):
@@ -178,22 +188,22 @@ def __highlight_closure(color=0, spec=0, condition=lambda x: True):
         return lambda arg: arg
 
 
+# Função de destaque de número acertado
+hi_acerto = __highlight_closure(color=33)
+
+# Função de destaque de ganhos
+hi_ganho = __highlight_closure(color=32, spec=0, condition=lambda x: x != "R$ 0,00")
+
+
 def main(argv=sys.argv, cfg_path=None):
-    # Função de destaque de número acertado
-    global hi_acerto
-    hi_acerto = __highlight_closure(color=33)
-
-    # Função de destaque de ganhos
-    global hi_ganho
-    hi_ganho = __highlight_closure(color=32, spec=0,
-                                   condition=lambda x: x != "R$ 0,00")
-
     try:
-        opts, args = getopt.gnu_getopt(argv[1:],
-        # opções curtas
-        "hn:q:c:i",
-        # opções longas
-        ["help", "numeros=", "quantidade=", "concurso=", "stdin"])
+        opts, args = getopt.gnu_getopt(
+            argv[1:],
+            # opções curtas
+            "hn:q:c:i",
+            # opções longas
+            ["help", "numeros=", "quantidade=", "concurso=", "stdin"],
+        )
     except getopt.GetoptError as err:
         return error("ERRO:", err, code=1)
 
@@ -213,13 +223,12 @@ def main(argv=sys.argv, cfg_path=None):
         elif option in ("-c", "--concurso"):
             if arg.isdigit():
                 concursos.append(int(arg))
-            elif '-' in arg:
-                faixa = arg.split('-')
-                if len(faixa) != 2 or not (faixa[0].isdigit() and
-                                           faixa[1].isdigit()):
+            elif "-" in arg:
+                faixa = arg.split("-")
+                if len(faixa) != 2 or not (faixa[0].isdigit() and faixa[1].isdigit()):
                     return error("ERRO: faixa '%s' inválida" % arg)
                 faixa = list(map(int, faixa))
-                concursos.extend(range(faixa[0], faixa[1]+1))
+                concursos.extend(range(faixa[0], faixa[1] + 1))
             else:
                 concursos.append(-1)
         elif option in ("-i", "--stdin"):
@@ -237,15 +246,15 @@ def main(argv=sys.argv, cfg_path=None):
     args = args[1:]
     if len(args) == 0 and usar_stdin:
         for linha in sys.stdin.readlines():
-            if not linha.lstrip().startswith('#'):
+            if not linha.lstrip().startswith("#"):
                 args.append(linha)
 
     apostas = []
     for arg in args:
         aposta = []
-        for n in re.split('[, ]+', arg):
-            fx = list(map(int, n.split('-', 1)))
-            aposta.extend(range(fx[0], fx[-1]+1))
+        for n in re.split("[, ]+", arg):
+            fx = list(map(int, n.split("-", 1)))
+            aposta.extend(range(fx[0], fx[-1] + 1))
         apostas.append(aposta)
 
     if concursos:
