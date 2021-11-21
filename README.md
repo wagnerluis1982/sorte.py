@@ -13,6 +13,8 @@ Veja https://github.com/wagnerluis1982/sorte.py/pull/4
 
 ---
 
+[![PyPI](https://img.shields.io/pypi/v/sorte.py)](https://pypi.org/project/sorte.py)
+
 Sobre
 -----
 
@@ -28,12 +30,7 @@ Instalação
 
 AVISO: `sorte.py` requer no mínimo o Python 3 para a instalação com sucesso.
 
-Para instalar, basta baixar o projeto, descompactar e executar, estando no
-diretório do projeto
-
-    $ python3 setup.py install
-
-Ou, você pode executar o `pip` diretamente
+Para instalar, basta executar o `pip` pondo como argumento o repositório.
 
     $ pip3 install git+https://github.com/wagnerluis1982/sorte-py
 

@@ -1,25 +1,42 @@
 [tool.poetry]
 name = "sorte.py"
 version = "0.1.0.dev1"
-description = "Geração e conferência de apostas de loterias"
-readme = "README.md"
-repository = "https://github.com/wagnerluis1982/sorte-py"
-authors = ["Wagner Macedo <wagnerluis1982@gmail.com>"]
+description = "Geração e conferência de apostas de loterias."
+authors = [
+    "Wagner Macedo <wagnerluis1982@gmail.com>",
+]
 license = "GPL-3.0-only"
+
+readme = "README.md"
+
+packages = [
+    { include = "sortepy", from = "src" }
+]
+include = [
+    "CHANGELOG.md",
+    { path = "tests", format = "sdist" },
+]
+
+repository = "https://github.com/wagnerluis1982/sorte.py"
+
+keywords = [
+    "loteria",
+    "aposta",
+    "sorte.py",
+]
+
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Environment :: Console",
     "Intended Audience :: Developers",
     "Intended Audience :: End Users/Desktop",
     "Natural Language :: Portuguese (Brazilian)",
+    "Topic :: Internet :: WWW/HTTP",
     "Topic :: Other/Nonlisted Topic",
-]
-include = [
-    "LICENSE",
 ]
 
 [tool.poetry.scripts]
-sorte.py = "sortepy.script:main"
+"sorte.py" = "sortepy.script:main"
 
 [tool.poetry.dependencies]
 python = "^3.8"
