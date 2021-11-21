@@ -2,7 +2,15 @@ import getopt
 import re
 import sys
 
-from . import loterica
+from typing import Any
+from typing import Callable
+from typing import Dict
+from typing import Iterable
+from typing import List
+from typing import Set
+from typing import Tuple
+
+from sortepy import loterica
 
 
 help_msg = "".join(
@@ -35,7 +43,7 @@ O valor de LOTERIA pode ser: """,
 )
 
 
-def error(*args, show_help=True, code=255, **kwargs):
+def error(*args: Any, show_help: bool = True, code: int = 255, **kwargs: Any) -> int:
     print(*args, **kwargs)
     if show_help:
         print(help_msg)
@@ -79,7 +87,9 @@ def exec_gerar(loteria: loterica.Loteria, quantidade: int, numeros: int) -> int:
         )
 
 
-def iter_resultados(fun, args, erros=set()):
+def iter_resultados(
+    fun: Callable[..., Dict[str, Any]], args: Tuple[List[int], ...], erros: Set[int]
+) -> Iterable[Dict[str, Any]]:
     consultados = set()
 
     concursos = args[0]
@@ -102,7 +112,7 @@ def iter_resultados(fun, args, erros=set()):
                 continue
 
 
-def exec_consultar(loteria, concursos):
+def exec_consultar(loteria: loterica.Loteria, concursos: List[int]) -> int:
     erros = set()
     try:
         resultados = iter_resultados(loteria.consultar, (concursos,), erros)
@@ -147,7 +157,9 @@ def exec_consultar(loteria, concursos):
         print("  erros:", ", ".join(sorted(map(str, erros))))
 
 
-def exec_conferir(loteria, concursos, apostas):
+def exec_conferir(
+    loteria: loterica.Loteria, concursos: List[int], apostas: List[int]
+) -> int:
     erros = set()
     try:
         resultados = iter_resultados(loteria.conferir, (concursos, apostas), erros)
@@ -180,7 +192,9 @@ def exec_conferir(loteria, concursos, apostas):
         print("  erros:", ", ".join(sorted(map(str, erros))))
 
 
-def __highlight_closure(color=0, spec=0, condition=lambda x: True):
+def __highlight_closure(
+    color: int = 0, spec: int = 0, condition: Callable[[str], bool] = lambda x: True
+) -> Callable[[str], str]:
     if sys.stdout.isatty():
         formatting = "\x1b[%02d;%02dm%%s\x1b[00m" % (spec, color)
         return lambda arg: formatting % arg if condition(arg) else arg
@@ -195,7 +209,7 @@ hi_acerto = __highlight_closure(color=33)
 hi_ganho = __highlight_closure(color=32, spec=0, condition=lambda x: x != "R$ 0,00")
 
 
-def main(argv=sys.argv, cfg_path=None):
+def main(argv: List[str] = sys.argv, cfg_path: str = None) -> int:
     try:
         opts, args = getopt.gnu_getopt(
             argv[1:],
@@ -210,7 +224,7 @@ def main(argv=sys.argv, cfg_path=None):
     # Avalia os parâmetros passados
     numeros = None
     quantidade = None
-    concursos = []
+    concursos: List[int] = []
     usar_stdin = False
     for option, arg in opts:
         if option in ("-h", "--help"):

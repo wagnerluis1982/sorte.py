@@ -1,5 +1,5 @@
 # modifica o método privado Loteria._url para garantir que use o script CGI interno
-def loteria_class():
+def loteria_class() -> None:
     if not loteria_class.done:
         # garantie que servidor interno de fixtures está inicializado
         import fixtures

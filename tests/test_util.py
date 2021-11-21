@@ -2,6 +2,9 @@ import os
 import sqlite3
 import unittest
 
+from typing import Any
+from typing import Dict
+
 import fixtures
 import sortepy.util
 
@@ -46,7 +49,7 @@ class DownloadTest(unittest.TestCase):
     "Util.download"
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         cls.util = sortepy.util.Util(cfg_path="")
 
     def test_download_pagina(self):
@@ -183,10 +186,12 @@ class FileDBTest(unittest.TestCase):
             "pk": False,
         }
 
-    def _open_db(self):
+    def _open_db(self) -> sortepy.util.FileDB:
         return sortepy.util.FileDB.open(self.arquivo)
 
-    def _table_descriptions(self, conn, table):
+    def _table_descriptions(
+        self, conn: sqlite3.Connection, table: str
+    ) -> Dict[str, Dict[str, Any]]:
         descriptions = conn.execute("PRAGMA table_info(%s)" % table).fetchall()
         return {
             row[1]: {

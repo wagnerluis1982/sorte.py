@@ -13,7 +13,7 @@ packages = [
     { include = "sortepy", from = "src" }
 ]
 include = [
-    "CHANGELOG.md",
+    { path = "CHANGELOG.md" },
     { path = "tests", format = "sdist" },
 ]
 

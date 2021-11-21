@@ -3,8 +3,12 @@ import json
 import random
 
 from html.parser import HTMLParser
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Tuple
 
-from . import util
+from sortepy import util
 
 
 class LoteriaNaoSuportada(Exception):
@@ -63,7 +67,7 @@ LOTERIAS = {
 class Loteria:
     kind = property(lambda self: self._kind)
 
-    def __init__(self, nome, cfg_path=None):
+    def __init__(self, nome: str, cfg_path: str = None):
         nome = APELIDOS.get(nome, nome)
         try:
             self.settings = LOTERIAS[nome]
@@ -89,7 +93,7 @@ class Loteria:
         self._max = self.settings["marcar"][1]
         self._padrao = self.settings.get("padrao", self._min)
 
-    def gerar_aposta(self, marcar: int = None):
+    def gerar_aposta(self, marcar: int = None) -> Tuple[int]:
         if marcar in (None, 0):
             marcar = self._padrao
         if not (self._min <= marcar <= self._max):
@@ -97,13 +101,13 @@ class Loteria:
         result = random.sample(self._range, marcar)
         return tuple(sorted(result))
 
-    def consultar(self, concurso=0, com_premios=False):
+    def consultar(self, concurso: int = 0) -> Dict[str, Any]:
         """Obtém o resultado do sorteio de um concurso.
 
         Primeiramente, é verificado se o resultado já existe em cache no banco de dados.
         Caso negativo, faz o download e armazena para uso futuro.
         """
-        result = self._cache(concurso, com_premios)
+        result = self._cache(concurso)
         if result:
             return result
 
@@ -112,20 +116,16 @@ class Loteria:
 
         return result
 
-    def _cache(self, concurso, com_premios):
+    def _cache(self, concurso: int) -> Dict[str, Any]:
         result = self.loteria_db.get("%s|%s" % (self.nome, concurso))
         if result:
-
-            def int_key(obj):
-                return {(int(k) if k.isdecimal() else k): v for k, v in obj.items()}
-
             # convert `(k, v)` de volta para `dict`
-            result = json.loads(result, object_hook=int_key)
+            result = json.loads(result)
             result["premios"] = collections.OrderedDict(result["premios"])
 
             return result
 
-    def _download(self, concurso):
+    def _download(self, concurso: int) -> Dict[str, Any]:
         parser = LoteriaParser(self.nome)
 
         url = self._url(concurso)
@@ -140,15 +140,15 @@ class Loteria:
         else:
             return result
 
-    def _store(self, result):
+    def _store(self, result: Dict[str, Any]) -> None:
         # converte `dict` para `(k, v)`: garante os prêmios na ordem devolvida pelo parser
         result = result.copy()
         result["premios"] = list(result["premios"].items())
         # armazena no cache
         self.loteria_db["%s|%s" % (self.nome, result["concurso"])] = json.dumps(result)
 
-    def conferir(self, concurso, apostas):
-        result = self.consultar(concurso, com_premios=True)
+    def conferir(self, concurso: int, apostas: List[List[int]]) -> List[Dict[str, Any]]:
+        result = self.consultar(concurso)
         resp = []
         for aposta in apostas:
             if self._kind == K_COMMON:
@@ -167,7 +167,7 @@ class Loteria:
             )
         return resp
 
-    def _ganhou(self, result, acertou):
+    def _ganhou(self, result: Dict[str, Any], acertou: List[List[int]]) -> List[str]:
         if self._kind == K_COMMON:
             acertou = [len(t) for t in acertou]
             if self.nome == "duplasena" and acertou[0] == 6:
@@ -179,11 +179,11 @@ class Loteria:
 
     def _url(
         self,
-        concurso,
-        base="http://www1.caixa.gov.br/loterias/loterias/%(loteria)s/",
-        script="%(loteria)s_pesquisa_new.asp",
-        query="?submeteu=sim&opcao=concurso&txtConcurso=%(concurso)d",
-    ):
+        concurso: int,
+        base: str = "http://www1.caixa.gov.br/loterias/loterias/%(loteria)s/",
+        script: str = "%(loteria)s_pesquisa_new.asp",
+        query: str = "?submeteu=sim&opcao=concurso&txtConcurso=%(concurso)d",
+    ) -> str:
         script = self.settings.get("url-script", script)
         if concurso <= 0:
             return (base + script) % {"loteria": self.nome}
@@ -254,7 +254,7 @@ class LoteriaParser:
         },
     }
 
-    def __init__(self, nome):
+    def __init__(self, nome: str) -> None:
         self._spec = self.SPECS.get(nome)
         if self._spec is None:
             raise NotImplementedError("parser")
@@ -266,10 +266,10 @@ class LoteriaParser:
         else:
             self._parser = _OldParser()
 
-    def __getattr__(self, name):
+    def __getattr__(self, name: str) -> Any:
         return getattr(self._parser, name)
 
-    def data(self):
+    def data(self) -> Dict[str, Any]:
         spec = self._spec
         dados = "".join(self._parser.data).split("|")
 
@@ -291,7 +291,9 @@ class LoteriaParser:
         }
 
     @staticmethod
-    def __common(spec, dados):
+    def __common(
+        spec: Dict[str, Any], dados: List[str]
+    ) -> Tuple[List[List[int]], Dict[int, str]]:
         pos_nums = [range(p[0], p[1] + 1) for p in spec["numeros"]]
         try:
             numeros = [[int(dados[i]) for i in r] for r in pos_nums]
@@ -304,7 +306,7 @@ class LoteriaParser:
             return None
 
     @staticmethod
-    def __ticket(spec, dados):
+    def __ticket(spec: Dict[str, Any], dados: List[str]) -> Tuple[None, Dict[int, str]]:
         try:
             premios = collections.OrderedDict()
             for pos_ticket, pos_premio in zip(spec["numeros"], spec["premios"]):
@@ -317,39 +319,50 @@ class LoteriaParser:
 
 
 class _OldParser(HTMLParser):
+    def __init__(self, *, convert_charrefs: bool = ...) -> None:
+        super().__init__(convert_charrefs=convert_charrefs)
+        self._capture: bool
+        self._data: List[str]
+
     @property
-    def data(self):
+    def data(self) -> List[str]:
         return self._data
 
-    def reset(self):
+    def reset(self) -> None:
         super().reset()
 
         self._capture = True
         self._data = []
 
-    def handle_starttag(self, tag, attrs):
+    def handle_starttag(self, tag: str, attrs: list) -> None:
         self._capture = False
 
-    def handle_endtag(self, tag):
+    def handle_endtag(self, tag: str) -> None:
         self._capture = True
 
-    def handle_data(self, data):
+    def handle_data(self, data: str) -> None:
         if self._capture:
             self._data.append(data)
 
-    def error(self, message):
+    def error(self, message: str) -> None:
         raise RuntimeError(message)
 
 
 class _NewParser(_OldParser):
-    def reset(self):
+    def __init__(self, *, convert_charrefs: bool = ...) -> None:
+        super().__init__(convert_charrefs=convert_charrefs)
+        self._capture_list: bool
+        self._capture_number: bool
+        self._numbers: List[str]
+
+    def reset(self) -> None:
         super().reset()
 
         self._capture_list = False
         self._capture_number = False
         self._numbers = []
 
-    def handle_starttag(self, tag, attrs):
+    def handle_starttag(self, tag: str, attrs: list) -> None:
         super().handle_starttag(tag, attrs)
 
         if tag == "ul":
@@ -358,7 +371,7 @@ class _NewParser(_OldParser):
         elif tag == "li" and self._capture_list:
             self._capture_number = True
 
-    def handle_endtag(self, tag):
+    def handle_endtag(self, tag: str) -> None:
         super().handle_endtag(tag)
 
         if tag == "li" and self._capture_list:
@@ -369,7 +382,7 @@ class _NewParser(_OldParser):
             self._capture_list = False
             self._numbers = []
 
-    def handle_data(self, data):
+    def handle_data(self, data: str) -> None:
         super().handle_data(data)
 
         if self._capture_number:

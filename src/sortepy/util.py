@@ -8,8 +8,12 @@ import sqlite3
 import time
 import urllib.request
 
+from typing import Any
+from typing import MutableMapping
+from typing import Type
 
-def get_config_path(app="sortepy"):
+
+def get_config_path(app: str = "sortepy") -> str:
     """Obtém o caminho de configuração de acordo com o SO
 
     Por enquanto é suportado os sistemas POSIX e Windows (NT)
@@ -31,7 +35,7 @@ def get_config_path(app="sortepy"):
     return os.path.join(profile_dir, prefixo + app)
 
 
-def makedirs(caminho):
+def makedirs(caminho: str) -> None:
     """Versão própria do makedirs()
 
     Essa versão não lança exceção se o caminho já existir
@@ -44,7 +48,7 @@ def makedirs(caminho):
 
 
 class Util:
-    def __init__(self, cfg_path=None):
+    def __init__(self, cfg_path: str = None):
         # Se o caminho é uma string vazia, não deve ser usado nenhum cache
         # Definido para propósitos de teste
         if cfg_path == "":
@@ -68,11 +72,11 @@ class Util:
         self.pages_db = self.get_mapdb("paginas")
         self.in_cache = True
 
-    def get_mapdb(self, name):
+    def get_mapdb(self, name: str) -> None:
         db_path = os.path.join(self.__cfg_path, "%s.db" % name)
         return FileDB.open(db_path)
 
-    def download(self, url, in_cache=None):
+    def download(self, url: str, in_cache: bool = None) -> None:
         in_cache = in_cache if isinstance(in_cache, bool) else self.in_cache
 
         # Obtém a página do cache
@@ -102,7 +106,7 @@ class Util:
 
         return conteudo
 
-    def cache(self, url, conteudo=None):
+    def cache(self, url: str, conteudo: str = None) -> None:
         # Sem conteúdo: leitura do cache
         if conteudo is None:
             if url not in self.pages_db:
@@ -124,7 +128,7 @@ class Util:
         else:
             self.pages_db[url] = conteudo
 
-    def blame(self, url):
+    def blame(self, url: str) -> None:
         """Marca o resultado de uma URL como inválida.
 
         Isso é feito, registrando o horário em que esse método foi chamado.
@@ -135,39 +139,42 @@ class Util:
     DIRTY_RE = re.compile(r"^[0-9]+\|")
 
     @classmethod
-    def is_dirty(cls, s):
+    def is_dirty(cls, s: str) -> re.Match:
         return cls.DIRTY_RE.match(s)
 
 
-class FileDB:
+class FileDB(MutableMapping[str, str]):
     @staticmethod
-    def open(filename):
+    def open(filename: str) -> "FileDB":
         (prefix, _) = os.path.splitext(os.path.basename(filename))
-        db = FileDB._SQLite3(filename, prefix)
+        cls = _file_db_cls("sqlite")
+        db = cls(filename, prefix)
         return db
 
-    class _SQLite3(object):
+
+def _file_db_cls(type: str) -> Type[FileDB]:
+    class _SQLite3(FileDB):
         __version__ = 1
 
-        def __init__(self, filename, prefix=""):
+        def __init__(self, filename: str, prefix: str = "") -> None:
             self._con = sqlite3.connect(filename)
             self._table = prefix + "map"
             self._create_schema()
 
-        def close(self):
+        def close(self) -> None:
             self._con.commit()
             self._con.close()
 
-        def flush(self):
+        def flush(self) -> None:
             self._con.commit()
 
-        def __del__(self):
+        def __del__(self) -> None:
             try:
                 self.close()
             except sqlite3.Error:
                 pass
 
-        def _create_schema(self):
+        def _create_schema(self) -> None:
             try:
                 self._con.execute("BEGIN EXCLUSIVE TRANSACTION")
                 self._con.execute(
@@ -182,17 +189,17 @@ class FileDB:
                 self._con.commit()
                 self._write_dbversion(self.__version__)
 
-        def _is_latest_version(self):
+        def _is_latest_version(self) -> bool:
             return self._read_dbversion() == self.__version__
 
-        def _read_dbversion(self):
+        def _read_dbversion(self) -> int:
             (dbversion,) = self._con.execute("PRAGMA user_version").fetchone()
             return dbversion
 
-        def _write_dbversion(self, version):
+        def _write_dbversion(self, version: int) -> None:
             self._con.execute("PRAGMA user_version = %d" % version)
 
-        def _migration_script(self):
+        def _migration_script(self) -> str:
             # se versão for a mais atual, não é preciso criar esquema!
             dbversion = self._read_dbversion()
             if dbversion == self.__version__:
@@ -216,13 +223,13 @@ class FileDB:
                 return sql_template.format(table=self._table)
             return ""
 
-        def get(self, key, default=None):
+        def get(self, key: str, default: str = None) -> str:
             try:
                 return self[key]
             except KeyError:
                 return default
 
-        def __setitem__(self, key, value):
+        def __setitem__(self, key: str, value: str) -> None:
             with self._con as con:
                 try:
                     con.execute(
@@ -234,7 +241,7 @@ class FileDB:
                         "UPDATE %s SET value=? WHERE key=?" % self._table, (value, key)
                     )
 
-        def __getitem__(self, key):
+        def __getitem__(self, key: str) -> str:
             cursor = self._con.cursor()
             cursor.execute("SELECT value FROM %s WHERE key=?" % self._table, (key,))
             result = cursor.fetchone()
@@ -243,17 +250,23 @@ class FileDB:
             else:
                 raise KeyError(key)
 
-        def __delitem__(self, key):
+        def __delitem__(self, key: str) -> None:
             with self._con as con:
                 con.execute("DELETE FROM %s WHERE key=?" % self._table, (key,))
 
-        def __contains__(self, key):
+        def __contains__(self, key: str) -> bool:
             cursor = self._con.cursor()
             cursor.execute("SELECT 1 FROM %s WHERE key=?" % self._table, (key,))
             return cursor.fetchall() != []
 
-        def __enter__(self):
+        def __enter__(self) -> FileDB:
             return self
 
-        def __exit__(self, *args):
+        def __exit__(self, *args: Any) -> None:
             self.__del__()
+
+        __iter__ = None
+        __len__ = None
+
+    if type == "sqlite":
+        return _SQLite3

@@ -1,13 +1,14 @@
 import functools
 import io
-import sys
 import unittest
+
+from typing import List
 
 import basetest
 import sortepy.script
 
 
-def run_script(args):
+def run_script(args: List[str]):
     output = io.StringIO()
 
     # Redefine 'print' para usar outra stdout passado como parâmetro
@@ -56,7 +57,7 @@ class ScriptTest(unittest.TestCase):
         readlines = run_script(args)
         linhas = readlines[1:]
         assert len(linhas) == 2
-        for no, linha in enumerate(linhas, 1):
+        for linha in linhas:
             assert len([int(x) for x in linha.split()]) == 5
 
         # geração de aposta da quina com mais de 5 números
@@ -67,7 +68,7 @@ class ScriptTest(unittest.TestCase):
             readlines = run_script(args)
             linhas = readlines[1:]
             assert len(linhas) == 2
-            for no, linha in enumerate(linhas, 1):
+            for linha in linhas:
                 assert len([int(x) for x in linha.split()]) == i
 
             # opções longas
@@ -76,7 +77,7 @@ class ScriptTest(unittest.TestCase):
             readlines = run_script(args)
             linhas = readlines[1:]
             assert len(linhas) == 2
-            for no, linha in enumerate(linhas, 1):
+            for linha in linhas:
                 assert len([int(x) for x in linha.split()]) == i
 
     def test_gerar_aposta_para_loteria_ticket_NAO_disponivel(self):
