@@ -1,19 +1,15 @@
 sorte.py
 ========
 
----
-
-AVISO
------
-
-`sorte.py` não consegue fazer mais consultas (o que também afeta as conferências),
-desde que a Caixa mudou drasticamente o sistema. Este problema está sendo investigado.
-
-Veja https://github.com/wagnerluis1982/sorte.py/pull/4
-
----
-
 [![PyPI](https://img.shields.io/pypi/v/sorte.py)](https://pypi.org/project/sorte.py)
+
+> AVISO
+> -----
+> 
+> `sorte.py` não consegue fazer mais consultas (o que também afeta as conferências),
+> desde que a Caixa mudou drasticamente o sistema. Este problema está sendo investigado.
+> 
+> Veja https://github.com/wagnerluis1982/sorte.py/pull/4
 
 Sobre
 -----
