@@ -67,3 +67,22 @@ known_first_party = "sortepy"
 
 [tool.black]
 line-length = 88
+
+[tool.mypy]
+mypy_path = "src"
+files = "src, tests"
+follow_imports = "silent"
+show_error_codes = true
+explicit_package_bases = true
+namespace_packages = true
+strict_optional = false
+
+[[tool.mypy.overrides]]
+module = [
+    'tests.basetest',
+    'tests.patchs',
+    'tests.fixtures',
+    'tests.test_script',
+    'tests.test_util',
+]
+ignore_errors = true

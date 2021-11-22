@@ -2,6 +2,8 @@ import collections
 import json
 import random
 
+from abc import ABCMeta
+from abc import abstractmethod
 from html.parser import HTMLParser
 from typing import Any
 from typing import Dict
@@ -31,7 +33,7 @@ APELIDOS = {
     "sena": "megasena",
 }
 
-LOTERIAS = {
+LOTERIAS: Dict[str, Dict[str, Any]] = {
     "quina": {
         "marcar": (5, 7),
         "numeros": (1, 80),
@@ -70,7 +72,7 @@ class Loteria:
     def __init__(self, nome: str, cfg_path: str = None):
         nome = APELIDOS.get(nome, nome)
         try:
-            self.settings = LOTERIAS[nome]
+            self.settings: Dict[str, Any] = LOTERIAS[nome]
         except KeyError as err:
             raise LoteriaNaoSuportada(err)
 
@@ -82,7 +84,7 @@ class Loteria:
         # método `gerar_aposta()` e encerra.
         self._kind = self.settings.get("kind", K_COMMON)
         if self._kind == K_TICKET:
-            self.gerar_aposta = lambda *a, **k: None
+            self.gerar_aposta = lambda *a, **k: None  # type: ignore[assignment]
             return
 
         # atributos do gerador de números
@@ -93,7 +95,7 @@ class Loteria:
         self._max = self.settings["marcar"][1]
         self._padrao = self.settings.get("padrao", self._min)
 
-    def gerar_aposta(self, marcar: int = None) -> Tuple[int]:
+    def gerar_aposta(self, marcar: int = None) -> Tuple[int, ...]:
         if marcar in (None, 0):
             marcar = self._padrao
         if not (self._min <= marcar <= self._max):
@@ -120,10 +122,12 @@ class Loteria:
         result = self.loteria_db.get("%s|%s" % (self.nome, concurso))
         if result:
             # convert `(k, v)` de volta para `dict`
-            result = json.loads(result)
-            result["premios"] = collections.OrderedDict(result["premios"])
+            _result = json.loads(result)
+            _result["premios"] = collections.OrderedDict(_result["premios"])
 
-            return result
+            return _result
+
+        return None
 
     def _download(self, concurso: int) -> Dict[str, Any]:
         parser = LoteriaParser(self.nome)
@@ -169,13 +173,13 @@ class Loteria:
 
     def _ganhou(self, result: Dict[str, Any], acertou: List[List[int]]) -> List[str]:
         if self._kind == K_COMMON:
-            acertou = [len(t) for t in acertou]
-            if self.nome == "duplasena" and acertou[0] == 6:
-                acertou[0] = -6
+            marcou = [len(t) for t in acertou]
+            if self.nome == "duplasena" and marcou[0] == 6:
+                marcou[0] = -6
         else:
-            acertou = [v for [v] in acertou] or [None]
+            marcou = [v for [v] in acertou] or [None]
 
-        return [result["premios"].get(n, "0,00") for n in acertou]
+        return [result["premios"].get(n, "0,00") for n in marcou]
 
     def _url(
         self,
@@ -262,9 +266,9 @@ class LoteriaParser:
             raise NotImplementedError("parser: premios")
 
         if self._spec.get("parser") == self.NEW:
-            self._parser = _NewParser()
+            self._parser: _Parser = _NewParser()
         else:
-            self._parser = _OldParser()
+            self._parser: _Parser = _OldParser()  # type: ignore[no-redef]
 
     def __getattr__(self, name: str) -> Any:
         return getattr(self._parser, name)
@@ -285,7 +289,7 @@ class LoteriaParser:
             return None
 
         return {
-            "concurso": int(dados[spec.get("concurso", 0)]),
+            "concurso": int(dados[spec.get("concurso", 0)]),  # type: ignore[call-overload]
             "numeros": numeros,
             "premios": premios,
         }
@@ -318,9 +322,16 @@ class LoteriaParser:
             return None
 
 
-class _OldParser(HTMLParser):
-    def __init__(self, *, convert_charrefs: bool = ...) -> None:
-        super().__init__(convert_charrefs=convert_charrefs)
+class _Parser(HTMLParser, metaclass=ABCMeta):
+    @property
+    @abstractmethod
+    def data(self) -> List[str]:
+        ...
+
+
+class _OldParser(_Parser):
+    def __init__(self) -> None:
+        super().__init__()
         self._capture: bool
         self._data: List[str]
 
@@ -349,8 +360,8 @@ class _OldParser(HTMLParser):
 
 
 class _NewParser(_OldParser):
-    def __init__(self, *, convert_charrefs: bool = ...) -> None:
-        super().__init__(convert_charrefs=convert_charrefs)
+    def __init__(self) -> None:
+        super().__init__()
         self._capture_list: bool
         self._capture_number: bool
         self._numbers: List[str]

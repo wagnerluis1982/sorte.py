@@ -5,10 +5,11 @@ import sys
 from typing import Any
 from typing import Callable
 from typing import Dict
-from typing import Iterable
+from typing import Iterator
 from typing import List
 from typing import Set
 from typing import Tuple
+from typing import overload
 
 from sortepy import loterica
 
@@ -85,11 +86,29 @@ def exec_gerar(loteria: loterica.Loteria, quantidade: int, numeros: int) -> int:
             show_help=False,
             code=5,
         )
+    else:
+        return 0
 
 
+@overload
 def iter_resultados(
-    fun: Callable[..., Dict[str, Any]], args: Tuple[List[int], ...], erros: Set[int]
-) -> Iterable[Dict[str, Any]]:
+    fun: Callable[[int], Any],
+    args: Tuple[List[int]],
+    erros: Set[int],
+) -> Iterator[Dict[str, Any]]:
+    ...
+
+
+@overload
+def iter_resultados(
+    fun: Callable[[int, List[List[int]]], List[Dict[str, Any]]],
+    args: Tuple[List[int], List[List[int]]],
+    erros: Set[int],
+) -> Iterator[List[Dict[str, Any]]]:
+    ...
+
+
+def iter_resultados(fun, args, erros):
     consultados = set()
 
     concursos = args[0]
@@ -113,7 +132,7 @@ def iter_resultados(
 
 
 def exec_consultar(loteria: loterica.Loteria, concursos: List[int]) -> int:
-    erros = set()
+    erros: Set[int] = set()
     try:
         resultados = iter_resultados(loteria.consultar, (concursos,), erros)
     except loterica.LoteriaNaoSuportada as err:
@@ -156,11 +175,13 @@ def exec_consultar(loteria: loterica.Loteria, concursos: List[int]) -> int:
             print()
         print("  erros:", ", ".join(sorted(map(str, erros))))
 
+    return 0
+
 
 def exec_conferir(
-    loteria: loterica.Loteria, concursos: List[int], apostas: List[int]
+    loteria: loterica.Loteria, concursos: List[int], apostas: List[List[int]]
 ) -> int:
-    erros = set()
+    erros: Set[int] = set()
     try:
         resultados = iter_resultados(loteria.conferir, (concursos, apostas), erros)
     except loterica.LoteriaNaoSuportada as err:
@@ -190,6 +211,8 @@ def exec_conferir(
         if "resp" in vars():
             print()
         print("  erros:", ", ".join(sorted(map(str, erros))))
+
+    return 0
 
 
 def __highlight_closure(
@@ -229,7 +252,7 @@ def main(argv: List[str] = sys.argv, cfg_path: str = None) -> int:
     for option, arg in opts:
         if option in ("-h", "--help"):
             print(help_msg)
-            return
+            return 0
         elif option in ("-n", "--numeros"):
             numeros = int(arg)
         elif option in ("-q", "--quantidade"):
@@ -241,8 +264,8 @@ def main(argv: List[str] = sys.argv, cfg_path: str = None) -> int:
                 faixa = arg.split("-")
                 if len(faixa) != 2 or not (faixa[0].isdigit() and faixa[1].isdigit()):
                     return error("ERRO: faixa '%s' inválida" % arg)
-                faixa = list(map(int, faixa))
-                concursos.extend(range(faixa[0], faixa[1] + 1))
+                intervalo = list(map(int, faixa))
+                concursos.extend(range(intervalo[0], intervalo[1] + 1))
             else:
                 concursos.append(-1)
         elif option in ("-i", "--stdin"):
@@ -263,9 +286,9 @@ def main(argv: List[str] = sys.argv, cfg_path: str = None) -> int:
             if not linha.lstrip().startswith("#"):
                 args.append(linha)
 
-    apostas = []
+    apostas: List[List[int]] = []
     for arg in args:
-        aposta = []
+        aposta: List[int] = []
         for n in re.split("[, ]+", arg):
             fx = list(map(int, n.split("-", 1)))
             aposta.extend(range(fx[0], fx[-1] + 1))

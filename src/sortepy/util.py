@@ -9,8 +9,9 @@ import time
 import urllib.request
 
 from typing import Any
+from typing import Callable
 from typing import MutableMapping
-from typing import Type
+from typing import overload
 
 
 def get_config_path(app: str = "sortepy") -> str:
@@ -72,11 +73,11 @@ class Util:
         self.pages_db = self.get_mapdb("paginas")
         self.in_cache = True
 
-    def get_mapdb(self, name: str) -> None:
+    def get_mapdb(self, name: str) -> "FileDB":
         db_path = os.path.join(self.__cfg_path, "%s.db" % name)
         return FileDB.open(db_path)
 
-    def download(self, url: str, in_cache: bool = None) -> None:
+    def download(self, url: str, in_cache: bool = None) -> str:
         in_cache = in_cache if isinstance(in_cache, bool) else self.in_cache
 
         # Obtém a página do cache
@@ -93,20 +94,28 @@ class Util:
             opener.addheaders.append(("Cookie", "security=true"))
 
             page = opener.open(url)
-            conteudo = page.read()
+            content: bytes = page.read()
 
             charset = page.headers.get_param("charset")
             if charset is not None:
-                conteudo = conteudo.decode(charset)
+                conteudo = content.decode(charset)
             else:
-                conteudo = conteudo.decode()
+                conteudo = content.decode()
 
             if in_cache:
                 self.cache(url, conteudo)
 
         return conteudo
 
-    def cache(self, url: str, conteudo: str = None) -> None:
+    @overload
+    def cache(self, url: str) -> str:
+        ...
+
+    @overload
+    def cache(self, url: str, conteudo: str) -> None:
+        ...
+
+    def cache(self, url, conteudo=None):
         # Sem conteúdo: leitura do cache
         if conteudo is None:
             if url not in self.pages_db:
@@ -152,7 +161,7 @@ class FileDB(MutableMapping[str, str]):
         return db
 
 
-def _file_db_cls(type: str) -> Type[FileDB]:
+def _file_db_cls(type: str) -> Callable[[str, str], FileDB]:
     class _SQLite3(FileDB):
         __version__ = 1
 
@@ -223,7 +232,7 @@ def _file_db_cls(type: str) -> Type[FileDB]:
                 return sql_template.format(table=self._table)
             return ""
 
-        def get(self, key: str, default: str = None) -> str:
+        def get(self, key: str, default: str = None) -> str:  # type: ignore[override]
             try:
                 return self[key]
             except KeyError:
@@ -254,7 +263,7 @@ def _file_db_cls(type: str) -> Type[FileDB]:
             with self._con as con:
                 con.execute("DELETE FROM %s WHERE key=?" % self._table, (key,))
 
-        def __contains__(self, key: str) -> bool:
+        def __contains__(self, key: object) -> bool:
             cursor = self._con.cursor()
             cursor.execute("SELECT 1 FROM %s WHERE key=?" % self._table, (key,))
             return cursor.fetchall() != []
@@ -270,3 +279,5 @@ def _file_db_cls(type: str) -> Type[FileDB]:
 
     if type == "sqlite":
         return _SQLite3
+
+    raise
