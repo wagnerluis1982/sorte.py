@@ -4,7 +4,6 @@ import sys
 
 from typing import Any
 from typing import Callable
-from typing import Dict
 from typing import Iterator
 from typing import List
 from typing import Set
@@ -12,6 +11,8 @@ from typing import Tuple
 from typing import overload
 
 from sortepy import loterica
+from sortepy.types import ConferenciaDict
+from sortepy.types import ResultadoDict
 
 
 help_msg = "".join(
@@ -90,21 +91,23 @@ def exec_gerar(loteria: loterica.Loteria, quantidade: int, numeros: int) -> int:
         return 0
 
 
+# Loteria.consultar
 @overload
 def iter_resultados(
-    fun: Callable[[int], Any],
+    fun: Callable[[int], ResultadoDict],
     args: Tuple[List[int]],
     erros: Set[int],
-) -> Iterator[Dict[str, Any]]:
+) -> Iterator[ResultadoDict]:
     ...
 
 
+# Loteria.conferir
 @overload
 def iter_resultados(
-    fun: Callable[[int, List[List[int]]], List[Dict[str, Any]]],
+    fun: Callable[[int, List[List[int]]], List[ConferenciaDict]],
     args: Tuple[List[int], List[List[int]]],
     erros: Set[int],
-) -> Iterator[List[Dict[str, Any]]]:
+) -> Iterator[List[ConferenciaDict]]:
     ...
 
 

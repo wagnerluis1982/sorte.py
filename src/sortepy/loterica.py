@@ -11,6 +11,8 @@ from typing import List
 from typing import Tuple
 
 from sortepy import util
+from sortepy.types import ConferenciaDict
+from sortepy.types import ResultadoDict
 
 
 class LoteriaNaoSuportada(Exception):
@@ -103,7 +105,7 @@ class Loteria:
         result = random.sample(self._range, marcar)
         return tuple(sorted(result))
 
-    def consultar(self, concurso: int = 0) -> Dict[str, Any]:
+    def consultar(self, concurso: int = 0) -> ResultadoDict:
         """Obtém o resultado do sorteio de um concurso.
 
         Primeiramente, é verificado se o resultado já existe em cache no banco de dados.
@@ -118,7 +120,7 @@ class Loteria:
 
         return result
 
-    def _cache(self, concurso: int) -> Dict[str, Any]:
+    def _cache(self, concurso: int) -> ResultadoDict:
         result = self.loteria_db.get("%s|%s" % (self.nome, concurso))
         if result:
             # convert `(k, v)` de volta para `dict`
@@ -129,7 +131,7 @@ class Loteria:
 
         return None
 
-    def _download(self, concurso: int) -> Dict[str, Any]:
+    def _download(self, concurso: int) -> ResultadoDict:
         parser = LoteriaParser(self.nome)
 
         url = self._url(concurso)
@@ -144,16 +146,18 @@ class Loteria:
         else:
             return result
 
-    def _store(self, result: Dict[str, Any]) -> None:
-        # converte `dict` para `(k, v)`: garante os prêmios na ordem devolvida pelo parser
-        result = result.copy()
-        result["premios"] = list(result["premios"].items())
+    def _store(self, result: ResultadoDict) -> None:
+        # converte "premios" `dict` para `(k, v)`: garante os prêmios na ordem devolvida pelo parser
+        store = dict(result)
+        store["premios"] = list(result["premios"].items())
         # armazena no cache
-        self.loteria_db["%s|%s" % (self.nome, result["concurso"])] = json.dumps(result)
+        self.loteria_db[f"{self.nome}|{store['concurso']}"] = json.dumps(store)
 
-    def conferir(self, concurso: int, apostas: List[List[int]]) -> List[Dict[str, Any]]:
+    def conferir(
+        self, concurso: int, apostas: List[List[int]]
+    ) -> List[ConferenciaDict]:
         result = self.consultar(concurso)
-        resp = []
+        resp: List[ConferenciaDict] = []
         for aposta in apostas:
             if self._kind == K_COMMON:
                 acertou = [[n for n in res if n in aposta] for res in result["numeros"]]
@@ -162,16 +166,16 @@ class Loteria:
 
             ganhou = self._ganhou(result, acertou)
             resp.append(
-                {
-                    "concurso": result["concurso"],
-                    "numeros": aposta,
-                    "acertou": acertou,
-                    "ganhou": ganhou,
-                }
+                ConferenciaDict(
+                    concurso=result["concurso"],
+                    numeros=aposta,
+                    acertou=acertou,
+                    ganhou=ganhou,
+                )
             )
         return resp
 
-    def _ganhou(self, result: Dict[str, Any], acertou: List[List[int]]) -> List[str]:
+    def _ganhou(self, result: ResultadoDict, acertou: List[List[int]]) -> List[str]:
         if self._kind == K_COMMON:
             marcou = [len(t) for t in acertou]
             if self.nome == "duplasena" and marcou[0] == 6:
@@ -273,7 +277,7 @@ class LoteriaParser:
     def __getattr__(self, name: str) -> Any:
         return getattr(self._parser, name)
 
-    def data(self) -> Dict[str, Any]:
+    def data(self) -> ResultadoDict:
         spec = self._spec
         dados = "".join(self._parser.data).split("|")
 
@@ -288,11 +292,11 @@ class LoteriaParser:
         else:
             return None
 
-        return {
-            "concurso": int(dados[spec.get("concurso", 0)]),  # type: ignore[call-overload]
-            "numeros": numeros,
-            "premios": premios,
-        }
+        return ResultadoDict(
+            concurso=int(dados[spec.get("concurso", 0)]),  # type: ignore[call-overload]
+            numeros=numeros,
+            premios=premios,
+        )
 
     @staticmethod
     def __common(
