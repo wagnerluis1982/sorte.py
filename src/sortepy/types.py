@@ -1,5 +1,7 @@
+from dataclasses import dataclass
 from typing import Dict
 from typing import List
+from typing import Tuple
 from typing import TypedDict
 
 
@@ -18,3 +20,13 @@ class ConferenciaDict(TypedDict):
     numeros: Aposta
     acertou: List[Aposta]
     ganhou: List[str]
+
+
+@dataclass(frozen=True)
+class LoteriaConfig:
+    marcar: Tuple[int, int] = None
+    numeros: Tuple[int, int] = None
+    nome: str = None
+    padrao: int = None
+    url_script: str = None
+    kind: int = None

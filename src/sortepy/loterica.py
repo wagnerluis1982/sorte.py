@@ -13,6 +13,7 @@ from typing import Tuple
 from sortepy import util
 from sortepy.types import Aposta
 from sortepy.types import ConferenciaDict
+from sortepy.types import LoteriaConfig
 from sortepy.types import ResultadoDict
 
 
@@ -32,40 +33,40 @@ class ResultadoNaoDisponivel(Exception):
 K_COMMON = 0
 K_TICKET = 1
 
-APELIDOS = {
+APELIDOS: Dict[str, str] = {
     "sena": "megasena",
 }
 
-LOTERIAS: Dict[str, Dict[str, Any]] = {
-    "quina": {
-        "marcar": (5, 7),
-        "numeros": (1, 80),
-    },
-    "megasena": {
-        "marcar": (6, 15),
-        "numeros": (1, 60),
-        "nome": "Mega-Sena",
-    },
-    "lotofacil": {
-        "marcar": (15, 18),
-        "numeros": (1, 25),
-    },
-    "lotomania": {
-        "marcar": (1, 50),
-        "numeros": (1, 100),
-        "padrao": 20,
-        "url-script": "_lotomania_pesquisa.asp",
-    },
-    "duplasena": {
-        "marcar": (6, 15),
-        "numeros": (1, 50),
-        "nome": "Dupla Sena",
-    },
-    "federal": {
+LOTERIAS: Dict[str, LoteriaConfig] = {
+    "quina": LoteriaConfig(
+        marcar=(5, 7),
+        numeros=(1, 80),
+    ),
+    "megasena": LoteriaConfig(
+        marcar=(6, 15),
+        numeros=(1, 60),
+        nome="Mega-Sena",
+    ),
+    "lotofacil": LoteriaConfig(
+        marcar=(15, 18),
+        numeros=(1, 25),
+    ),
+    "lotomania": LoteriaConfig(
+        marcar=(1, 50),
+        numeros=(1, 100),
+        padrao=20,
+        url_script="_lotomania_pesquisa.asp",
+    ),
+    "duplasena": LoteriaConfig(
+        marcar=(6, 15),
+        numeros=(1, 50),
+        nome="Dupla Sena",
+    ),
+    "federal": LoteriaConfig(
         # essa loteria não gera números
-        "url-script": "federal_pesquisa.asp",
-        "kind": K_TICKET,
-    },
+        url_script="federal_pesquisa.asp",
+        kind=K_TICKET,
+    ),
 }
 
 
@@ -75,7 +76,9 @@ class Loteria:
     def __init__(self, nome: str, cfg_path: str = None):
         nome = APELIDOS.get(nome, nome)
         try:
-            self.settings: Dict[str, Any] = LOTERIAS[nome]
+            self.settings = {
+                k: v for (k, v) in LOTERIAS[nome].__dict__.items() if v is not None
+            }
         except KeyError as err:
             raise LoteriaNaoSuportada(err)
 
@@ -193,7 +196,7 @@ class Loteria:
         script: str = "%(loteria)s_pesquisa_new.asp",
         query: str = "?submeteu=sim&opcao=concurso&txtConcurso=%(concurso)d",
     ) -> str:
-        script = self.settings.get("url-script", script)
+        script = self.settings.get("url_script", script)
         if concurso <= 0:
             return (base + script) % {"loteria": self.nome}
         else:
