@@ -11,6 +11,7 @@ from typing import List
 from typing import Tuple
 
 from sortepy import util
+from sortepy.types import Aposta
 from sortepy.types import ConferenciaDict
 from sortepy.types import ResultadoDict
 
@@ -153,14 +154,14 @@ class Loteria:
         # armazena no cache
         self.loteria_db[f"{self.nome}|{store['concurso']}"] = json.dumps(store)
 
-    def conferir(
-        self, concurso: int, apostas: List[List[int]]
-    ) -> List[ConferenciaDict]:
+    def conferir(self, concurso: int, apostas: List[Aposta]) -> List[ConferenciaDict]:
         result = self.consultar(concurso)
         resp: List[ConferenciaDict] = []
         for aposta in apostas:
             if self._kind == K_COMMON:
-                acertou = [[n for n in res if n in aposta] for res in result["numeros"]]
+                acertou = [
+                    Aposta(n for n in res if n in aposta) for res in result["numeros"]
+                ]
             else:
                 acertou = [aposta for res in result["premios"] if [res] == aposta]
 
@@ -175,7 +176,7 @@ class Loteria:
             )
         return resp
 
-    def _ganhou(self, result: ResultadoDict, acertou: List[List[int]]) -> List[str]:
+    def _ganhou(self, result: ResultadoDict, acertou: List[Aposta]) -> List[str]:
         if self._kind == K_COMMON:
             marcou = [len(t) for t in acertou]
             if self.nome == "duplasena" and marcou[0] == 6:
@@ -301,10 +302,10 @@ class LoteriaParser:
     @staticmethod
     def __common(
         spec: Dict[str, Any], dados: List[str]
-    ) -> Tuple[List[List[int]], Dict[int, str]]:
+    ) -> Tuple[List[Aposta], Dict[int, str]]:
         pos_nums = [range(p[0], p[1] + 1) for p in spec["numeros"]]
         try:
-            numeros = [[int(dados[i]) for i in r] for r in pos_nums]
+            numeros = [Aposta(int(dados[i]) for i in r) for r in pos_nums]
             premios = collections.OrderedDict()
             for qnt, pos_premio in sorted(spec["premios"].items(), reverse=True):
                 premios[qnt] = dados[pos_premio]

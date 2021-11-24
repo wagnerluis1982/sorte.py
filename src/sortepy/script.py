@@ -11,6 +11,7 @@ from typing import Tuple
 from typing import overload
 
 from sortepy import loterica
+from sortepy.types import Aposta
 from sortepy.types import ConferenciaDict
 from sortepy.types import ResultadoDict
 
@@ -104,8 +105,8 @@ def iter_resultados(
 # Loteria.conferir
 @overload
 def iter_resultados(
-    fun: Callable[[int, List[List[int]]], List[ConferenciaDict]],
-    args: Tuple[List[int], List[List[int]]],
+    fun: Callable[[int, List[Aposta]], List[ConferenciaDict]],
+    args: Tuple[List[int], List[Aposta]],
     erros: Set[int],
 ) -> Iterator[List[ConferenciaDict]]:
     ...
@@ -182,7 +183,7 @@ def exec_consultar(loteria: loterica.Loteria, concursos: List[int]) -> int:
 
 
 def exec_conferir(
-    loteria: loterica.Loteria, concursos: List[int], apostas: List[List[int]]
+    loteria: loterica.Loteria, concursos: List[int], apostas: List[Aposta]
 ) -> int:
     erros: Set[int] = set()
     try:
@@ -289,9 +290,9 @@ def main(argv: List[str] = sys.argv, cfg_path: str = None) -> int:
             if not linha.lstrip().startswith("#"):
                 args.append(linha)
 
-    apostas: List[List[int]] = []
+    apostas: List[Aposta] = []
     for arg in args:
-        aposta: List[int] = []
+        aposta = Aposta()
         for n in re.split("[, ]+", arg):
             fx = list(map(int, n.split("-", 1)))
             aposta.extend(range(fx[0], fx[-1] + 1))
