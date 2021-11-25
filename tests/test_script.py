@@ -5,7 +5,10 @@ import unittest
 from typing import List
 
 import basetest
+import sortepy.loterica
 import sortepy.script
+
+from sortepy.types import ResultadoDict
 
 
 def run_script(args: List[str]):
@@ -173,3 +176,17 @@ class ScriptTest(unittest.TestCase):
             "    acertou:\n",
             "      3: R$ 32.422,00\n",
         ]
+
+    def test_iter_resultados_coleta_erros(self):
+        def when_gt5_then_exception(num: int):
+            if num > 5:
+                raise sortepy.loterica.ResultadoNaoDisponivel()
+            return ResultadoDict(concurso=num, numeros=[], premios={})
+
+        erros = set()
+        resultados = sortepy.script.iter_resultados(
+            when_gt5_then_exception, (list(range(10)),), erros
+        )
+        tuple(resultados)
+
+        assert erros == set(range(6, 10))

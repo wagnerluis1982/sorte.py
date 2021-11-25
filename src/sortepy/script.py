@@ -112,27 +112,18 @@ def iter_resultados(
     ...
 
 
-def iter_resultados(fun, args, erros):
-    consultados = set()
-
-    concursos = args[0]
+def iter_resultados(fun, args, erros: set):
+    concursos = dict.fromkeys(args[0])
     args = args[1:]
-    while True:
-        try:
-            c = concursos.pop(0)
-        except IndexError:
-            return
-
-        if c not in consultados:
-            consultados.add(c)
+    for c in concursos:
+        if c not in erros:
             try:
                 yield fun(c, *args)
             except loterica.ResultadoNaoDisponivel:
+                for e in erros:
+                    if e > c:
+                        erros.add(e)
                 erros.add(c)
-                for i in reversed(range(len(concursos))):
-                    if concursos[i] > c:
-                        erros.add(concursos.pop(i))
-                continue
 
 
 def exec_consultar(loteria: loterica.Loteria, concursos: List[int]) -> int:
