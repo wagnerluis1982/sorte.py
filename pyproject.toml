@@ -43,6 +43,7 @@ python = "^3.8"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"
+pytest-srcpaths = "^1.2.1"
 pre-commit = "^2.15.0"
 
 [build-system]
@@ -51,6 +52,9 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
+pythonpath = [
+    "src",
+]
 testpaths = [
     "tests",
 ]
