@@ -9,6 +9,11 @@ from sortepy.v2.types import DrawPrize
 from sortepy.v2.types import DrawResult
 
 
+class FederalResponseHandler(DrawResponseHandler[LotericaResponseDict]):
+    def handle(self, data: LotericaResponseDict) -> DrawResult:
+        return _handle_response_type1(data)
+
+
 class LotofacilResponseHandler(DrawResponseHandler[LotericaResponseDict]):
     def handle(self, data: LotericaResponseDict) -> DrawResult:
         return _handle_response_type1(data)

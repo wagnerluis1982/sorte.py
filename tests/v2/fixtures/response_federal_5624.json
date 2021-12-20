@@ -1,0 +1,102 @@
+{
+    "tipoJogo": "LOTERIA_FEDERAL",
+    "numero": 5624,
+    "nomeMunicipioUFSorteio": "SAO PAULO, SP",
+    "dataApuracao": "22/12/2021",
+    "valorArrecadado": 0.00,
+    "valorEstimadoProximoConcurso": 0.00,
+    "valorAcumuladoProximoConcurso": 0.00,
+    "valorAcumuladoConcursoEspecial": 0.00,
+    "valorAcumuladoConcurso_0_5": 0.00,
+    "acumulado": false,
+    "indicadorConcursoEspecial": 1,
+    "dezenasSorteadasOrdemSorteio": ["086447", "026701", "028242", "003477", "066757"],
+    "listaResultadoEquipeEsportiva": null,
+    "numeroJogo": 10,
+    "nomeTimeCoracaoMesSorte": null,
+    "tipoPublicacao": 3,
+    "observacao": null,
+    "localSorteio": "ESPAÇO LOTERIAS CAIXA                   ",
+    "dataProximoConcurso": "",
+    "numeroConcursoAnterior": 5623,
+    "numeroConcursoProximo": 5625,
+    "valorTotalPremioFaixaUm": 0,
+    "numeroConcursoFinal_0_5": 0,
+    "listaMunicipioUFGanhadores": [
+        {
+            "posicao": 5,
+            "ganhadores": 0,
+            "municipio": "EUNAPOLIS",
+            "uf": "BA",
+            "nomeFatansiaUL": "LOTERIA BOA SORTE                       ",
+            "serie": "A"
+        },
+        {
+            "posicao": 1,
+            "ganhadores": 0,
+            "municipio": "RIO DE JANEIRO",
+            "uf": "RJ",
+            "nomeFatansiaUL": "BAZAR BERLINCK LTDA                     ",
+            "serie": "A"
+        },
+        {
+            "posicao": 4,
+            "ganhadores": 0,
+            "municipio": "RODEIO",
+            "uf": "SC",
+            "nomeFatansiaUL": "LOTERICA RODEIO                         ",
+            "serie": "A"
+        },
+        {
+            "posicao": 3,
+            "ganhadores": 0,
+            "municipio": "BEBEDOURO",
+            "uf": "SP",
+            "nomeFatansiaUL": "A ZEBRINHA DA SORTE LOTERIAS            ",
+            "serie": "A"
+        },
+        {
+            "posicao": 2,
+            "ganhadores": 0,
+            "municipio": "MOGI DAS CRUZES",
+            "uf": "SP",
+            "nomeFatansiaUL": "MEGASORTE LOTERIAS                      ",
+            "serie": "A"
+        }
+    ],
+    "listaRateioPremio": [
+        {
+            "faixa": 1,
+            "numeroDeGanhadores": 1,
+            "valorPremio": 500000.00,
+            "descricaoFaixa": "1 acertos"
+        },
+        {
+            "faixa": 2,
+            "numeroDeGanhadores": 1,
+            "valorPremio": 27000.00,
+            "descricaoFaixa": "2 acertos"
+        },
+        {
+            "faixa": 3,
+            "numeroDeGanhadores": 1,
+            "valorPremio": 24000.00,
+            "descricaoFaixa": "3 acertos"
+        },
+        {
+            "faixa": 4,
+            "numeroDeGanhadores": 1,
+            "valorPremio": 19000.00,
+            "descricaoFaixa": "4 acertos"
+        },
+        {
+            "faixa": 5,
+            "numeroDeGanhadores": 1,
+            "valorPremio": 18329.00,
+            "descricaoFaixa": "5 acertos"
+        }
+    ],
+    "listaDezenas": ["086447", "026701", "028242", "003477", "066757"],
+    "listaDezenasSegundoSorteio": null,
+    "id": null
+}

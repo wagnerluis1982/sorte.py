@@ -3,9 +3,32 @@ import json
 from datetime import datetime
 from pathlib import Path
 
+from sortepy.v2.loterica.handlers import FederalResponseHandler
 from sortepy.v2.loterica.handlers import LotofacilResponseHandler
 from sortepy.v2.loterica.handlers import QuinaResponseHandler
 from sortepy.v2.types import DrawPrize
+
+
+def test_federal_handler(fixtures_dir: Path):
+    handler = FederalResponseHandler()
+    data = json.load(open(fixtures_dir / "response_federal_5624.json"))
+
+    result = handler.handle(data)
+    assert result.draw_date == datetime(year=2021, month=12, day=22)
+    assert result.draw_number == "5624"
+    assert len(result.draw_details) == 1
+
+    draw = result.draw_details[0]
+    assert draw.ball_numbers == [86447, 26701, 28242, 3477, 66757]
+    assert draw.jackpot == 0.00
+    assert draw.currency == "BRL"
+    assert draw.prize_breakdown == {
+        "1": DrawPrize(winners=1, prize=500_000.00),
+        "2": DrawPrize(winners=1, prize=27_000.00),
+        "3": DrawPrize(winners=1, prize=24_000.00),
+        "4": DrawPrize(winners=1, prize=19_000.00),
+        "5": DrawPrize(winners=1, prize=18_329.00),
+    }
 
 
 def test_lotofacil_handler(fixtures_dir: Path):
