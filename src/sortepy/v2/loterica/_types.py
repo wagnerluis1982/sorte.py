@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TypedDict
 
 
-class ResultadoQuinaDict(TypedDict):
+class ResultadoT1Dict(TypedDict):
     tipoJogo: str
     numero: int
     nomeMunicipioUFSorteio: str
