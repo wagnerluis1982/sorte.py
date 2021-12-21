@@ -5,13 +5,16 @@ import unittest
 from typing import Any
 from typing import Dict
 
+import pytest
+
 import fixtures
 import sortepy.util
 
 from basetest import tempdir
 
 
-fixtures.start_server()
+pytestmark = pytest.mark.v1
+
 
 # Conteúdo para 'pagina_ascii.html'
 CONTEUDO_ASCII = """<!DOCTYPE html>

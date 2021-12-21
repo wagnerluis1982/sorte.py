@@ -4,28 +4,21 @@ import multiprocessing
 import os
 
 
-# diretório onde o servidor irá iniciar
-FIXTURES_DIR = os.path.join(os.path.dirname(__file__))
-
 # declaração de globais
-global server_port, server_url
+global server_url
 
 
 def start_server():
-    if not start_server.status:
+    if not getattr(start_server, "status", 0):
         # inicia servidor
         server = FixtureHttpServer()
         server.start()
         atexit.register(server.terminate)
         # guarda a porta e cria URL
-        global server_port, server_url
-        server_port = server.port
+        global server_url
         server_url = "http://127.0.0.1:%d" % server.port
         # marca servidor como já inicializado
         start_server.status = 1
-
-
-start_server.status = 0
 
 
 class FixtureRequestHandler(http.server.CGIHTTPRequestHandler):
@@ -49,5 +42,6 @@ class FixtureHttpServer(multiprocessing.Process):
         self.port = self.httpd.server_port
 
     def run(self):
-        os.chdir(FIXTURES_DIR)
+        fixtures_dir = os.path.join(os.path.dirname(__file__))
+        os.chdir(fixtures_dir)
         self.httpd.serve_forever()

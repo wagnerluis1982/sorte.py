@@ -3,7 +3,7 @@ from dataclasses import replace
 
 # modifica o método privado Loteria._url para garantir que use o script CGI interno
 def loteria_class() -> None:
-    if not loteria_class.done:
+    if not getattr(loteria_class, "done", False):
         # garantie que servidor interno de fixtures está inicializado
         import fixtures
 
@@ -30,6 +30,3 @@ def __patch_url_method(_url: str, server_url: str) -> None:
 def __patch_settings(loterias: dict) -> None:
     for key, value in loterias.items():
         loterias[key] = replace(value, url_script=None)
-
-
-loteria_class.done = False

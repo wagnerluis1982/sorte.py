@@ -4,11 +4,16 @@ import unittest
 
 from typing import List
 
+import pytest
+
 import basetest
 import sortepy.loterica
 import sortepy.script
 
 from sortepy.types import ResultadoDict
+
+
+pytestmark = pytest.mark.v1
 
 
 def run_script(args: List[str]):

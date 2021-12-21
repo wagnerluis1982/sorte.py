@@ -3,13 +3,12 @@ import shutil
 import tempfile
 import unittest
 
-# patch para classe de loteria utilizar o servidor interno
-import patchs
+import pytest
 
 from sortepy.loterica import Loteria
 
 
-patchs.loteria_class()
+pytestmark = pytest.mark.v1
 
 
 def tempdir(custom_prefix: str = "sortepy-"):
