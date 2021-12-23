@@ -22,13 +22,13 @@ def test_federal_handler(fixtures_dir: Path):
     assert draw.ball_numbers == [86447, 26701, 28242, 3477, 66757]
     assert draw.jackpot == 0.00
     assert draw.currency == "BRL"
-    assert draw.prize_breakdown == {
-        "1": DrawPrize(winners=1, prize=500_000.00),
-        "2": DrawPrize(winners=1, prize=27_000.00),
-        "3": DrawPrize(winners=1, prize=24_000.00),
-        "4": DrawPrize(winners=1, prize=19_000.00),
-        "5": DrawPrize(winners=1, prize=18_329.00),
-    }
+    assert draw.prize_breakdown == (
+        DrawPrize(winners=1, prize=500_000.00),
+        DrawPrize(winners=1, prize=27_000.00),
+        DrawPrize(winners=1, prize=24_000.00),
+        DrawPrize(winners=1, prize=19_000.00),
+        DrawPrize(winners=1, prize=18_329.00),
+    )
 
 
 def test_lotofacil_handler(fixtures_dir: Path):

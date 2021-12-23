@@ -2,8 +2,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
-from typing import Dict
+from typing import Mapping
 from typing import Sequence
+from typing import Union
 
 
 if TYPE_CHECKING:
@@ -14,10 +15,14 @@ if TYPE_CHECKING:
 
 
 @dataclass(frozen=True, kw_only=True)  # type: ignore[call-overload]
-class DrawResult:
-    draw_date: datetime
-    draw_number: str
-    draw_details: Sequence[DrawDetail]
+class DrawPrize:
+    winners: int
+    prize: int | float
+
+
+_PrizesAsMapping = Mapping[str, DrawPrize]
+_PrizesAsSequence = Sequence[DrawPrize]
+PrizeBreakdown = Union[_PrizesAsMapping, _PrizesAsSequence]
 
 
 @dataclass(frozen=True, kw_only=True)  # type: ignore[call-overload]
@@ -25,10 +30,11 @@ class DrawDetail:
     ball_numbers: Sequence[int]
     jackpot: int | float
     currency: str
-    prize_breakdown: Dict[str, DrawPrize]
+    prize_breakdown: PrizeBreakdown
 
 
 @dataclass(frozen=True, kw_only=True)  # type: ignore[call-overload]
-class DrawPrize:
-    winners: int
-    prize: int | float
+class DrawResult:
+    draw_date: datetime
+    draw_number: str
+    draw_details: Sequence[DrawDetail]
