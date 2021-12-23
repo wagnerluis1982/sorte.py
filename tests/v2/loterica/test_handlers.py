@@ -44,13 +44,13 @@ def test_lotofacil_handler(fixtures_dir: Path):
     assert draw.ball_numbers == [1, 2, 3, 4, 5, 6, 9, 10, 11, 13, 14, 18, 20, 23, 25]
     assert draw.jackpot == 0.00
     assert draw.currency == "BRL"
-    assert draw.prize_breakdown == {
-        "15": DrawPrize(winners=3, prize=370_337.82),
-        "14": DrawPrize(winners=321, prize=1036.73),
-        "13": DrawPrize(winners=13_409, prize=25.00),
-        "12": DrawPrize(winners=144_941, prize=10.00),
-        "11": DrawPrize(winners=741_668, prize=5.00),
-    }
+    assert draw.prize_breakdown == (
+        DrawPrize(hits=15, winners=3, prize=370_337.82),
+        DrawPrize(hits=14, winners=321, prize=1036.73),
+        DrawPrize(hits=13, winners=13_409, prize=25.00),
+        DrawPrize(hits=12, winners=144_941, prize=10.00),
+        DrawPrize(hits=11, winners=741_668, prize=5.00),
+    )
 
 
 def test_quina_handler(fixtures_dir: Path):
@@ -66,9 +66,9 @@ def test_quina_handler(fixtures_dir: Path):
     assert draw.ball_numbers == [26, 27, 29, 74, 77]
     assert draw.jackpot == 10_358_517.22
     assert draw.currency == "BRL"
-    assert draw.prize_breakdown == {
-        "5": DrawPrize(winners=0, prize=0.00),
-        "4": DrawPrize(winners=61, prize=8093.88),
-        "3": DrawPrize(winners=6120, prize=76.83),
-        "2": DrawPrize(winners=151744, prize=3.09),
-    }
+    assert draw.prize_breakdown == (
+        DrawPrize(hits=5, winners=0, prize=0.00),
+        DrawPrize(hits=4, winners=61, prize=8093.88),
+        DrawPrize(hits=3, winners=6120, prize=76.83),
+        DrawPrize(hits=2, winners=151744, prize=3.09),
+    )

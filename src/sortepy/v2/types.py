@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING
 from typing import Any
 from typing import Mapping
 from typing import Sequence
-from typing import Union
 
 
 if TYPE_CHECKING:
@@ -19,12 +18,8 @@ if TYPE_CHECKING:
 class DrawPrize:
     winners: int
     prize: int | float
-    context: Mapping[str, Any] | None = None
-
-
-_PrizesAsMapping = Mapping[str, DrawPrize]
-_PrizesAsSequence = Sequence[DrawPrize]
-PrizeBreakdown = Union[_PrizesAsMapping, _PrizesAsSequence]
+    hits: int = None
+    context: Mapping[str, Any] = None
 
 
 @dataclass(frozen=True, kw_only=True)  # type: ignore[call-overload]
@@ -32,7 +27,7 @@ class DrawDetail:
     ball_numbers: Sequence[int]
     jackpot: int | float
     currency: str
-    prize_breakdown: PrizeBreakdown
+    prize_breakdown: Sequence[DrawPrize]
 
 
 @dataclass(frozen=True, kw_only=True)  # type: ignore[call-overload]
