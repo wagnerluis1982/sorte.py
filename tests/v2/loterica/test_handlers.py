@@ -23,11 +23,11 @@ def test_federal_handler(fixtures_dir: Path):
     assert draw.jackpot == 0.00
     assert draw.currency == "BRL"
     assert draw.prize_breakdown == (
-        DrawPrize(winners=1, prize=500_000.00),
-        DrawPrize(winners=1, prize=27_000.00),
-        DrawPrize(winners=1, prize=24_000.00),
-        DrawPrize(winners=1, prize=19_000.00),
-        DrawPrize(winners=1, prize=18_329.00),
+        DrawPrize(winners=1, prize=500_000.00, context={"ticket": "086447"}),
+        DrawPrize(winners=1, prize=27_000.00, context={"ticket": "026701"}),
+        DrawPrize(winners=1, prize=24_000.00, context={"ticket": "028242"}),
+        DrawPrize(winners=1, prize=19_000.00, context={"ticket": "003477"}),
+        DrawPrize(winners=1, prize=18_329.00, context={"ticket": "066757"}),
     )
 
 

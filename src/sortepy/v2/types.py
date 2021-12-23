@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
+from typing import Any
 from typing import Mapping
 from typing import Sequence
 from typing import Union
@@ -18,6 +19,7 @@ if TYPE_CHECKING:
 class DrawPrize:
     winners: int
     prize: int | float
+    context: Mapping[str, Any] | None = None
 
 
 _PrizesAsMapping = Mapping[str, DrawPrize]
