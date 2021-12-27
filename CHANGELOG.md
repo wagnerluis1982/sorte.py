@@ -5,7 +5,8 @@ Todas as mudanças de destaque nesse projeto será documentado neste arquivo.
 ## [Não publicado]
 
 ### Adicionado
-- Suporte à consulta e conferência da Loteria Federal.
+- [x] Suporte à consulta e conferência da Loteria Federal.
+- [ ] Extrato de consultas funcionam com o novo site da CEF.
 
 ### Modificado
 - Projeto migrado de `setup.py` para [poetry]

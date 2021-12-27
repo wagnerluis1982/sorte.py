@@ -1,13 +1,22 @@
 import functools
 import io
-import sys
 import unittest
 
+from typing import List
+
+import pytest
+
 import basetest
+import sortepy.loterica
 import sortepy.script
 
+from sortepy.types import ResultadoDict
 
-def run_script(args):
+
+pytestmark = pytest.mark.v1
+
+
+def run_script(args: List[str]):
     output = io.StringIO()
 
     # Redefine 'print' para usar outra stdout passado como parâmetro
@@ -56,7 +65,7 @@ class ScriptTest(unittest.TestCase):
         readlines = run_script(args)
         linhas = readlines[1:]
         assert len(linhas) == 2
-        for no, linha in enumerate(linhas, 1):
+        for linha in linhas:
             assert len([int(x) for x in linha.split()]) == 5
 
         # geração de aposta da quina com mais de 5 números
@@ -67,7 +76,7 @@ class ScriptTest(unittest.TestCase):
             readlines = run_script(args)
             linhas = readlines[1:]
             assert len(linhas) == 2
-            for no, linha in enumerate(linhas, 1):
+            for linha in linhas:
                 assert len([int(x) for x in linha.split()]) == i
 
             # opções longas
@@ -76,7 +85,7 @@ class ScriptTest(unittest.TestCase):
             readlines = run_script(args)
             linhas = readlines[1:]
             assert len(linhas) == 2
-            for no, linha in enumerate(linhas, 1):
+            for linha in linhas:
                 assert len([int(x) for x in linha.split()]) == i
 
     def test_gerar_aposta_para_loteria_ticket_NAO_disponivel(self):
@@ -172,3 +181,17 @@ class ScriptTest(unittest.TestCase):
             "    acertou:\n",
             "      3: R$ 32.422,00\n",
         ]
+
+    def test_iter_resultados_coleta_erros(self):
+        def when_gt5_then_exception(num: int):
+            if num > 5:
+                raise sortepy.loterica.ResultadoNaoDisponivel()
+            return ResultadoDict(concurso=num, numeros=[], premios={})
+
+        erros = set()
+        resultados = sortepy.script.iter_resultados(
+            when_gt5_then_exception, (list(range(10)),), erros
+        )
+        tuple(resultados)
+
+        assert erros == set(range(6, 10))

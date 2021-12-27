@@ -2,7 +2,18 @@ import getopt
 import re
 import sys
 
-from . import loterica
+from typing import Any
+from typing import Callable
+from typing import Iterator
+from typing import List
+from typing import Set
+from typing import Tuple
+from typing import overload
+
+from sortepy import loterica
+from sortepy.types import Aposta
+from sortepy.types import ConferenciaDict
+from sortepy.types import ResultadoDict
 
 
 help_msg = "".join(
@@ -35,7 +46,7 @@ O valor de LOTERIA pode ser: """,
 )
 
 
-def error(*args, show_help=True, code=255, **kwargs):
+def error(*args: Any, show_help: bool = True, code: int = 255, **kwargs: Any) -> int:
     print(*args, **kwargs)
     if show_help:
         print(help_msg)
@@ -77,33 +88,46 @@ def exec_gerar(loteria: loterica.Loteria, quantidade: int, numeros: int) -> int:
             show_help=False,
             code=5,
         )
+    else:
+        return 0
 
 
-def iter_resultados(fun, args, erros=set()):
-    consultados = set()
+# Loteria.consultar
+@overload
+def iter_resultados(
+    fun: Callable[[int], ResultadoDict],
+    args: Tuple[List[int]],
+    erros: Set[int],
+) -> Iterator[ResultadoDict]:
+    ...
 
-    concursos = args[0]
+
+# Loteria.conferir
+@overload
+def iter_resultados(
+    fun: Callable[[int, List[Aposta]], List[ConferenciaDict]],
+    args: Tuple[List[int], List[Aposta]],
+    erros: Set[int],
+) -> Iterator[List[ConferenciaDict]]:
+    ...
+
+
+def iter_resultados(fun, args, erros: set):
+    concursos = dict.fromkeys(args[0])
     args = args[1:]
-    while True:
-        try:
-            c = concursos.pop(0)
-        except IndexError:
-            return
-
-        if c not in consultados:
-            consultados.add(c)
+    for c in concursos:
+        if c not in erros:
             try:
                 yield fun(c, *args)
             except loterica.ResultadoNaoDisponivel:
+                for e in erros:
+                    if e > c:
+                        erros.add(e)
                 erros.add(c)
-                for i in reversed(range(len(concursos))):
-                    if concursos[i] > c:
-                        erros.add(concursos.pop(i))
-                continue
 
 
-def exec_consultar(loteria, concursos):
-    erros = set()
+def exec_consultar(loteria: loterica.Loteria, concursos: List[int]) -> int:
+    erros: Set[int] = set()
     try:
         resultados = iter_resultados(loteria.consultar, (concursos,), erros)
     except loterica.LoteriaNaoSuportada as err:
@@ -146,9 +170,13 @@ def exec_consultar(loteria, concursos):
             print()
         print("  erros:", ", ".join(sorted(map(str, erros))))
 
+    return 0
 
-def exec_conferir(loteria, concursos, apostas):
-    erros = set()
+
+def exec_conferir(
+    loteria: loterica.Loteria, concursos: List[int], apostas: List[Aposta]
+) -> int:
+    erros: Set[int] = set()
     try:
         resultados = iter_resultados(loteria.conferir, (concursos, apostas), erros)
     except loterica.LoteriaNaoSuportada as err:
@@ -179,8 +207,12 @@ def exec_conferir(loteria, concursos, apostas):
             print()
         print("  erros:", ", ".join(sorted(map(str, erros))))
 
+    return 0
 
-def __highlight_closure(color=0, spec=0, condition=lambda x: True):
+
+def __highlight_closure(
+    color: int = 0, spec: int = 0, condition: Callable[[str], bool] = lambda x: True
+) -> Callable[[str], str]:
     if sys.stdout.isatty():
         formatting = "\x1b[%02d;%02dm%%s\x1b[00m" % (spec, color)
         return lambda arg: formatting % arg if condition(arg) else arg
@@ -195,7 +227,7 @@ hi_acerto = __highlight_closure(color=33)
 hi_ganho = __highlight_closure(color=32, spec=0, condition=lambda x: x != "R$ 0,00")
 
 
-def main(argv=sys.argv, cfg_path=None):
+def main(argv: List[str] = sys.argv, cfg_path: str = None) -> int:
     try:
         opts, args = getopt.gnu_getopt(
             argv[1:],
@@ -210,12 +242,12 @@ def main(argv=sys.argv, cfg_path=None):
     # Avalia os parâmetros passados
     numeros = None
     quantidade = None
-    concursos = []
+    concursos: List[int] = []
     usar_stdin = False
     for option, arg in opts:
         if option in ("-h", "--help"):
             print(help_msg)
-            return
+            return 0
         elif option in ("-n", "--numeros"):
             numeros = int(arg)
         elif option in ("-q", "--quantidade"):
@@ -227,8 +259,8 @@ def main(argv=sys.argv, cfg_path=None):
                 faixa = arg.split("-")
                 if len(faixa) != 2 or not (faixa[0].isdigit() and faixa[1].isdigit()):
                     return error("ERRO: faixa '%s' inválida" % arg)
-                faixa = list(map(int, faixa))
-                concursos.extend(range(faixa[0], faixa[1] + 1))
+                intervalo = list(map(int, faixa))
+                concursos.extend(range(intervalo[0], intervalo[1] + 1))
             else:
                 concursos.append(-1)
         elif option in ("-i", "--stdin"):
@@ -249,9 +281,9 @@ def main(argv=sys.argv, cfg_path=None):
             if not linha.lstrip().startswith("#"):
                 args.append(linha)
 
-    apostas = []
+    apostas: List[Aposta] = []
     for arg in args:
-        aposta = []
+        aposta = Aposta()
         for n in re.split("[, ]+", arg):
             fx = list(map(int, n.split("-", 1)))
             aposta.extend(range(fx[0], fx[-1] + 1))

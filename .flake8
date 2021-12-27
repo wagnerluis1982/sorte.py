@@ -1,0 +1,24 @@
+[flake8]
+max-line-length = 88
+ban-relative-imports = True
+mypy-init-return = True
+format-greedy = 1
+
+ignore = E501, W503, ANN101, ANN102, FS001
+per-file-ignores =
+    __init__.py:F401
+    tests/basetest.py:ANN002,ANN003,ANN201,ANN204
+    tests/test_*:ANN002,ANN003,ANN201,ANN204
+    tests/**/test_*:ANN002,ANN003,ANN201,ANN204
+exclude =
+    .git
+    __pycache__
+    build
+    dist
+    .venv
+    .tox
+    .pytest_cache
+    .github
+    src/poetry/core/_vendor/*
+    tests/fixtures/*
+    tests/**/fixtures/*

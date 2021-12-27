@@ -3,16 +3,15 @@ import shutil
 import tempfile
 import unittest
 
-# patch para classe de loteria utilizar o servidor interno
-import patchs
+import pytest
 
 from sortepy.loterica import Loteria
 
 
-patchs.loteria_class()
+pytestmark = pytest.mark.v1
 
 
-def tempdir(custom_prefix="sortepy-"):
+def tempdir(custom_prefix: str = "sortepy-"):
     newdir = tempfile.mkdtemp(prefix=custom_prefix)
     atexit.register(shutil.rmtree, newdir)
     return newdir
@@ -83,7 +82,7 @@ class LoteriaTestCase(unittest.TestCase):
             assert resp[i]["acertou"] == self.esperados["acertou"][i]
             assert resp[i]["ganhou"] == self.esperados["ganhou"][i]
 
-    def check_gerar_aposta(self, n):
+    def check_gerar_aposta(self, n: int):
         n = n or self.numeros[0]  # número padrão ou informado
 
         aposta = self.loto.gerar_aposta(n)

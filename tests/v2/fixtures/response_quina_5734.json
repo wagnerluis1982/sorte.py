@@ -1,0 +1,55 @@
+{
+    "tipoJogo": "QUINA",
+    "numero": 5734,
+    "nomeMunicipioUFSorteio": "SÃO PAULO,    SP",
+    "dataApuracao": "18/12/2021",
+    "valorArrecadado": 10846960.00,
+    "valorEstimadoProximoConcurso": 12000000.00,
+    "valorAcumuladoProximoConcurso": 10358517.22,
+    "valorAcumuladoConcursoEspecial": 68252631.10,
+    "valorAcumuladoConcurso_0_5": 10358517.22,
+    "acumulado": true,
+    "indicadorConcursoEspecial": 1,
+    "dezenasSorteadasOrdemSorteio": ["029", "074", "027", "026", "077"],
+    "listaResultadoEquipeEsportiva": null,
+    "numeroJogo": 3,
+    "nomeTimeCoracaoMesSorte": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+    "tipoPublicacao": 3,
+    "observacao": "Acumulado próximo concurso final cinco (5735) R$ 10.358.517,22.",
+    "localSorteio": "ESPAÇO LOTERIAS CAIXA                   ",
+    "dataProximoConcurso": "20/12/2021",
+    "numeroConcursoAnterior": 5733,
+    "numeroConcursoProximo": 5735,
+    "valorTotalPremioFaixaUm": 0,
+    "numeroConcursoFinal_0_5": 5735,
+    "listaMunicipioUFGanhadores": [],
+    "listaRateioPremio": [
+        {
+            "faixa": 1,
+            "numeroDeGanhadores": 0,
+            "valorPremio": 0.00,
+            "descricaoFaixa": "5 acertos"
+        },
+        {
+            "faixa": 2,
+            "numeroDeGanhadores": 61,
+            "valorPremio": 8093.88,
+            "descricaoFaixa": "4 acertos"
+        },
+        {
+            "faixa": 3,
+            "numeroDeGanhadores": 6120,
+            "valorPremio": 76.83,
+            "descricaoFaixa": "3 acertos"
+        },
+        {
+            "faixa": 4,
+            "numeroDeGanhadores": 151744,
+            "valorPremio": 3.09,
+            "descricaoFaixa": "2 acertos"
+        }
+    ],
+    "listaDezenas": ["026", "027", "029", "074", "077"],
+    "listaDezenasSegundoSorteio": null,
+    "id": null
+}

@@ -1,4 +1,9 @@
+import pytest
+
 import basetest
+
+
+pytestmark = pytest.mark.v1
 
 
 class FederalTest(basetest.LoteriaTestCase):

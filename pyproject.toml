@@ -13,7 +13,7 @@ packages = [
     { include = "sortepy", from = "src" }
 ]
 include = [
-    "CHANGELOG.md",
+    { path = "CHANGELOG.md" },
     { path = "tests", format = "sdist" },
 ]
 
@@ -39,10 +39,13 @@ classifiers = [
 "sorte.py" = "sortepy.script:main"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.10"
+requests = "^2.26.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"
+pytest-cov = "^3.0.0"
+pytest-srcpaths = "^1.2.1"
 pre-commit = "^2.15.0"
 
 [build-system]
@@ -51,6 +54,9 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
+pythonpath = [
+    "src",
+]
 testpaths = [
     "tests",
 ]
@@ -67,3 +73,22 @@ known_first_party = "sortepy"
 
 [tool.black]
 line-length = 88
+
+[tool.mypy]
+mypy_path = "src"
+files = "src, tests"
+follow_imports = "silent"
+show_error_codes = true
+explicit_package_bases = true
+namespace_packages = true
+strict_optional = false
+
+[[tool.mypy.overrides]]
+module = [
+    'tests.basetest',
+    'tests.patchs',
+    'tests.fixtures',
+    'tests.test_script',
+    'tests.test_util',
+]
+ignore_errors = true

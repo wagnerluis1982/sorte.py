@@ -1,0 +1,86 @@
+{
+    "tipoJogo": "LOTOFACIL",
+    "numero": 2402,
+    "nomeMunicipioUFSorteio": "SÃO PAULO, SP",
+    "dataApuracao": "20/12/2021",
+    "valorArrecadado": 18576502.50,
+    "valorEstimadoProximoConcurso": 1500000.00,
+    "valorAcumuladoProximoConcurso": 0.00,
+    "valorAcumuladoConcursoEspecial": 32851669.79,
+    "valorAcumuladoConcurso_0_5": 410529.74,
+    "acumulado": false,
+    "indicadorConcursoEspecial": 1,
+    "dezenasSorteadasOrdemSorteio": ["001", "004", "003", "002", "009", "014", "013", "025", "006", "020", "023", "005", "011", "010", "018"],
+    "listaResultadoEquipeEsportiva": null,
+    "numeroJogo": 8,
+    "nomeTimeCoracaoMesSorte": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+    "tipoPublicacao": 3,
+    "observacao": "",
+    "localSorteio": "ESPAÇO LOTERIAS CAIXA                   ",
+    "dataProximoConcurso": "21/12/2021",
+    "numeroConcursoAnterior": 2401,
+    "numeroConcursoProximo": 2403,
+    "valorTotalPremioFaixaUm": 0,
+    "numeroConcursoFinal_0_5": 2410,
+    "listaMunicipioUFGanhadores": [
+        {
+            "posicao": 1,
+            "ganhadores": 1,
+            "municipio": "SERRA",
+            "uf": "ES",
+            "nomeFatansiaUL": "",
+            "serie": ""
+        },
+        {
+            "posicao": 1,
+            "ganhadores": 1,
+            "municipio": "CARAZINHO",
+            "uf": "RS",
+            "nomeFatansiaUL": "",
+            "serie": ""
+        },
+        {
+            "posicao": 1,
+            "ganhadores": 1,
+            "municipio": "CACHOEIRA PAULISTA",
+            "uf": "SP",
+            "nomeFatansiaUL": "",
+            "serie": ""
+        }
+    ],
+    "listaRateioPremio": [
+        {
+            "faixa": 1,
+            "numeroDeGanhadores": 3,
+            "valorPremio": 370337.82,
+            "descricaoFaixa": "15 acertos"
+        },
+        {
+            "faixa": 2,
+            "numeroDeGanhadores": 321,
+            "valorPremio": 1036.73,
+            "descricaoFaixa": "14 acertos"
+        },
+        {
+            "faixa": 3,
+            "numeroDeGanhadores": 13409,
+            "valorPremio": 25.00,
+            "descricaoFaixa": "13 acertos"
+        },
+        {
+            "faixa": 4,
+            "numeroDeGanhadores": 144941,
+            "valorPremio": 10.00,
+            "descricaoFaixa": "12 acertos"
+        },
+        {
+            "faixa": 5,
+            "numeroDeGanhadores": 741668,
+            "valorPremio": 5.00,
+            "descricaoFaixa": "11 acertos"
+        }
+    ],
+    "listaDezenas": ["001", "002", "003", "004", "005", "006", "009", "010", "011", "013", "014", "018", "020", "023", "025"],
+    "listaDezenasSegundoSorteio": null,
+    "id": null
+}

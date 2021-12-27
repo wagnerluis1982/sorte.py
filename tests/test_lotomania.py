@@ -1,6 +1,11 @@
 # encoding=utf8
 
+import pytest
+
 import basetest
+
+
+pytestmark = pytest.mark.v1
 
 
 class LotomaniaTest(basetest.LoteriaTestCase):
